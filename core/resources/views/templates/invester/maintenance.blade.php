@@ -39,5 +39,11 @@
             font-size: 26px;
             color: #e73d3e;
         }
+        h3  {
+            color: #FFFFFF !important;
+        }
+        body {
+            background: #020202 !important;
+        }
     </style>
 @endpush
