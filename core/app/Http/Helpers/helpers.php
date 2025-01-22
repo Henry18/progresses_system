@@ -19,8 +19,8 @@ use Laramin\Utility\VugiChugi;
 
 function systemDetails() {
     $system['name']          = 'hyiplab';
-    $system['version']       = '5.4';
-    $system['build_version'] = '5.1.3';
+    $system['version']       = '5.4.1';
+    $system['build_version'] = '5.1.4';
     $system['h_verifier']    = str_rot13('ivfre_ulvcyno');
     return $system;
 }
