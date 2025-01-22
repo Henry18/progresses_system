@@ -22,7 +22,7 @@
                         </div>
                     </div>
                     <div class="col-xl-1 d-xl-block d-none"></div>
-                    <div class="col-xl-2 col-sm-6">
+                    <div class="col-xl-2 col-sm-6 d-none">
                         <div class="footer-item">
                             <h5 class="footer-item__title">@lang('Site Link')</h5>
                             <ul class="footer-menu">
@@ -35,7 +35,7 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-xl-2 col-sm-6">
+                    <div class="col-xl-2 col-sm-6 d-none">
                         <div class="footer-item">
                             <h5 class="footer-item__title"> @lang('Important Link') </h5>
                             <ul class="footer-menu">
@@ -47,7 +47,7 @@
                         </div>
                     </div>
                     <div class="col-xl-1 d-xl-block d-none"></div>
-                    <div class="col-xl-3 col-sm-6">
+                    <div class="col-xl-3 col-sm-6 d-none">
                         <div class="footer-item">
                             <h5 class="footer-item__title">@lang('Contact Info')</h5>
                             <ul class="footer-contact-menu">

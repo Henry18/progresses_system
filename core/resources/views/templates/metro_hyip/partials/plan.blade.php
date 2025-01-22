@@ -61,7 +61,7 @@
                         </li>
                     @endif
                 </ul>
-                <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#investModal" data-plan="{{ $data }}" class="btn btn--base pill outline investModal">@lang('Invest Now')</a>
+                <!--<a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#investModal" data-plan="{{ $data }}" class="btn btn--base pill outline investModal">@lang('Invest Now')</a>-->
             </div>
         </div>
     </div>

@@ -10,7 +10,7 @@
                     <li class="nav-item">
                         <a class="nav-link {{ menuActive('home') }}" href="{{ route('home') }}">@lang('Home')</a>
                     </li>
-                    @php
+                    <!--@php
                         $pages = App\Models\Page::where('tempname', $activeTemplate)->where('is_default', 0)->get();
                     @endphp
                     @foreach ($pages as $data)
@@ -25,12 +25,12 @@
                     <li class="nav-item">
                         <a class="nav-link {{ menuActive('contact') }}" href="{{ route('contact') }}">@lang('Contact')</a>
                     </li>
-                    <!-- languages -->
+                     languages -->
                     @if (gs('multi_language'))
                         @include($activeTemplate . 'partials.language')
                     @endif
                 </ul>
-                <ul class="login-registration-list d-flex flex-wrap align-items-center">
+                <!--<ul class="login-registration-list d-flex flex-wrap align-items-center">
                     @auth
                         <li class="login-registration-list__item"><a href="{{ route('user.home') }}" class="login-registration-list__link btn btn--base btn--sm"> @lang('Dashboard')</a></li>
                         <li class="login-registration-list__item"><a href="{{ route('user.logout') }}" class="login-registration-list__link btn btn--base btn--sm"> @lang('Logout')</a></li>
@@ -38,7 +38,7 @@
                         <li class="login-registration-list__item"><a href="{{ route('user.register') }}" class="login-registration-list__link btn btn--base btn--sm"> @lang('Register')</a></li>
                         <li class="login-registration-list__item"><a href="{{ route('user.login') }}" class="login-registration-list__link btn btn--base btn--sm"> @lang('Login')</a></li>
                     @endauth
-                </ul>
+                </ul>-->
             </div>
         </nav>
     </div>
