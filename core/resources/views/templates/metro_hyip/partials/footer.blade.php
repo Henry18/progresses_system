@@ -22,10 +22,10 @@
                         </div>
                     </div>
                     <div class="col-xl-1 d-xl-block d-none"></div>
-                    <div class="col-xl-2 col-sm-6 d-none">
+                    <div class="col-xl-2 col-sm-6 ">
                         <div class="footer-item">
                             <h5 class="footer-item__title">@lang('Site Link')</h5>
-                            <ul class="footer-menu">
+                            <ul class="footer-menu d-none">
                                 <li class="footer-menu__item"><a href="{{ route('home') }}" class="footer-menu__link">@lang('Home')</a>
                                 </li>
                                 @foreach ($policies as $policy)
@@ -35,10 +35,10 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-xl-2 col-sm-6 d-none">
+                    <div class="col-xl-2 col-sm-6">
                         <div class="footer-item">
                             <h5 class="footer-item__title"> @lang('Important Link') </h5>
-                            <ul class="footer-menu">
+                            <ul class="footer-menu d-none">
                                 <li class="footer-menu__item"><a href="{{ route('plan') }}" class="footer-menu__link"> @lang('Plan')</a></li>
                                 <li class="footer-menu__item"><a href="{{ route('blogs') }}" class="footer-menu__link">@lang('Blog')
                                     </a></li>
@@ -46,8 +46,8 @@
                             </ul>
                         </div>
                     </div>
-                    <div class="col-xl-1 d-xl-block d-none"></div>
-                    <div class="col-xl-3 col-sm-6 d-none">
+                    <div class="col-xl-1 d-xl-block"></div>
+                    <div class="col-xl-3 col-sm-6">
                         <div class="footer-item">
                             <h5 class="footer-item__title">@lang('Contact Info')</h5>
                             <ul class="footer-contact-menu">

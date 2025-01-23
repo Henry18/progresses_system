@@ -6,6 +6,7 @@
         "name": "Banner Content",
         "content": {
             "heading": "text",
+            "sub_heading": "text",
             "button_name": "text",
             "button_link": "text",
             "button_two_name": "text",
@@ -25,10 +26,12 @@
             "heading": "text",
             "sub_heading": "text",
             "content": "textarea", 
+            "label_point_one": "text",
             "point_one": "text",
+            "label_point_two": "text",
             "point_two": "text",
-            "point_three": "text",
-            "point_four": "text"
+            "label_point_three": "text",
+            "point_three": "text"
         }
     },
 
@@ -51,7 +54,24 @@
                 }
             },
             "heading": "text",
-            "sub_heading": "text"
+            "sub_heading": "text", 
+            "url": "text"
+        },
+        "element": {
+            "icon": "icon",
+            "title": "text",
+            "content": "textarea",
+            "modal": true
+        }
+    },
+    "filosofia": {
+        "builder": true,
+        "name": "filosofia",
+        "content": {
+            "heading": "text",
+            "sub_heading": "text",
+            "url_video": "text"
+            
         },
         "element": {
             "icon": "icon",
@@ -67,6 +87,13 @@
         "name": "Profit Calculator",
         "content": {
             "heading": "text"
+        }
+    },
+    "custom_code": {
+        "builder": true,
+        "name": "custom code",
+        "content": {
+            "heading": "textarea-nic"
         }
     },
 

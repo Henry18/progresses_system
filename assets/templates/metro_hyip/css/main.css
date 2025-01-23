@@ -5402,7 +5402,7 @@ select option {
 }
 
 .about-content__item {
-    display: flex;
+    display: flow;
     color: hsl(var(--white)/0.8);
     margin-bottom: 15px;
     font-weight: 400;
