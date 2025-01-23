@@ -40,6 +40,7 @@
         <div class="col-xl-5 col-md-7">
             <div class="banner-content">
                 <h2 class="banner-content__title">  {{ __(@$banner->data_values->heading) }}</h2>
+                <p>{{ __(@$banner->data_values->sub_heading) }}</p>
                 <!--<div class="banner-content__buttons">
                     <a href="{{ @$banner->data_values->button_link }}" class="btn btn--base">
                         {{ __(@$banner->data_values->button_name) }}</a>
