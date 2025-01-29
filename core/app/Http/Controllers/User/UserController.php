@@ -314,6 +314,11 @@ class UserController extends Controller
         return view('Template::user.referrals', compact('pageTitle', 'user', 'maxLevel'));
     }
 
+    public function tokenGrafica()
+    {
+        $pageTitle    = 'Grafica Token';
+        return view('Template::user.token_grafica', compact('pageTitle'));
+    }
     public function promotionalBanners()
     {
         $promotionCount = PromotionTool::count();

@@ -97,7 +97,22 @@
                 </ul>
             </div>
         </li>
-
+        <li class="sidebar-menu-list__item has-dropdown">
+            <a href="javascript:void(0)" class="sidebar-menu-list__link">
+                <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
+                <span class="text">Token</span>
+            </a>
+            <div class="sidebar-submenu {{ menuActive(['user.token', 'user.token.grafica']) }}">
+                <ul class="sidebar-submenu-list">
+                    <li class="sidebar-submenu-list__item  {{ menuActive('user.token.grafica') }}">
+                        <a href="{{ route('user.token.grafica') }}" class="sidebar-submenu-list__link">Grafica</a>
+                    </li>
+                    <li class="sidebar-submenu-list__item ">
+                        <a target="_blank" href="https://pancakeswap.finance/?inputCurrency=0x55d398326f99059fF775485246999027B3197955&outputCurrency=0x2e954e60ea4125EfaBda0F0bdedF1a68d6040E23" class="sidebar-submenu-list__link">Comprar Token</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
         @if (gs('b_transfer'))
             <li class="sidebar-menu-list__item {{ menuActive('user.transfer.balance') }}">
                 <a href="{{ route('user.transfer.balance') }}" class="sidebar-menu-list__link">
