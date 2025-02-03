@@ -18,6 +18,8 @@
                                     <th>@lang('Time')</th>
                                     <th>@lang('Featured')</th>
                                     <th>@lang('Status')</th>
+                                    <th>@lang('Testing')</th>
+                                    <th>@lang('Days to init')</th>
                                     <th>@lang('Action')</th>
                                 </tr>
                             </thead>
@@ -54,6 +56,16 @@
                                             @else
                                                 <span class="badge badge--warning">@lang('Inactive')</span>
                                             @endif
+                                        </td>
+                                        <td>
+                                            @if ($plan->testing == 1)
+                                                <span class="badge badge--success">@lang('Yes')</span>
+                                            @else
+                                                <span class="badge badge--warning">@lang('No')</span>
+                                            @endif
+                                        </td>                                        
+                                        <td>
+                                            {{ $plan->days_to_init }}
                                         </td>
                                         <td>
                                             <button class="btn btn-sm btn-outline--primary modalShow me-2" data-type="edit" data-bs-toggle="modal" data-bs-target="#editModal" data-resource="{{ $plan }}" data-action="{{ route('admin.plan.update', $plan->id) }}"><i class="las la-pen"></i>@lang('Edit')</button>
@@ -94,6 +106,12 @@
                                 <div class="form-group">
                                     <label>@lang('Name')</label>
                                     <input type="text" class="form-control" name="name" required>
+                                </div>
+                            </div>                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@lang('Days to init')</label>
+                                    <input type="number" class="form-control" name="days_to_init" min="1" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -162,6 +180,12 @@
                                     <label for="">@lang('Hold Capital') <i class="las la-info-circle" title="@lang('Investor\'s investment capital will be hold after completing the invest. Investors will be able to reinvest or withdraw the capital.')"></i></label>
                                     <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="hold_capital">
                                 </div>
+                            </div>                            
+                            <div class="col-md-6 col-lg-6">
+                                <div class="form-group">
+                                    <label for="">Prueba</label>
+                                    <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="testing">
+                                </div>
                             </div>
                             <div class="col-md-6 col-lg-6">
                                 <div class="form-group">
@@ -196,6 +220,12 @@
                                 <div class="form-group">
                                     <label>@lang('Name')</label>
                                     <input type="text" class="form-control" name="name" required>
+                                </div>
+                            </div>                      
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>@lang('Days to init')</label>
+                                    <input type="number" class="form-control" name="days_to_init" min="1" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -262,6 +292,12 @@
                                 <div class="form-group">
                                     <label for="">@lang('Hold Capital') <i class="las la-info-circle" title="@lang('Investor\'s investment capital will be hold after completing the invest. Investors will be able to reinvest or withdraw the capital.')"></i></label>
                                     <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="hold_capital">
+                                </div>
+                            </div>                      
+                            <div class="col-md-6 col-lg-6">
+                                <div class="form-group">
+                                    <label for="">@lang('Testing')</label>
+                                    <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="testing">
                                 </div>
                             </div>
                             <div class="col-md-6 col-lg-6">
@@ -375,6 +411,12 @@
                         } else {
                             this.modal.find('[name=featured]').bootstrapToggle('off');
                         }
+                        
+                        if (this.resource.testing) {
+                            this.modal.find('[name=testing]').bootstrapToggle('on');
+                        } else {
+                            this.modal.find('[name=testing]').bootstrapToggle('off');
+                        }
                     }
                 }
 
@@ -463,6 +505,7 @@
                     var resource = this.resource;
                     if (resource) {
                         modal.find('[name=name]').val(resource.name);
+                        modal.find('[name=days_to_init]').val(resource.days_to_init);
                         modal.find('[name=minimum]').val(parseFloat(resource.minimum).toFixed(2));
                         modal.find('[name=maximum]').val(parseFloat(resource.maximum).toFixed(2));
                         modal.find('[name=amount]').val(parseFloat(resource.fixed_amount).toFixed(2));

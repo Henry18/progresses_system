@@ -100,7 +100,7 @@
         <li class="sidebar-menu-list__item has-dropdown">
             <a href="javascript:void(0)" class="sidebar-menu-list__link">
                 <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
-                <span class="text">Token</span>
+                <span class="text">@lang('Token')</span>
             </a>
             <div class="sidebar-submenu {{ menuActive(['user.token', 'user.token.grafica']) }}">
                 <ul class="sidebar-submenu-list">
