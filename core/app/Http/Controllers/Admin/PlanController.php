@@ -58,6 +58,8 @@ class PlanController extends Controller
         $plan->compound_interest = $request->compound_interest ? Status::YES : Status::NO;
         $plan->hold_capital      = $request->hold_capital ? Status::YES : Status::NO;
         $plan->featured          = $request->featured ? Status::YES : Status::NO;
+        $plan->testing          = $request->testing ? Status::YES : Status::NO;
+        $plan->days_to_init     = $request->days_to_init ?? 1;
         $plan->save();
     }
 

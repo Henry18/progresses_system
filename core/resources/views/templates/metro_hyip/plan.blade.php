@@ -1,3 +1,13 @@
+@php
+    $planContent = getContent('plan.content', true);
+    $plans = App\Models\Plan::with('timeSetting')
+        ->whereHas('timeSetting', function ($time) {
+            $time->where('status', 1);
+        })
+        ->where('status', 1)
+        ->where('testing', 0)
+        ->get();
+@endphp
 @extends($activeTemplate . 'layouts.' . $layout)
 @section('content')
     <section class="@if($layout == 'frontend') pt-120 pb-120 @else pt-4 pb-60 @endif">

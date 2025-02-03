@@ -5,6 +5,7 @@
             $time->where('status', 1);
         })
         ->where('status', 1)
+        ->where('testing', 0)
         ->orderBy('id', 'desc')
         ->with('timeSetting')
         ->get();
