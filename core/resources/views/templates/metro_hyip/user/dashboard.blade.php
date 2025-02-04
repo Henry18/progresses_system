@@ -126,7 +126,87 @@
 
             </div>
         </div>
-
+        <div class="row justify-content-center">
+                <div class="col-lg-12 mt-lg-0 mt-5">
+                    <div class="row mb-none-30">
+                        <div class="col-xl-4 col-sm-6 mb-30">
+                            <div class="d-widget d-flex justify-content-between gap-5">
+                                <div class="left-content">
+                                    <span class="caption">@lang('Deposit Wallet Balance')</span>
+                                    <h4 class="currency-amount">{{ showAmount($user->deposit_wallet) }}</h4>
+                                </div>
+                                <div class="icon ms-auto">
+                                    <i class="las la-dollar-sign"></i>
+                                </div>
+                            </div><!-- d-widget-two end -->
+                        </div>
+                        <div class="col-xl-4 col-sm-6 mb-30">
+                            <div class="d-widget d-flex justify-content-between gap-5">
+                                <div class="left-content">
+                                    <span class="caption">@lang('Interest Wallet Balance')</span>
+                                    <h4 class="currency-amount">
+                                        {{ showAmount($user->interest_wallet) }}</h4>
+                                </div>
+                                <div class="icon ms-auto">
+                                    <i class="las la-wallet"></i>
+                                </div>
+                            </div><!-- d-widget-two end -->
+                        </div>
+                        <div class="col-xl-4 col-sm-6 mb-30">
+                            <div class="d-widget d-flex justify-content-between gap-5">
+                                <div class="left-content">
+                                    <span class="caption">@lang('Total Invest')</span>
+                                    <h4 class="currency-amount">
+                                        {{ showAmount($totalInvest) }}
+                                    </h4>
+                                </div>
+                                <div class="icon ms-auto">
+                                    <i class="las la-cubes "></i>
+                                </div>
+                            </div><!-- d-widget-two end -->
+                        </div>
+                        <div class="col-xl-4 col-sm-6 mb-30">
+                            <div class="d-widget d-flex justify-content-between gap-5">
+                                <div class="left-content">
+                                    <span class="caption">@lang('Total Deposit')</span>
+                                    <h4 class="currency-amount">
+                                        {{ showAmount($totalDeposit) }}
+                                    </h4>
+                                </div>
+                                <div class="icon ms-auto">
+                                    <i class="las la-credit-card"></i>
+                                </div>
+                            </div><!-- d-widget-two end -->
+                        </div>
+                        <div class="col-xl-4 col-sm-6 mb-30">
+                            <div class="d-widget d-flex justify-content-between gap-5">
+                                <div class="left-content">
+                                    <span class="caption">@lang('Total Withdraw')</span>
+                                    <h4 class="currency-amount">
+                                        {{ showAmount($totalWithdraw) }}
+                                    </h4>
+                                </div>
+                                <div class="icon ms-auto">
+                                    <i class="las la-cloud-download-alt"></i>
+                                </div>
+                            </div><!-- d-widget-two end -->
+                        </div>
+                        <div class="col-xl-4 col-sm-6 mb-30">
+                            <div class="d-widget d-flex justify-content-between gap-5">
+                                <div class="left-content">
+                                    <span class="caption">@lang('Referral Earnings')</span>
+                                    <h4 class="currency-amount">
+                                        {{ showAmount($referralEarnings) }}
+                                    </h4>
+                                </div>
+                                <div class="icon ms-auto">
+                                    <i class="las la-user-friends"></i>
+                                </div>
+                            </div><!-- d-widget-two end -->
+                        </div>
+                    </div><!-- row end -->
+                </div>
+            </div>
         <div class="row gy-4 justify-content-center">
             <div class="col-xxl-4 col-xl-6 col-sm-6">
                 <div class="dashboard-card">
