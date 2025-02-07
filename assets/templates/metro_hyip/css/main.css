@@ -7686,4 +7686,29 @@ select option {
 .mb-30 {
     margin-bottom: 30px;
 }
+.accordion-item {
+    background-color: #ffffff00;
+}
+.accordion-item {
+    color: #ffffff;
+    border: none !important;
+}
+.accordion-body {
+    padding: 0;
+}
+.accordion {
+--bs-accordion-border-color: none;
+}
+.accordion {
+    --bs-accordion-color: #ffffff;
+    --bs-accordion-bg: #141443;
+    --bs-accordion-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
+    --bs-accordion-border-color: #ffffff;
+    --bs-accordion-btn-color: #ffffff;
+    --bs-accordion-active-color: #ffffff;
+    --bs-accordion-active-bg: #3703b0;
+}
+.accordion-item:first-of-type, .accordion-item:last-of-type .accordion-button.collapsed{
+    border: none;
+}
 /* dashboard section css end */

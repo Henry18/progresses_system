@@ -303,7 +303,7 @@ class HyipLab
         $transaction->trx          = getTrx();
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'capital_return';
-        $transaction->details      = showAmount($invest->amount) . ' ' . gs()->cur_text . ' capital back from ' . @$invest->plan->name;
+        $transaction->details      = showAmount($invest->amount) . ' ' . gs()->cur_text . '' . @$invest->plan->name;
         $transaction->save();
     }
 }

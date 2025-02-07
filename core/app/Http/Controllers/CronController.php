@@ -118,7 +118,7 @@ class CronController extends Controller
                 $transaction->trx          = $trx;
                 $transaction->remark       = 'interest';
                 $transaction->wallet_type  = 'interest_wallet';
-                $transaction->details      = showAmount($invest->interest) . ' interest from ' . @$invest->plan->name;
+                $transaction->details      = showAmount($invest->interest) . '' . @$invest->plan->name;
                 $transaction->save();
 
                 // Give Referral Commission if Enabled
@@ -158,7 +158,7 @@ class CronController extends Controller
                     $transaction->post_balance = $user->interest_wallet;
                     $transaction->charge       = 0;
                     $transaction->trx_type     = '-';
-                    $transaction->details      = 'Invested Compound on ' . $invest->plan->name;
+                    $transaction->details      = '' . $invest->plan->name;
                     $transaction->trx          = $trx;
                     $transaction->wallet_type  = 'interest_wallet';
                     $transaction->remark       = 'invest_compound';
