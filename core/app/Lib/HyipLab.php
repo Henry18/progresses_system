@@ -102,6 +102,10 @@ class HyipLab
         $invest->initial_amount     = $amount;
         $invest->interest           = $interestAmount;
         $invest->initial_interest   = $interestAmount;
+        $invest->interest_rate      = $plan->interest;
+        $invest->mon_interest_rate  = $plan->interest/21;
+        $invest->period_return_capital = $period - $plan->capital_months_return;
+        $invest->mon_return_amount  = $amount / ($period - $plan->capital_months_return);
         $invest->period             = $period;
         $invest->time_name          = $plan->timeSetting->name;
         $invest->hours              = $plan->timeSetting->time;

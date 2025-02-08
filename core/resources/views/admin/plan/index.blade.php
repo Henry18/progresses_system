@@ -63,7 +63,7 @@
                                             @else
                                                 <span class="badge badge--warning">@lang('No')</span>
                                             @endif
-                                        </td>                                        
+                                        </td>
                                         <td>
                                             {{ $plan->days_to_init }}
                                         </td>
@@ -107,7 +107,7 @@
                                     <label>@lang('Name')</label>
                                     <input type="text" class="form-control" name="name" required>
                                 </div>
-                            </div>                            
+                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>@lang('Days to init')</label>
@@ -148,7 +148,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>@lang('Time')</label>
+                                    <label>@lang('Frequency of pay')</label>
                                     <select name="time" class="form-control" required>
                                         <option value="">@lang('Select One')</option>
                                         @foreach ($times as $time)
@@ -161,8 +161,8 @@
                                 <div class="form-group">
                                     <label>@lang('Return type')</label>
                                     <select name="return_type" class="form-control" required>
-                                        <option value="1">@lang('Lifetime')</option>
                                         <option value="0">@lang('Repeat')</option>
+                                        <option value="1">@lang('Lifetime')</option>
                                     </select>
                                 </div>
                             </div>
@@ -180,7 +180,7 @@
                                     <label for="">@lang('Hold Capital') <i class="las la-info-circle" title="@lang('Investor\'s investment capital will be hold after completing the invest. Investors will be able to reinvest or withdraw the capital.')"></i></label>
                                     <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="hold_capital">
                                 </div>
-                            </div>                            
+                            </div>
                             <div class="col-md-6 col-lg-6">
                                 <div class="form-group">
                                     <label for="">Prueba</label>
@@ -221,7 +221,7 @@
                                     <label>@lang('Name')</label>
                                     <input type="text" class="form-control" name="name" required>
                                 </div>
-                            </div>                      
+                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>@lang('Days to init')</label>
@@ -262,7 +262,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label>@lang('Time')</label>
+                                    <label>@lang('Frequency of pay')</label>
                                     <select name="time" class="form-control" required>
                                         @foreach ($times as $time)
                                             <option value="{{ $time->id }}">{{ __($time->name) }}</option>
@@ -274,8 +274,8 @@
                                 <div class="form-group">
                                     <label>@lang('Return type')</label>
                                     <select name="return_type" class="form-control" required>
-                                        <option value="1">@lang('Lifetime')</option>
                                         <option value="0">@lang('Repeat')</option>
+                                        <option value="1">@lang('Lifetime')</option>
                                     </select>
                                 </div>
                             </div>
@@ -293,7 +293,7 @@
                                     <label for="">@lang('Hold Capital') <i class="las la-info-circle" title="@lang('Investor\'s investment capital will be hold after completing the invest. Investors will be able to reinvest or withdraw the capital.')"></i></label>
                                     <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="hold_capital">
                                 </div>
-                            </div>                      
+                            </div>
                             <div class="col-md-6 col-lg-6">
                                 <div class="form-group">
                                     <label for="">@lang('Testing')</label>
@@ -411,7 +411,7 @@
                         } else {
                             this.modal.find('[name=featured]').bootstrapToggle('off');
                         }
-                        
+
                         if (this.resource.testing) {
                             this.modal.find('[name=testing]').bootstrapToggle('on');
                         } else {
@@ -474,7 +474,7 @@
                         var html = `
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label class="required">@lang('Repeat Times')</label>
+                                    <label class="required">@lang('Total Months')</label>
                                     <div class="input-group">
                                         <input type="number" class="form-control" name="repeat_time" required>
                                     </div>
@@ -489,12 +489,21 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="required">@lang('Months back capital') <i class="las la-info-circle" title="@lang('Time that must pass before starting to repay the capital.')"></i></label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="capital_months_return" min="1" required>
+                                    </div>
+                                </div>
+                            </div>
                         `;
                     }
                     this.modal.find('.repeat-time').html(html);
                     if (resource) {
                         this.modal.find('[name=repeat_time]').val(resource.repeat_time);
                         this.modal.find('[name=capital_back]').val(resource.capital_back);
+                        this.modal.find('[name=capital_months_return]').val(resource.capital_months_return);
                     }
 
                     this.holdCapitalView();
@@ -503,6 +512,7 @@
                 setupEditModal() {
                     var modal = this.modal;
                     var resource = this.resource;
+
                     if (resource) {
                         modal.find('[name=name]').val(resource.name);
                         modal.find('[name=days_to_init]').val(resource.days_to_init);
@@ -514,6 +524,7 @@
                         modal.find('[name=repeat_time]').val(resource.repeat_time);
                         modal.find('[name=capital_back]').val(resource.capital_back);
                         modal.find('[name=return_type]').val(resource.lifetime);
+                        modal.find('[name=capital_months_return]').val(resource.capital_months_return);
                         modal.find('form').attr('action', this.btn.data('action'));
                     }
                 }

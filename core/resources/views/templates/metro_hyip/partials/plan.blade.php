@@ -13,7 +13,7 @@
                 <div class="plan-item__info">
                     <h5 class="plan-item__time">
                         @if ($data->lifetime == 0)
-                            {{ __($data->repeat_time) }} {{ __($data->timeSetting->name) }}
+                            {{ __($data->repeat_time) }} Meses
                         @else
                             @lang('Lifetime')
                         @endif
@@ -28,7 +28,7 @@
                     </div>
                 </div>
                 <ul class="plan-item__list">
-                <li class="plan-item__list-inner">@lang('Days to init')
+                    <li class="plan-item__list-inner">@lang('Days to init')
                         {{ $data->days_to_init }}
                     </li>
                     <li class="plan-item__list-inner">@lang('Return')
@@ -36,7 +36,7 @@
                     </li>
                     <li class="plan-item__list-inner">
                         @if ($data->lifetime == 0)
-                            {{ __($data->repeat_time) }} {{ __($data->timeSetting->name) }}
+                            {{ __($data->repeat_time) }} Meses
                         @else
                             @lang('Lifetime')
                         @endif
@@ -133,12 +133,22 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-6 return_capital">
+                                <div class="form-group">
+                                    <div class="form-group">
+                                        <label for="">@lang('Capital back') </label>
+                                        <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="hold_capital">
+                                    </div>
+                                </div>
+                            </div>
+
+
                             <div class="col-md-6 compoundInterest">
                                 <div class="form-group">
                                     <label>@lang('Compound Interest') (@lang('optional'))</label>
                                     <div class="input-group">
                                         <input type="number" min="0" class="form--control form-control" name="compound_interest">
-                                        
+
                                         <div class="input-group-text bg--base">@lang('Times')</div>
                                     </div>
                                     <small class="fst-italic text--info"><i class="las la-info-circle"></i> @lang('Your interest will add to the investment capital amount for a specific time that you\'re entering.')</small>
@@ -229,6 +239,12 @@
                     modal.find('[name=amount]').removeAttr('readonly');
                 }
 
+                if(plan.capital_back == 1){
+                    $('.return_capital').show();
+                }else{
+                    $('.return_capital').hide();
+                }
+
                 if (plan.interest_type == '1') {
                     modal.find('.interestDetails').html(
                         `<strong> Interest: ${interestAmount}% </strong>`);
@@ -239,7 +255,7 @@
 
                 if (plan.lifetime == '0') {
                     modal.find('.interestValidity').html(
-                        `<strong>  Per ${plan.time_setting.time} hours ,  ${plan.repeat_time} times</strong>`
+                        `<strong>  Paga cada ${plan.time_setting.time} horas ,  ${plan.repeat_time} meses</strong>`
                     );
                 } else {
                     modal.find('.interestValidity').html(
@@ -303,8 +319,14 @@
                 calculateInterest();
             })
 
+            $('[name=hold_capital]').on('change', function() {
+                calculateInterest();
+            })
+
 
             function calculateInterest() {
+                console.log(plan);
+
                 let interest = parseFloat(plan.interest);
                 let interestType = plan.interest_type; //1: percent, 0: fixed
                 let repeatTime = plan.repeat_time;
@@ -313,6 +335,10 @@
                 let compoundInterest = $('[name=compound_interest]').val() ?? 0;
                 let calculatedInterest = 0;
                 let baseInterest = 0;
+                let selectBackCapital = $('[name=hold_capital]').is(':checked');
+                let monthDays = 21;
+                let dailyPercent = interest / monthDays;
+                let monthsReturnCapital = plan.capital_months_return;
 
                 if (repeatTime == 0 || investAmount == 0) {
                     $('.calculatedInterest').hide();
@@ -332,6 +358,18 @@
                     } else {
                         totalInterest = interest * investAmount / 100 * repeatTime;
                     }
+                }
+
+                if (selectBackCapital) {
+                    let tempTotalTime = repeatTime - monthsReturnCapital;
+                    let tempCapital = investAmount * interest / 100 * monthsReturnCapital;
+                    let tempReturn = investAmount / tempTotalTime;
+                    let acum = investAmount;
+                    for (let i = 0; i < tempTotalTime; i++) {
+                        tempCapital += acum * interest / 100;
+                        acum = acum - tempReturn;
+                    }
+                    totalInterest = tempCapital;
                 }
 
                 totalInterest = capitalBack ? totalInterest : totalInterest - investAmount;

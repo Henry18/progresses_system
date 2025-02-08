@@ -60,6 +60,7 @@ class PlanController extends Controller
         $plan->featured          = $request->featured ? Status::YES : Status::NO;
         $plan->testing          = $request->testing ? Status::YES : Status::NO;
         $plan->days_to_init     = $request->days_to_init ?? 1;
+        $plan->capital_months_return = $request->capital_months_return ?? 0;
         $plan->save();
     }
 

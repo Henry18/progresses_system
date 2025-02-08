@@ -47,7 +47,7 @@ class CronController extends Controller
             } else {
                 try {
                     CurlRequest::curlContent($cron->url);
-                    
+
                 } catch (\Exception $e) {
                     $cronLog->error = $e->getMessage();
                 }
@@ -95,7 +95,8 @@ class CronController extends Controller
                 $user = $invest->user;
 
                 $invest->return_rec_time += 1;
-                $invest->paid += $invest->interest;
+                //$invest->paid += $invest->interest;
+                $invest->paid += $invest->amount * ($invest->mon_interest_rate/100);
                 $invest->should_pay -= $invest->period > 0 ? $invest->interest : 0;
                 $invest->next_time = $next;
                 $invest->last_time = $now;
