@@ -89,11 +89,29 @@
             "heading": "text"
         }
     },
-    "custom_code": {
+    "inversiones": {
         "builder": true,
-        "name": "custom code",
+        "name": "inversiones",
         "content": {
-            "heading": "textarea-nic"
+            "images": {
+                "image1": {
+                    "size": "600x580"
+                },
+                "image2": {
+                    "size": "600x580"
+                },
+                "image3": {
+                    "size": "600x580"
+                }
+            },
+            "heading": "text",
+            "sub_heading": "text",
+            "label_point_one": "text",
+            "sub_label_point_one": "text",
+            "label_point_two": "text",
+            "sub_label_point_two": "text",
+            "label_point_three": "text",
+            "sub_label_point_three": "text"
         }
     },
 
