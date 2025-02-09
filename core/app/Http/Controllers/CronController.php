@@ -182,7 +182,7 @@ class CronController extends Controller
                     $transaction->post_balance = $user->interest_wallet;
                     $transaction->charge       = 0;
                     $transaction->trx_type     = '+';
-                    $transaction->details      = '' . $invest->plan->name;
+                    $transaction->details      = 'Retorno fraccionado de capital ' . $invest->plan->name;
                     $transaction->trx          = $trx;
                     $transaction->wallet_type  = 'interest_wallet';
                     $transaction->remark       = 'return_fractional_capital';
