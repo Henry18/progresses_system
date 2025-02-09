@@ -37,14 +37,14 @@
                     <tr>
                         <td>{{ __($invest->plan->name) }} <br> {{ showAmount($invest->amount) }} </td>
                         <td>
-                            {{ showAmount($invest->interest) }} @lang('every') {{ $invest->time_name }}
+                            {{ showAmount($invest->amount*($invest->mon_interest_rate/100)) }} @lang('every') @lang('Day')
                             <br>
                             @lang('for')
                             @if ($invest->period == '-1')
                                 @lang('Lifetime')
                             @else
                                 {{ $invest->period }}
-                                {{ $invest->time_name }}
+                                @lang('Months')
                             @endif
                             @if ($invest->capital_status == '1')
                                 + @lang('Capital')
@@ -54,7 +54,7 @@
                             @if ($invest->compound_times)
                                 {{ $invest->return_rec_time }} @lang('times') | {{ showAmount($invest->paid) }}
                             @else
-                                {{ $invest->return_rec_time }}x{{ showAmount($invest->interest) }} = {{ showAmount($invest->paid) }}
+                                {{ $invest->return_rec_time }}x{{ showAmount($invest->amount*($invest->mon_interest_rate/100)) }} = {{ showAmount($invest->paid) }}
                             @endif
                         </td>
 

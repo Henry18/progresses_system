@@ -5,7 +5,7 @@
                 <p class="return-title" data-bs-toggle="tooltip" data-bs-placement="top" title="@lang('Return On Invest')">
                     @lang('ROI')</p>
                 <span class="plan-item__title">
-                    {{ showAmount($data->interest, currencyFormat:false) }}{{ $data->interest_type == 1 ? '%' : ' ' . __(gs('cur_text')) }}
+                    {{ showAmount($data->interest, currencyFormat:false) }}{{ $data->interest_type == 1 ? '% ' : ' ' . __(gs('cur_text')) }}
                 </span>
                 <h4 class="plan-item__name"> {{ __($data->name) }} </h4>
             </div>
@@ -32,7 +32,7 @@
                         {{ $data->days_to_init }}
                     </li>
                     <li class="plan-item__list-inner">@lang('Return')
-                        {{ showAmount($data->interest, currencyFormat:false) }}{{ $data->interest_type == 1 ? '%' : ' ' . __(gs('cur_text')) }}
+                        {{ showAmount($data->interest, currencyFormat:false) }}{{ $data->interest_type == 1 ? '% ' : ' ' . __(gs('cur_text')) }} @lang('monthly')
                     </li>
                     <li class="plan-item__list-inner">
                         @if ($data->lifetime == 0)
@@ -106,9 +106,6 @@
                                         <option value="">@lang('Select One')</option>
                                         @if (auth()->user()->deposit_wallet > 0)
                                             <option value="deposit_wallet">@lang('Deposit Wallet - ' . showAmount(auth()->user()->deposit_wallet))</option>
-                                        @endif
-                                        @if (auth()->user()->interest_wallet > 0)
-                                            <option value="interest_wallet">@lang('Interest Wallet -' . showAmount(auth()->user()->interest_wallet))</option>
                                         @endif
                                         @foreach ($gatewayCurrency as $data)
                                             <option value="{{ $data->id }}" @selected(old('wallet_type') == $data->method_code) data-gateway="{{ $data }}">{{ $data->name }}</option>
@@ -247,7 +244,7 @@
 
                 if (plan.interest_type == '1') {
                     modal.find('.interestDetails').html(
-                        `<strong> Interest: ${interestAmount}% </strong>`);
+                        `<strong> Interest: ${interestAmount}% / @lang('monthly') </strong>`);
                 } else {
                     modal.find('.interestDetails').html(
                         `<strong> Interest: ${interestAmount} ${currency}  </strong>`);
@@ -325,8 +322,6 @@
 
 
             function calculateInterest() {
-                console.log(plan);
-
                 let interest = parseFloat(plan.interest);
                 let interestType = plan.interest_type; //1: percent, 0: fixed
                 let repeatTime = plan.repeat_time;

@@ -56,7 +56,7 @@ class HyipLab
      * @param string $wallet
      * @return void
      */
-    public function invest($amount, $wallet, $compoundTimes = 0)
+    public function invest($amount, $wallet, $compoundTimes = 0, $fractional_capital = 0)
     {
         $plan = $this->plan;
         $user = $this->user;
@@ -118,6 +118,7 @@ class HyipLab
         $invest->compound_times     = $compoundTimes ?? 0;
         $invest->rem_compound_times = $compoundTimes ?? 0;
         $invest->hold_capital       = $plan->hold_capital;
+        $invest->fractional_capital = $fractional_capital;
         $invest->save();
 
         if ($this->setting->invest_commission == 1) {
@@ -177,6 +178,22 @@ class HyipLab
         $hours = (int) $hours;
         while (0 == 0) {
             $nextPossible = Carbon::parse($now)->addHours($hours)->toDateTimeString();
+
+            if (!self::isHoliDay($nextPossible, $setting)) {
+                $next = $nextPossible;
+                break;
+            }
+            $now = $now->addDay();
+        }
+        return $next;
+    }
+
+    public static function nextWorkingMinute($minutes) {
+        $now     = now();
+        $setting = gs();
+        $minutes = (int) $minutes;
+        while (0 == 0) {
+            $nextPossible = Carbon::parse($now)->addMinutes($minutes)->toDateTimeString();
 
             if (!self::isHoliDay($nextPossible, $setting)) {
                 $next = $nextPossible;

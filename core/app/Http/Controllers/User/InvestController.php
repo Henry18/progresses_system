@@ -68,7 +68,7 @@ class InvestController extends Controller
         }
 
         $hyip = new HyipLab($user, $plan);
-        $hyip->invest($request->amount, $wallet, $request->compound_interest);
+        $hyip->invest($request->amount, $wallet, $request->compound_interest, $request->hold_capital ? Status::YES : Status::NO);
 
         $notify[] = ['success', 'Invested to plan successfully'];
         return back()->withNotify($notify);
@@ -227,7 +227,7 @@ class InvestController extends Controller
         if (!gs('staking_option')) {
             abort(404);
         }
-        
+
         $pageTitle  = 'My Staking';
         $stakings   = Staking::active()->get();
         $myStakings = StakingInvest::where('user_id', auth()->id())->orderBy('id', 'desc')->paginate(getPaginate());
@@ -247,7 +247,7 @@ class InvestController extends Controller
             'duration' => 'required|integer|min:1',
             'amount'   => "required|numeric|between:$min,$max",
             'wallet'   => 'required|in:deposit_wallet,interest_wallet',
-            
+
         ]);
 
         $user   = auth()->user();

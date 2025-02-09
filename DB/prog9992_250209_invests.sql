@@ -1,0 +1,1 @@
+ALTER TABLE `invests` ADD `fractional_capital` TINYINT NOT NULL DEFAULT '0' AFTER `capital_back`;

@@ -91,19 +91,21 @@ class CronController extends Controller
 
             foreach ($invests as $invest) {
                 $now  = $now;
-                $next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
+                //$next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
+                $next = HyipLab::nextWorkingMinute(5);
                 $user = $invest->user;
+                $interest = $invest->amount * ($invest->mon_interest_rate/100);
 
                 $invest->return_rec_time += 1;
                 //$invest->paid += $invest->interest;
-                $invest->paid += $invest->amount * ($invest->mon_interest_rate/100);
+                $invest->paid += $interest;
                 $invest->should_pay -= $invest->period > 0 ? $invest->interest : 0;
                 $invest->next_time = $next;
                 $invest->last_time = $now;
                 $invest->net_interest += $invest->rem_compound_times ? 0 : $invest->interest;
 
                 // Add Return Amount to user's Interest Balance
-                $user->interest_wallet += $invest->interest;
+                $user->interest_wallet += $interest;
                 $user->save();
 
                 $trx = getTrx();
@@ -112,14 +114,14 @@ class CronController extends Controller
                 $transaction               = new Transaction();
                 $transaction->user_id      = $user->id;
                 $transaction->invest_id    = $invest->id;
-                $transaction->amount       = $invest->interest;
+                $transaction->amount       = $interest;
                 $transaction->charge       = 0;
                 $transaction->post_balance = $user->interest_wallet;
                 $transaction->trx_type     = '+';
                 $transaction->trx          = $trx;
                 $transaction->remark       = 'interest';
                 $transaction->wallet_type  = 'interest_wallet';
-                $transaction->details      = showAmount($invest->interest) . '' . @$invest->plan->name;
+                $transaction->details      = showAmount($invest->interest) . ' ' . @$invest->plan->name;
                 $transaction->save();
 
                 // Give Referral Commission if Enabled
@@ -133,7 +135,7 @@ class CronController extends Controller
                     $invest->status = 0; // Change Status so he do not get any more return
 
                     // Give the capital back if plan says the same and hold capital option is disabled
-                    if ($invest->capital_status == 1 && !$invest->hold_capital) {
+                    if ($invest->capital_status == 1 && !$invest->hold_capital && !$invest->fractional_capital) {
                         HyipLab::capitalReturn($invest);
                     }
                 }
@@ -158,11 +160,32 @@ class CronController extends Controller
                     $transaction->amount       = $interest;
                     $transaction->post_balance = $user->interest_wallet;
                     $transaction->charge       = 0;
-                    $transaction->trx_type     = '-';
+                    $transaction->trx_type     = '+';
                     $transaction->details      = '' . $invest->plan->name;
                     $transaction->trx          = $trx;
                     $transaction->wallet_type  = 'interest_wallet';
                     $transaction->remark       = 'invest_compound';
+                    $transaction->save();
+                }
+
+                if ($invest->fractional_capital && (($invest->period - $invest->return_rec_time) <= $invest->period_return_capital)) {
+                    $newInvestAmount = $invest->amount - $invest->mon_return_amount;
+                    $invest->amount  = $newInvestAmount;
+
+                    $user->interest_wallet += $invest->mon_return_amount;
+                    $user->save();
+
+                    $transaction               = new Transaction();
+                    $transaction->user_id      = $user->id;
+                    $transaction->invest_id    = $invest->id;
+                    $transaction->amount       = $invest->mon_return_amount;
+                    $transaction->post_balance = $user->interest_wallet;
+                    $transaction->charge       = 0;
+                    $transaction->trx_type     = '+';
+                    $transaction->details      = '' . $invest->plan->name;
+                    $transaction->trx          = $trx;
+                    $transaction->wallet_type  = 'interest_wallet';
+                    $transaction->remark       = 'return_fractional_capital';
                     $transaction->save();
                 }
 
