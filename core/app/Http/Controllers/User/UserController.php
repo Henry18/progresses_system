@@ -59,6 +59,8 @@ class UserController extends Controller
         $data['depositWalletInvests']  = Invest::where('user_id', $user->id)->where('wallet_type', 'deposit_wallet')->where('status', Status::INVEST_RUNNING)->sum('amount');
         $data['interestWalletInvests'] = Invest::where('user_id', $user->id)->where('wallet_type', 'interest_wallet')->where('status', Status::INVEST_RUNNING)->sum('amount');
 
+        $data['fractionalCapital'] = Transaction::where('remark', 'return_fractional_capital')->where('user_id', $user->id)->sum('amount');
+
         $data['isHoliday']      = HyipLab::isHoliDay(now()->toDateTimeString(), gs());
         $data['nextWorkingDay'] = now()->toDateString();
         if ($data['isHoliday']) {

@@ -118,7 +118,7 @@
 	</div>
 	</div>
 	<div class="row gy-4 justify-content-center">
-		
+
         <div class="col-xxl-6 col-xl-6 col-sm-6">
 			<div class="dashboard-card">
 				<div class="dashboard-card__shape"></div>
@@ -254,7 +254,7 @@
 			<div class="accordion-item">
 				<h2 class="accordion-header" id="headingOne">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                @lang('My Investment Progress') 
+                @lang('My Investment Progress')
                 </button>
             </h2>
 				<div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#miAcordeon">
@@ -354,6 +354,10 @@
 											</div>
 										</div>
 									</div>
+                                    <div class="dashboard-item__pay">
+										<span class="dashboard-item__investment-title">@lang('Return fractional capital')</span>
+										<h6 class="dashboard-item__pay-number">{{ showAmount($fractionalCapital) }}</h6>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -367,7 +371,7 @@
 			<div class="accordion-item">
 				<h2 class="accordion-header" id="headingTwo">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                @lang('Transactions') 
+                @lang('Transactions')
                 </button>
             </h2>
 				<div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#miAcordeon">
@@ -428,7 +432,7 @@
 		</div>
 	</div>
 
-	
+
 </section>
 
 @if ($user->kv == Status::KYC_UNVERIFIED && $user->kyc_rejection_reason)
@@ -473,10 +477,10 @@
 	                        tms--;
 	                    }, 1000);
 	                }
-	
+
 	                createCountDown('counter', {{ abs(\Carbon\Carbon::parse($nextWorkingDay)->diffInSeconds()) }});
 	            @endif
 	        })(jQuery);
-	
+
 </script>
 @endpush
