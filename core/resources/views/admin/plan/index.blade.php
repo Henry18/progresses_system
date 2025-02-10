@@ -457,6 +457,7 @@
                     }
 
                     this.modal.find('.amount-fields').html(html);
+                    tooltips()
                 }
 
                 getInterestType(type) {
