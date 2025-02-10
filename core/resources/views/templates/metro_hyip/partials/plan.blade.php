@@ -134,8 +134,8 @@
                                 <div class="form-group">
                                     <div class="form-group">
                                         <label for="">@lang('Capital back') </label>
+                                        <i class="las la-info-circle cap_plan"></i>
                                         <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="hold_capital">
-                                        <i class="las la-info-circle" title="@lang('By activating this option you indicate that you want to receive your invested balance in equal fractions in the last') {{$data->repeat_time - $data->capital_months_return}} @lang('months of the plan')"></i>
                                     </div>
                                 </div>
                             </div>
@@ -218,7 +218,9 @@
                 $('.gateway-info').addClass('d-none');
                 var modal = $('#investModal');
                 plan = $(this).data('plan');
+                modal.find('.cap_plan').attr('title', '@lang('By activating this option you indicate that you want to receive your invested balance in equal fractions in the last')' + plan.repeat_time + '@lang('months of the plan')');
 
+                tooltips()
                 modal.find('.planName').text(plan.name)
                 modal.find('[name=plan_id]').val(plan.id);
                 let fixedAmount = parseFloat(plan.fixed_amount).toFixed(2);
@@ -378,7 +380,6 @@
             @endif
 
         })(jQuery);
-        tooltips()
         function tooltips() {
             setTimeout(function() {
                 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title], [data-title], [data-bs-title]'));

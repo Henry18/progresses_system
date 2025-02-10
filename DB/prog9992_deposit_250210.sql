@@ -1,0 +1,1 @@
+ALTER TABLE `deposits` ADD `fractional_capital_plan` INT NOT NULL DEFAULT '0' AFTER `plan_id`;

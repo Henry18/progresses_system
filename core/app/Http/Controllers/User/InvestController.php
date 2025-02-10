@@ -57,7 +57,7 @@ class InvestController extends Controller
                 return back()->withNotify($notify);
             }
 
-            $data = PaymentController::insertDeposit($gate, $request->amount, $plan, $request->compound_interest);
+            $data = PaymentController::insertDeposit($gate, $request->amount, $plan, $request->hold_capital ? Status::YES : Status::NO, $request->compound_interest);
             session()->put('Track', $data->trx);
             return to_route('user.deposit.confirm');
         }

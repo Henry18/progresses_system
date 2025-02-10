@@ -118,17 +118,17 @@
                     <div class="card-body">
                         <ul class="list-group">
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Total Payable')
+                                @lang('Total time')
                                 <span>
                                     @if ($invest->period != -1)
-                                        {{ $invest->period }} @lang('Months')
+                                        {{ $invest->period }} @lang('Months') ({{ $invest->period * 21 }} @lang('days'))
                                     @else
                                         @lang('Lifetime')
                                     @endif
                                 </span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Total Paid')
+                                @lang('Elapsed Time')
                                 <span>{{ ($invest->return_rec_time * 21) + (21 - $invest->rec_total_days) }} @lang('days')</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
