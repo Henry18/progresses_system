@@ -118,7 +118,7 @@
                     <div class="card-body">
                         <ul class="list-group">
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Total time')
+                                @lang('Total Time')
                                 <span>
                                     @if ($invest->period != -1)
                                         {{ $invest->period }} @lang('Months') ({{ $invest->period * 21 }} @lang('days'))
