@@ -1,1 +1,2 @@
 ALTER TABLE `invests` ADD `fractional_capital` TINYINT NOT NULL DEFAULT '0' AFTER `capital_back`;
+ALTER TABLE `invests` ADD `rec_total_days` INT NOT NULL DEFAULT '0' COMMENT 'dias totales periodo x 21 dias del mes' AFTER `return_rec_time`;

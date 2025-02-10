@@ -92,11 +92,13 @@ class CronController extends Controller
             foreach ($invests as $invest) {
                 $now  = $now;
                 //$next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
-                $next = HyipLab::nextWorkingMinute(5);
+                $next = HyipLab::nextWorkingMinute(1);
                 $user = $invest->user;
                 $interest = $invest->amount * ($invest->mon_interest_rate/100);
 
-                $invest->return_rec_time += 1;
+                $invest->rec_total_days = $invest->rec_total_days - 1 < 0 ? 21 : $invest->rec_total_days - 1;
+                $invest->return_rec_time += $invest->rec_total_days == 0 ? 1 : 0;
+                //$invest->return_rec_time += 1;
                 //$invest->paid += $invest->interest;
                 $invest->paid += $interest;
                 $invest->should_pay -= $invest->period > 0 ? $invest->interest : 0;
@@ -121,7 +123,7 @@ class CronController extends Controller
                 $transaction->trx          = $trx;
                 $transaction->remark       = 'interest';
                 $transaction->wallet_type  = 'interest_wallet';
-                $transaction->details      = showAmount($invest->interest) . ' ' . @$invest->plan->name;
+                $transaction->details      = showAmount($interest) . ' ' . @$invest->plan->name;
                 $transaction->save();
 
                 // Give Referral Commission if Enabled
@@ -168,7 +170,7 @@ class CronController extends Controller
                     $transaction->save();
                 }
 
-                if ($invest->fractional_capital && (($invest->period - $invest->return_rec_time) <= $invest->period_return_capital)) {
+                if ($invest->rec_total_days == 0 && $invest->fractional_capital && (($invest->period - $invest->return_rec_time) <= $invest->period_return_capital)) {
                     $newInvestAmount = $invest->amount - $invest->mon_return_amount;
                     $invest->amount  = $newInvestAmount;
 

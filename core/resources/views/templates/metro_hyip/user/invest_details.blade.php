@@ -90,7 +90,7 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 @lang('Current Interest Pay')
-                                <span>{{ showAmount($invest->interest) }}</span>
+                                <span>{{ showAmount($invest->amount * ($invest->interest_rate/100)) }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 @lang('Pay Interest Interval')
@@ -129,7 +129,7 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 @lang('Total Paid')
-                                <span>{{ $invest->return_rec_time }} @lang('days')</span>
+                                <span>{{ ($invest->return_rec_time * 21) + (21 - $invest->rec_total_days) }} @lang('days')</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 @lang('Total Paid Amount')

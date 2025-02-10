@@ -46,7 +46,10 @@
                                 {{ $invest->period }}
                                 @lang('Months')
                             @endif
-                            @if ($invest->capital_status == '1')
+                            @if ($invest->capital_status == '1' && $invest->fractional_capital == '1')
+                                + @lang('Fractional Capital')
+                            @endif
+                            @if ($invest->capital_status == '1' && $invest->fractional_capital == '0')
                                 + @lang('Capital')
                             @endif
                         </td>
@@ -54,7 +57,7 @@
                             @if ($invest->compound_times)
                                 {{ $invest->return_rec_time }} @lang('times') | {{ showAmount($invest->paid) }}
                             @else
-                                {{ $invest->return_rec_time }}x{{ showAmount($invest->amount*($invest->mon_interest_rate/100)) }} = {{ showAmount($invest->paid) }}
+                                {{ ($invest->return_rec_time * 21) + (21 - $invest->rec_total_days) }}x{{ showAmount($invest->amount*($invest->mon_interest_rate/100)) }} = {{ showAmount($invest->paid) }}
                             @endif
                         </td>
 

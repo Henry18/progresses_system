@@ -89,7 +89,8 @@ class HyipLab
 
         //$next = self::nextWorkingDay($plan->timeSetting->time);
         //multiplica los dias para el inicio * 24 horas, y el sistema entonces basado en esas horas le coloca la proxima fecha de pago
-        $next = self::nextWorkingDay($plan->days_to_init * 24);
+        //$next = self::nextWorkingDay($plan->days_to_init * 24);
+        $next = HyipLab::nextWorkingMinute(5);
         $shouldPay = -1;
         if ($period > 0) {
             $shouldPay = $interestAmount * $period;
@@ -107,6 +108,7 @@ class HyipLab
         $invest->period_return_capital = $period - $plan->capital_months_return;
         $invest->mon_return_amount  = $amount / ($period - $plan->capital_months_return);
         $invest->period             = $period;
+        $invest->rec_total_days     = 21;
         $invest->time_name          = $plan->timeSetting->name;
         $invest->hours              = $plan->timeSetting->time;
         $invest->next_time          = $next;
