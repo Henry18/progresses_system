@@ -52,7 +52,7 @@ class PaymentController extends Controller
         return to_route('user.deposit.confirm');
     }
 
-    public static function insertDeposit($gateway, $amount, $investPlan = null, $compoundTimes = 0)
+    public static function insertDeposit($gateway, $amount, $investPlan = null, $hold_capital = 0, $compoundTimes = 0)
     {
         $user        = auth()->user();
         $charge      = $gateway->fixed_charge + ($amount * $gateway->percent_charge / 100);
@@ -62,6 +62,7 @@ class PaymentController extends Controller
         $data = new Deposit();
         if ($investPlan) {
             $data->plan_id = $investPlan->id;
+            $data->fractional_capital_plan = $hold_capital;
         }
         $data->user_id         = $user->id;
         $data->method_code     = $gateway->method_code;
@@ -98,7 +99,7 @@ class PaymentController extends Controller
     public function depositConfirm()
     {
         $track = session()->get('Track');
-        
+
         $deposit = Deposit::where('trx', $track)->where('status', Status::PAYMENT_INITIATE)->orderBy('id', 'DESC')->with('gateway')->firstOrFail();
 
         if ($deposit->method_code >= 1000) {
@@ -124,7 +125,7 @@ class PaymentController extends Controller
             $deposit->btc_wallet = $data->session->id;
             $deposit->save();
         }
-        
+
         $pageTitle = 'Payment Confirm';
         return view("Template::$data->view", compact('data', 'pageTitle', 'deposit'));
     }
@@ -174,7 +175,7 @@ class PaymentController extends Controller
                     $time->where('status', Status::ENABLE);
                 })->where('status', Status::ENABLE)->findOrFail($deposit->plan_id);
                 $hyip = new HyipLab($user, $plan);
-                $hyip->invest($deposit->amount, 'deposit_wallet', $deposit->compound_times);
+                $hyip->invest($deposit->amount, 'deposit_wallet', $deposit->compound_times, $deposit->fractional_capital_plan);
             }
 
 
