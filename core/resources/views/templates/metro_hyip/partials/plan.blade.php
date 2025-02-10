@@ -135,6 +135,7 @@
                                     <div class="form-group">
                                         <label for="">@lang('Capital back') </label>
                                         <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="hold_capital">
+                                        <i class="las la-info-circle" title="@lang('By activating this option you indicate that you want to receive your invested balance in equal fractions in the last') {{$data->repeat_time - $data->capital_months_return}} @lang('months of the plan')"></i>
                                     </div>
                                 </div>
                             </div>
@@ -377,5 +378,14 @@
             @endif
 
         })(jQuery);
+        tooltips()
+        function tooltips() {
+            setTimeout(function() {
+                var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title], [data-title], [data-bs-title]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }, 100);
+            }
     </script>
 @endpush
