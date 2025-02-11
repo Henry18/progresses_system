@@ -9,7 +9,24 @@
         <a href="{{ route('home') }}" class="sidebar-logo__link"> <img src="{{ siteLogo() }}" alt="site-logo"></a>
     </div>
     <!-- Sidebar Logo End -->
-   
+    <!--==== account start ==== -->
+    <!--div class="balance">
+        <h5 class="balance__title"> @lang('Account Balance') </h5>
+        <div class="balance__item">
+            <span class="balance__item-wallet"> @lang('Deposit Wallet') </span>
+            <h5 class="balance__item-number"> {{ showAmount(auth()->user()->deposit_wallet, currencyFormat:false) }} <span class="balance__item-currency">{{ __(gs('cur_text')) }}</span> </h5>
+        </div>
+        <div class="balance__item">
+            <span class="balance__item-wallet"> @lang('Interest Wallet') </span>
+            <h5 class="balance__item-number"> {{ showAmount(auth()->user()->interest_wallet, currencyFormat:false) }} <span class="balance__item-currency">{{ __(gs('cur_text')) }}</span> </h5>
+        </div>
+        <div class="balance__button">
+            <a href="{{ route('user.deposit.index') }}" class="balance__button-one style-one"> @lang('Deposit') </a>
+            <a href="{{ route('user.withdraw') }}" class="balance__button-one style-two"> @lang('Withdraw') </a>
+        </div>
+    </div-->
+    <!--===== account end ===== -->
+
     <!-- ========= Sidebar Menu Start ================ -->
     <ul class="sidebar-menu-list mt-5">
         <li class="sidebar-menu-list__item {{ menuActive('user.home') }} ">
@@ -32,7 +49,7 @@
                 </a>
             </li>
         @endif
-        @if (gs('staking_option')) 
+        @if (gs('staking_option'))
             <li class="sidebar-menu-list__item {{ menuActive('user.staking.index') }} ">
                 <a href="{{ route('user.staking.index') }}" class="sidebar-menu-list__link ">
                     <span class="icon"><i class="fas fa-chart-line"></i></span>
@@ -40,7 +57,7 @@
                 </a>
             </li>
         @endif
-        @if (gs('pool_option')) 
+        @if (gs('pool_option'))
             <li class="sidebar-menu-list__item {{ menuActive(['user.pool.index', 'user.pool.invests']) }} ">
                 <a href="{{ route('user.pool.index') }}" class="sidebar-menu-list__link ">
                     <span class="icon"><i class="fas fa-cubes"></i></span>
@@ -104,7 +121,7 @@
                 </a>
             </li>
         @endif
-        
+
         <li class="sidebar-menu-list__item {{ menuActive('user.transactions') }}">
             <a href="{{ route('user.transactions') }}" class="sidebar-menu-list__link">
                 <span class="icon"> <i class="fas fa-exchange-alt"></i> </span>

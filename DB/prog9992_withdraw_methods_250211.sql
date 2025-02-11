@@ -1,0 +1,1 @@
+ALTER TABLE `withdraw_methods` ADD `fixed_charge_bonus` DECIMAL(28,8) NOT NULL DEFAULT '0.00000' AFTER `percent_charge`, ADD `percent_charge_bonus` DECIMAL(5,2) NOT NULL DEFAULT '0.00' AFTER `fixed_charge_bonus`;

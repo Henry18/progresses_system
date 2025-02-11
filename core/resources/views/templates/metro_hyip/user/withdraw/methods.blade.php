@@ -41,6 +41,10 @@
                         </div>
                     </div>
                 @else
+                <select name="type" id="type" class="form-control">
+                    <option value="interest_wallet">Billetera de Intereses</option>
+                    <option value="bonus_wallet">Billetera de Bonos</option>
+                </select>
                     <form action="{{ route('user.withdraw.money') }}" method="post" class="withdraw-form">
                         @csrf
                         <div class="gateway-card">

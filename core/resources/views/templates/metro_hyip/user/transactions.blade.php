@@ -87,9 +87,13 @@
 
                                     <td>
                                         @if ($trx->wallet_type == 'deposit_wallet')
-                                            <span class="badge badge--info">@lang('Deposit Wallet')</span>
-                                        @else
+                                            <span class="badge badge--success">@lang('Deposit Wallet')</span>
+                                        @endif
+                                        @if ($trx->wallet_type == 'interest_wallet')
                                             <span class="badge badge--warning">@lang('Interest Wallet')</span>
+                                        @endif
+                                        @if ($trx->wallet_type == 'bonus_wallet')
+                                            <span class="badge badge--info">@lang('Bonus Wallet')</span>
                                         @endif
                                     </td>
 

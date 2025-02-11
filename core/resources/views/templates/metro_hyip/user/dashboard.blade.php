@@ -118,8 +118,97 @@
 	</div>
 	</div>
 	<div class="row gy-4 justify-content-center">
-
-        <div class="col-xxl-6 col-xl-6 col-sm-6">
+        <div class="col-xxl-4 col-xl-4 col-sm-6">
+			<div class="dashboard-card">
+				<div class="dashboard-card__shape"></div>
+				<div class="dashboard-card__header">
+					<span class="dashboard-card__header-icon style-one">
+                            <i class="fas fa-funnel-dollar"></i>
+                        </span>
+					<div class="dashboard-card__header-content">
+						<h6 class="dashboard-card__header-title"> @lang('Running') </h6>
+						<span class="dashboard-card__header-currency"> {{ showAmount($runningInvests) }}
+                            </span>
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="col-xxl-4 col-xl-4 col-sm-6">
+			<div class="dashboard-card">
+				<div class="dashboard-card__shape"></div>
+				<div class="dashboard-card__header">
+					<span class="dashboard-card__header-icon style-three">
+                            <i class="fas fa-funnel-dollar"></i>
+                        </span>
+					<div class="dashboard-card__header-content">
+						<h6 class="dashboard-card__header-title"> Ganancia Disponible </h6>
+						<span class="dashboard-card__header-currency"> {{ showAmount(auth()->user()->interest_wallet) }}
+                            </span>
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="col-xxl-4 col-xl-4 col-sm-6">
+			<div class="dashboard-card">
+				<div class="dashboard-card__shape"></div>
+				<div class="dashboard-card__header">
+					<span class="dashboard-card__header-icon style-five">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                        </span>
+					<div class="dashboard-card__header-content">
+						<h6 class="dashboard-card__header-title"> Bonos Disponibles </h6>
+						<span class="dashboard-card__header-currency"> {{ showAmount($bonusWalletInvests) }}
+                            </span>
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="col-xxl-4 col-xl-4 col-sm-6">
+			<div class="dashboard-card">
+				<div class="dashboard-card__shape"></div>
+				<div class="dashboard-card__header">
+					<span class="dashboard-card__header-icon style-four">
+                            <i class="fas fa-wallet"></i>
+                        </span>
+					<div class="dashboard-card__header-content">
+						<h6 class="dashboard-card__header-title"> Devolucion de capital </h6>
+						<span class="dashboard-card__header-currency"> {{ showAmount($fractionalCapital) }}
+                            </span>
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="col-xxl-4 col-xl-4 col-sm-6">
+			<div class="dashboard-card">
+				<div class="dashboard-card__shape"></div>
+				<div class="dashboard-card__header">
+					<span class="dashboard-card__header-icon style-two">
+                        <i class="fas fa-coins"></i>
+                        </span>
+					<div class="dashboard-card__header-content">
+						<h6 class="dashboard-card__header-title"> Retiro total de ganancias </h6>
+						<span class="dashboard-card__header-currency"> {{ showAmount($successfulWithdrawals) }}
+                            </span>
+					</div>
+				</div>
+			</div>
+		</div>
+        <div class="col-xxl-4 col-xl-4 col-sm-6">
+			<div class="dashboard-card">
+				<div class="dashboard-card__shape"></div>
+				<div class="dashboard-card__header">
+					<span class="dashboard-card__header-icon">
+                            <i class="fas fa-coins"></i>
+                        </span>
+					<div class="dashboard-card__header-content">
+						<h6 class="dashboard-card__header-title"> Retiro total de bonos </h6>
+						<span class="dashboard-card__header-currency"> {{ showAmount($bonusWalletInvests) }}
+                            </span>
+					</div>
+				</div>
+			</div>
+		</div>
+        <!--div class="col-xxl-6 col-xl-6 col-sm-6">
 			<div class="dashboard-card">
 				<div class="dashboard-card__shape"></div>
 				<div class="dashboard-card__header">
@@ -246,7 +335,7 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		</div-->
 
 	</div>
 	<div class="mt-4">

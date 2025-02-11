@@ -259,18 +259,19 @@ class HyipLab
             }
 
             $com = ($amount * $commission->percent) / 100;
-            $refer->interest_wallet += $com;
+            //$refer->interest_wallet += $com;
+            $refer->bonus_wallet += $com;
             $refer->save();
 
             $transactions[] = [
                 'user_id'      => $refer->id,
                 'amount'       => $com,
-                'post_balance' => $refer->interest_wallet,
+                'post_balance' => $refer->bonus_wallet,
                 'charge'       => 0,
                 'trx_type'     => '+',
                 'details'      => 'level ' . $i . ' Referral Commission From ' . $user->username,
                 'trx'          => $trx,
-                'wallet_type'  => 'interest_wallet',
+                'wallet_type'  => 'bonus_wallet',
                 'remark'       => 'referral_commission',
                 'created_at'   => now(),
             ];

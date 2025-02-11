@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `bonus_wallet` DECIMAL(28,8) NOT NULL DEFAULT '0.00000000' AFTER `interest_wallet`;

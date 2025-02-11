@@ -225,7 +225,7 @@ class CronController extends Controller
                 $rankings = UserRanking::active()->where('id', '>', $user->user_ranking_id)->where('minimum_invest', '<=', $userInvests)->where('min_referral_invest', '<=', $referralInvests)->where('min_referral', '<=', $referralCount)->get();
 
                 foreach ($rankings as $ranking) {
-                    $user->interest_wallet += $ranking->bonus;
+                    $user->bonus_wallet += $ranking->bonus;
                     $user->user_ranking_id = $ranking->id;
                     $user->save();
 
@@ -233,11 +233,11 @@ class CronController extends Controller
                     $transaction->user_id      = $user->id;
                     $transaction->amount       = $ranking->bonus;
                     $transaction->charge       = 0;
-                    $transaction->post_balance = $user->interest_wallet;
+                    $transaction->post_balance = $user->bonus_wallet;
                     $transaction->trx_type     = '+';
                     $transaction->trx          = getTrx();
                     $transaction->remark       = 'ranking_bonus';
-                    $transaction->wallet_type  = 'interest_wallet';
+                    $transaction->wallet_type  = 'bonus_wallet';
                     $transaction->details      = showAmount($ranking->bonus) . ' ranking bonus for ' . @$ranking->name;
                     $transaction->save();
                 }

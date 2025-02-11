@@ -10,7 +10,8 @@
                                 <tr>
                                     <th>@lang('Method')</th>
                                     <th>@lang('Currency')</th>
-                                    <th>@lang('Charge')</th>
+                                    <th>@lang('Interest Charge')</th>
+                                    <th>@lang('Bonus Charge')</th>
                                     <th>@lang('Withdraw Limit')</th>
                                     <th>@lang('Status')</th>
                                     <th>@lang('Action')</th>
@@ -28,6 +29,7 @@
 
                                         <td class="fw-bold">{{ __($method->currency) }}</td>
                                         <td class="fw-bold">{{ showAmount($method->fixed_charge) }} {{ 0 < $method->percent_charge ? ' + ' . showAmount($method->percent_charge, currencyFormat: false) . ' %' : '' }} </td>
+                                        <td class="fw-bold">{{ showAmount($method->fixed_charge_bonus) }} {{ 0 < $method->percent_charge_bonus ? ' + ' . showAmount($method->percent_charge_bonus, currencyFormat: false) . ' %' : '' }} </td>
                                         <td class="fw-bold">{{ showAmount($method->min_limit) }}
                                             @lang('to') {{ showAmount($method->max_limit) }}</td>
                                         <td>
