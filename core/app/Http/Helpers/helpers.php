@@ -64,7 +64,7 @@ function activeTemplateName() {
 }
 
 function siteLogo($type = null) {
-    $name = $type ? "/logo_$type.png" : '/logo.png';
+    $name = $type ? "/logo_$type.svg" : '/logo.svg';
     return getImage(getFilePath('logoIcon') . $name);
 }
 function siteFavicon() {
