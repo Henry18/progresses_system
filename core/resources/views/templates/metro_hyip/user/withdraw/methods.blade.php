@@ -41,13 +41,13 @@
                         </div>
                     </div>
                 @else
-                <select name="type" id="type" class="form-control wallet_type">
-                    <option value="interest_wallet" selected>Billetera de Intereses</option>
-                    <option value="bonus_wallet">Billetera de Bonos</option>
-                </select>
                     <form action="{{ route('user.withdraw.money') }}" method="post" class="withdraw-form">
                         @csrf
                         <div class="gateway-card">
+                        <select name="type" id="type" class="form-control wallet_type">
+                            <option value="interest_wallet" selected>Billetera de Intereses</option>
+                            <option value="bonus_wallet">Billetera de Bonos</option>
+                        </select>
                             <div class="row justify-content-center gy-sm-4 gy-3">
                                 <div class="col-lg-6">
                                     <div class="payment-system-list is-scrollable gateway-option-list">
@@ -266,3 +266,39 @@
         })(jQuery);
     </script>
 @endpush
+<style>
+    #type {
+  appearance: none;
+  background-color: #1a1754;
+  color: #ffffff;
+  border: 2px solid #5a48e0;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='white'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 15px;
+  margin-bottom: 12px;
+}
+
+#type:hover {
+  background-color: #2b267a;
+  border-color: #7a65ff;
+}
+
+#type:focus {
+  border-color: #a28bff;
+  box-shadow: 0 0 5px rgba(162, 139, 255, 0.5);
+}
+
+#type option {
+  background-color: #1a1754;
+  color: white;
+  padding: 5px;
+}
+
+</style>
