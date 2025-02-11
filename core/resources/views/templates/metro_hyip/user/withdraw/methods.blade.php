@@ -41,8 +41,8 @@
                         </div>
                     </div>
                 @else
-                <select name="type" id="type" class="form-control">
-                    <option value="interest_wallet">Billetera de Intereses</option>
+                <select name="type" id="type" class="form-control wallet_type">
+                    <option value="interest_wallet" selected>Billetera de Intereses</option>
                     <option value="bonus_wallet">Billetera de Bonos</option>
                 </select>
                     <form action="{{ route('user.withdraw.money') }}" method="post" class="withdraw-form">
@@ -163,11 +163,23 @@
         (function($) {
 
             var amount = parseFloat($('.amount').val() || 0);
+            var walletType = ''
             var gateway, minAmount, maxAmount;
 
 
             $('.amount').on('input', function(e) {
+                walletType = $('.wallet_type').val();
                 amount = parseFloat($(this).val());
+                if (!amount) {
+                    amount = 0;
+                }
+                calculation();
+            });
+            $('.wallet_type').on('change', function(e) {
+                walletType = $(this).val();
+                console.log(walletType);
+
+                amount = parseFloat($('.amount').val() || 0);
                 if (!amount) {
                     amount = 0;
                 }
@@ -212,8 +224,8 @@
                 let totalPercentCharge = 0;
 
                 if (amount) {
-                    percentCharge = parseFloat(gateway.percent_charge);
-                    fixedCharge = parseFloat(gateway.fixed_charge);
+                    percentCharge = walletType == 'interest_wallet' ? parseFloat(gateway.percent_charge) : parseFloat(gateway.percent_charge_bonus);
+                    fixedCharge = walletType == 'interest_wallet' ? parseFloat(gateway.fixed_charge) : parseFloat(gateway.fixed_charge_bonus);
                     totalPercentCharge = parseFloat(amount / 100 * percentCharge);
                 }
 
