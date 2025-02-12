@@ -142,7 +142,7 @@ class StakingPoolController extends Controller
             $transaction->post_balance = $user->interest_wallet;
             $transaction->charge       = 0;
             $transaction->trx_type     = '+';
-            $transaction->details      = 'Pool invested return';
+            $transaction->details      = __('tagpoolinvestedpreturn');
             $transaction->trx          = getTrx();
             $transaction->wallet_type  = 'interest_wallet';
             $transaction->remark       = 'pool_invest_return';

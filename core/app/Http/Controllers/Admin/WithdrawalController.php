@@ -128,7 +128,7 @@ class WithdrawalController extends Controller {
         $transaction->charge       = 0;
         $transaction->trx_type     = '+';
         $transaction->remark       = 'withdraw_reject';
-        $transaction->details      = 'Refunded for withdrawal rejection';
+        $transaction->details      = __('tagrefundedforwithdrawalrejection');
         $transaction->trx          = $withdraw->trx;
         $transaction->save();
 
