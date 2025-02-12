@@ -75,11 +75,19 @@ class Email extends NotifyProcess implements Notifiable {
     protected function sendPhpMail() {
         $sentFromName  = $this->getEmailFrom()['name'];
         $sentFromEmail = $this->getEmailFrom()['email'];
+        $boundary = md5(time());
         $headers       = "From: $sentFromName <$sentFromEmail> \r\n";
         $headers .= "Reply-To: $sentFromName <$sentFromEmail> \r\n";
         $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: text/html; charset=utf-8\r\n";
-        @mail($this->email, $this->subject, $this->finalMessage, $headers);
+        //$headers .= "X-Mailer: PHP/" . phpversion();
+        $headers .= "Content-Type: multipart/alternative; boundary=\"$boundary\"\r\n";
+        $message  = "--$boundary\r\n";
+        $message .= "Content-Type: text/plain; charset=UTF-8\r\n\r\n";
+        $message .= "Hola $sentFromName Comunicate con soporte si vez este mensaje.\r\n\r\n";
+        $message .= "--$boundary\r\n";
+        $message .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
+        $message .=$this->finalMessage;
+        @mail($this->email, $this->subject, $message, $headers);
     }
 
     protected function sendSmtpMail() {
