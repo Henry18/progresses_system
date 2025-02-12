@@ -19,7 +19,7 @@
                 <div class="alert border border--danger" role="alert">
                     <div class="alert__icon d-flex align-items-center text--danger"><i class="fas fa-bell"></i></div>
                     <p class="alert__message">
-                        <span class="fw-bold">@lang('Please Allow / Reset Browser Notification ')</span><br>
+                        <span class="fw-bold">@lang('Please Allow / Reset Browser Notification')</span><br>
                         <small>@lang('If you want to get push notification then you have to allow notification from your browser')</small>
                     </p>
                 </div>

@@ -150,7 +150,7 @@ class PlanController extends Controller
         $transaction->post_balance = $postBalance;
         $transaction->charge       = 0;
         $transaction->trx_type     = '-';
-        $transaction->details      = 'Interest return for investment canceled';
+        $transaction->details      = __('tagetornodeinteresesporinvancelada');
         $transaction->trx          = getTrx();
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'interest_return';
