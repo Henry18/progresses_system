@@ -91,8 +91,8 @@ class CronController extends Controller
 
             foreach ($invests as $invest) {
                 $now  = $now;
-                //$next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
-                $next = HyipLab::nextWorkingMinute(1);
+                $next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
+                //$next = HyipLab::nextWorkingMinute(1);
                 $user = $invest->user;
                 $interest = $invest->amount * ($invest->mon_interest_rate/100);
 
