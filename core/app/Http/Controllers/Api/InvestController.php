@@ -607,7 +607,7 @@ class InvestController extends Controller
         $transaction->post_balance = $user->$wallet;
         $transaction->charge       = 0;
         $transaction->trx_type     = '-';
-        $transaction->details      = 'Staking investment';
+        $transaction->details      = __('tagstakinginvestment');
         $transaction->trx          = getTrx();
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'staking_invest';
@@ -769,7 +769,7 @@ class InvestController extends Controller
         $transaction->post_balance = $user->$wallet;
         $transaction->charge       = 0;
         $transaction->trx_type     = '-';
-        $transaction->details      = 'Pool investment';
+        $transaction->details      = __('tagpoolinvestment');
         $transaction->trx          = getTrx();
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'pool_invest';

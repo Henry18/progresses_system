@@ -94,7 +94,7 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 @lang('Pay Interest Interval')
-                                <span>@lang('Every') @lang('days')</span>
+                                <span>@lang('Every') @lang('day')</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 @lang('Status')
