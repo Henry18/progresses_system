@@ -1,0 +1,1 @@
+ALTER TABLE `withdrawals` ADD `withdraw_wallet` VARCHAR(50) NOT NULL AFTER `final_amount`;
