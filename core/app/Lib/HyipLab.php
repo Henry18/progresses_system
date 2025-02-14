@@ -268,7 +268,7 @@ class HyipLab
                 'post_balance' => $refer->bonus_wallet,
                 'charge'       => 0,
                 'trx_type'     => '+',
-                'details'      => 'level ' . $i . ' Referral Commission From ' . $user->username,
+                'details'      => __('level'). ' ' . $i . __('tagreferralcommissionrrom') . $user->username,
                 'trx'          => $trx,
                 'wallet_type'  => 'bonus_wallet',
                 'remark'       => 'referral_commission',

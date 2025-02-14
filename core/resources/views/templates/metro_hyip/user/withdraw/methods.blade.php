@@ -165,6 +165,9 @@
             var amount = parseFloat($('.amount').val() || 0);
             var walletType = ''
             var gateway, minAmount, maxAmount;
+            let percentCharge = 0;
+            let fixedCharge = 0;
+            let totalPercentCharge = 0;
 
 
             $('.amount').on('input', function(e) {
@@ -177,7 +180,6 @@
             });
             $('.wallet_type').on('change', function(e) {
                 walletType = $(this).val();
-                console.log(walletType);
 
                 amount = parseFloat($('.amount').val() || 0);
                 if (!amount) {
@@ -198,10 +200,6 @@
                 minAmount = gatewayElement.data('min-amount');
                 maxAmount = gatewayElement.data('max-amount');
 
-                let processingFeeInfo =
-                    `${parseFloat(gateway.percent_charge).toFixed(2)}% with ${parseFloat(gateway.fixed_charge).toFixed(2)} {{ __(gs('cur_text')) }} {{__('charge for processing fees')}}`
-                $(".proccessing-fee-info").attr("data-bs-original-title", processingFeeInfo);
-
                 calculation();
             }
 
@@ -219,14 +217,14 @@
             function calculation() {
                 if (!gateway) return;
                 $(".gateway-limit").text(minAmount + " - " + maxAmount);
-                let percentCharge = 0;
-                let fixedCharge = 0;
-                let totalPercentCharge = 0;
 
                 if (amount) {
                     percentCharge = walletType == 'interest_wallet' ? parseFloat(gateway.percent_charge) : parseFloat(gateway.percent_charge_bonus);
                     fixedCharge = walletType == 'interest_wallet' ? parseFloat(gateway.fixed_charge) : parseFloat(gateway.fixed_charge_bonus);
                     totalPercentCharge = parseFloat(amount / 100 * percentCharge);
+                    let processingFeeInfo =
+                    `${parseFloat(percentCharge).toFixed(2)}% with ${parseFloat(fixedCharge).toFixed(2)} {{ __(gs('cur_text')) }} {{__('charge for processing fees')}}`
+                $(".proccessing-fee-info").attr("data-bs-original-title", processingFeeInfo);
                 }
 
                 let totalCharge = parseFloat(totalPercentCharge + fixedCharge);

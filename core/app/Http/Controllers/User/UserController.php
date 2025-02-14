@@ -47,6 +47,7 @@ class UserController extends Controller
 
         $data['submittedWithdrawals']  = Withdrawal::where('status', '!=', Status::PAYMENT_INITIATE)->where('user_id', $user->id)->sum('amount');
         $data['successfulWithdrawals'] = Withdrawal::approved()->where('user_id', $user->id)->sum('amount');
+        $data['successfulbonusWithdrawals'] = Withdrawal::approved()->where('user_id', $user->id)->where('withdraw_wallet', 'bonus_wallet')->sum('amount');
         $data['rejectedWithdrawals']   = Withdrawal::rejected()->where('user_id', $user->id)->sum('amount');
         $data['initiatedWithdrawals']  = Withdrawal::initiated()->where('user_id', $user->id)->sum('amount');
         $data['requestedWithdrawals']  = Withdrawal::where('user_id', $user->id)->sum('amount');

@@ -141,7 +141,7 @@
                             <i class="fas fa-funnel-dollar"></i>
                         </span>
 					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> Ganancia Disponible </h6>
+						<h6 class="dashboard-card__header-title"> @lang('Ganancia Disponible') </h6>
 						<span class="dashboard-card__header-currency"> {{ showAmount(auth()->user()->interest_wallet) }}
                             </span>
 					</div>
@@ -156,7 +156,7 @@
                         <i class="fa-solid fa-sack-dollar"></i>
                         </span>
 					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> Bonos Disponibles </h6>
+						<h6 class="dashboard-card__header-title"> @lang('Bonos Disponibles') </h6>
 						<span class="dashboard-card__header-currency"> {{ showAmount($bonusWalletInvests) }}
                             </span>
 					</div>
@@ -171,7 +171,7 @@
                             <i class="fas fa-wallet"></i>
                         </span>
 					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> Devolucion de capital </h6>
+						<h6 class="dashboard-card__header-title"> @lang('Devolucion de capital') </h6>
 						<span class="dashboard-card__header-currency"> {{ showAmount($fractionalCapital) }}
                             </span>
 					</div>
@@ -186,7 +186,7 @@
                         <i class="fas fa-coins"></i>
                         </span>
 					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> Retiro total de ganancias </h6>
+						<h6 class="dashboard-card__header-title"> @lang('Retiro total de ganancias') </h6>
 						<span class="dashboard-card__header-currency"> {{ showAmount($successfulWithdrawals) }}
                             </span>
 					</div>
@@ -201,8 +201,8 @@
                             <i class="fas fa-coins"></i>
                         </span>
 					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> Retiro total de bonos </h6>
-						<span class="dashboard-card__header-currency"> {{ showAmount($bonusWalletInvests) }}
+						<h6 class="dashboard-card__header-title"> @lang('Retiro total de bonos') </h6>
+						<span class="dashboard-card__header-currency"> {{ showAmount($successfulbonusWithdrawals) }}
                             </span>
 					</div>
 				</div>
