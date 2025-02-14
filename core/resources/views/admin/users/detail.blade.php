@@ -229,6 +229,7 @@
                                 <option value="" hidden>@lang('Select One')</option>
                                 <option value="deposit_wallet">@lang('Deposit Wallet')</option>
                                 <option value="interest_wallet">@lang('Interest Wallet')</option>
+                                <option value="bonus_wallet">@lang('Bonus Wallet')</option>
                             </select>
                         </div>
                         <div class="form-group">
