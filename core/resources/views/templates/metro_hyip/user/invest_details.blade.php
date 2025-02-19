@@ -182,7 +182,8 @@
                     <h5 class="my-2">@lang('All Interests')</h5>
                 @endif
 
-                <table class="table style-two table-responsive--lg">
+                <div class="table-section">
+                <table class="table style-two table--responsive--lg">
                     <thead>
                         <tr>
                             <th>@lang('TRX')</th>
@@ -217,6 +218,7 @@
                         @endforelse
                     </tbody>
                 </table><!-- table end -->
+            </div>
 
                 @if ($transactions->hasPages())
                     <div class="custom--pagination">

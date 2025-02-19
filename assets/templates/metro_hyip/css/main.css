@@ -4543,10 +4543,6 @@ select option {
     padding: 30px 20px;
 }
 
-.dashboard-fluid .sidebar-logo__link img {
-    max-width: 180px;
-    max-height: 100px;
-}
 
 .dashboard-fluid .balance {
     padding: 0 20px;

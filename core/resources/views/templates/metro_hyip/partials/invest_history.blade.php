@@ -39,7 +39,7 @@
                         <td>
                             {{ showAmount($invest->amount*($invest->mon_interest_rate/100)) }} @lang('every') @lang('Day')
                             <br>
-                            @lang('for')
+                            @lang('during')
                             @if ($invest->period == '-1')
                                 @lang('Lifetime')
                             @else
