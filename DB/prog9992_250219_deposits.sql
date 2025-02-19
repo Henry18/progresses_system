@@ -1,0 +1,1 @@
+ALTER TABLE deposits ADD id_transaccion VARCHAR(500) NOT NULL AFTER id;
