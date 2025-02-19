@@ -30,6 +30,9 @@
     </div>
     <div class="navbar__right">
         <ul class="navbar__action-list">
+            @if (gs('multi_language'))
+                @include($activeTemplate . 'partials.language')
+            @endif
             @if(version_compare(gs('available_version'),systemDetails()['version'],'>'))
             <li><button type="button" class="primary--layer" data-bs-toggle="tooltip" data-bs-placement="bottom" title="@lang('Update Available')"><a href="{{ route('admin.system.update') }}" class="primary--layer"><i class="las la-download text--warning"></i></a> </button></li>
             @endif
@@ -145,4 +148,12 @@
             </li>`
     }
 </script>
+<style>
+    .language_switcher__list{
+        
+    background: rgb(20, 20, 67);
+    width: 120px;
+    padding: 4px;
+    }
+</style>
 @endpush
