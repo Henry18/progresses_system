@@ -25,6 +25,7 @@
                                 </div>
 
                                 <x-viser-form identifier="id" identifierValue="{{ $gateway->form_id }}" />
+                                <input name="idTransaccion" type="hidden" id="idTransaccion">
 
                                 <div class="col-md-12">
                                     <div class="form-group">
@@ -38,4 +39,9 @@
             </div>
         </div>
 </section>
+<script>
+    document.querySelectorAll('.inputidTransaccion')[0].addEventListener('keyup', function() {
+        document.getElementById('idTransaccion').value = this.value;
+    });
+</script>
 @endsection

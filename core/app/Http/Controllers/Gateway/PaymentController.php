@@ -219,7 +219,7 @@ class PaymentController extends Controller
         $validationRule = $formProcessor->valueValidation($formData);
         $request->validate($validationRule);
         $userData = $formProcessor->processFormData($request, $formData);
-        $idTransaccion = $userData[1]['value'];
+        $idTransaccion = $request->idTransaccion;
         $valida_id_transaccion = Deposit::where('id_transaccion', $idTransaccion)->exists();
         if ($valida_id_transaccion) {
             return back()->withErrors(['id_transaccion' => 'El ID de transacción ya ha sido utilizado.']);
