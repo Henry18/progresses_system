@@ -12,6 +12,7 @@
                                     <th>@lang('Level')</th>
                                     <th>@lang('Name')</th>
                                     <th>@lang('Minimum Invest')</th>
+                                    <th>@lang('Refer Percent')</th>
                                     <th>@lang('Bonus')</th>
                                     <th>@lang('Status')</th>
                                     <th>@lang('Action')</th>
@@ -21,9 +22,10 @@
                                 @forelse($userRankings as $userRanking)
                                     <tr>
                                         <td><img src="{{ getImage(getFilePath('userRanking') . '/' . $userRanking->icon, getFileSize('userRanking')) }}" class="ranking-image" alt=""></td>
-                                        <td>{{ __($userRanking->level) }}</td>
+                                        <td>{{  $userRanking->level }}</td>
                                         <td>{{ __($userRanking->name) }}</td>
                                         <td>{{ showAmount($userRanking->minimum_invest) }}</td>
+                                        <td>{{ $userRanking->refer_bonus_level }} %</td>
                                         <td>{{ showAmount($userRanking->bonus) }}</td>
                                         <td>
                                             @php
@@ -106,6 +108,10 @@
                                         <input type="number" name="min_referral" min="0" class="form-control" required>
                                 </div>
                                 <div class="form-group">
+                                    <label>@lang('Refer Percent')</label>
+                                        <input type="number" name="refer_bonus_level" min="0" class="form-control" required>
+                                </div>
+                                <div class="form-group">
                                     <label>@lang('Bonus')</label>
                                     <div class="input-group">
                                         <input type="number" step="any" name="bonus" min="0" class="form-control" required>
@@ -162,6 +168,7 @@
                 modal.find('[name=minimum_invest]').val(parseFloat(ranking.minimum_invest).toFixed(2));
                 modal.find('[name=team_minimum_invest]').val(parseFloat(ranking.min_referral_invest).toFixed(2));
                 modal.find('[name=min_referral]').val(ranking.min_referral);
+                modal.find('[name=refer_bonus_level]').val(ranking.refer_bonus_level);
                 modal.find('[name=bonus]').val(parseFloat(ranking.bonus).toFixed(2));
                 modal.find('[name=description]').val(ranking.description);
                 modal.find('.image-upload-preview').css('backgroundImage', `url(${$(this).data('icon')})`);

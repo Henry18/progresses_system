@@ -58,7 +58,7 @@
                                 $myInvestPercent = ($user->total_invests / $userRanking->minimum_invest) * 100;
                                 $refInvestPercent = ($user->team_invests / $userRanking->min_referral_invest) * 100;
                                 $refCountPercent = ($user->activeReferrals->count() / $userRanking->min_referral) * 100;
-                                
+
                                 $myInvestPercent = $myInvestPercent < 100 ? $myInvestPercent : 100;
                                 $refInvestPercent = $refInvestPercent < 100 ? $refInvestPercent : 100;
                                 $refCountPercent = $refCountPercent < 100 ? $refCountPercent : 100;
@@ -90,6 +90,9 @@
                                     </li>
                                     <li class="d-flex "><span>@lang('No. of Direct Referral')</span>
                                         <span>: {{ $userRanking->min_referral }}</span>
+                                    </li>
+                                    <li class="d-flex "><span>@lang('Referral Range Percent')</span>
+                                        <span>: {{ $userRanking->refer_bonus_level }}%</span>
                                     </li>
                                     <li class="d-flex "><span>@lang('Team Invest')</span>
                                         <span>:

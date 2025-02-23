@@ -235,7 +235,7 @@
                     modal.find('[name=amount]').attr('readonly', true);
                 } else {
                     modal.find('.investAmountRange').text(
-                        `Invest: ${symbol}${minimumAmount} - ${symbol}${maximumAmount}`);
+                        `@lang('Invest'): ${symbol}${minimumAmount} - ${symbol}${maximumAmount}`);
                     modal.find('[name=amount]').val('');
                     modal.find('[name=amount]').removeAttr('readonly');
                 }
@@ -248,19 +248,19 @@
 
                 if (plan.interest_type == '1') {
                     modal.find('.interestDetails').html(
-                        `<strong> Interest: ${interestAmount}% / @lang('monthly') </strong>`);
+                        `<strong> @lang('Interest'): ${interestAmount}% / @lang('monthly') </strong>`);
                 } else {
                     modal.find('.interestDetails').html(
-                        `<strong> Interest: ${interestAmount} ${currency}  </strong>`);
+                        `<strong> @lang('Interest'): ${interestAmount} ${currency}  </strong>`);
                 }
 
                 if (plan.lifetime == '0') {
                     modal.find('.interestValidity').html(
-                        `<strong>  Paga cada ${plan.time_setting.time} horas ,  ${plan.repeat_time} meses</strong>`
+                        `<strong>  @lang('Every') ${plan.time_setting.time} @lang('Hours'),  ${plan.repeat_time} @lang('Months'),</strong>`
                     );
                 } else {
                     modal.find('.interestValidity').html(
-                        `<strong>  Per ${plan.time_setting.time} hours,  life time </strong>`);
+                        `<strong>  Per ${plan.time_setting.time} @lang('Hours'),  life time </strong>`);
                 }
 
                 if (plan.compound_interest == '1') {

@@ -224,7 +224,7 @@ class PaymentController extends Controller
         if ($valida_id_transaccion) {
             return back()->withErrors(['id_transaccion' => 'El ID de transacción ya ha sido utilizado.']);
         }
-        $data->id_transaccion = $userData[1]['value'];
+        $data->id_transaccion = $idTransaccion;
         $data->detail = $userData;
         $data->status = Status::PAYMENT_PENDING;
         $data->save();

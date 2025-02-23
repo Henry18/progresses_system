@@ -32,10 +32,11 @@
                     <div class="form-group">
                         <label>@lang('Number of Level')</label>
                         <div class="input-group">
-                            <input type="number" name="level" min="1" placeholder="Type a number & hit ENTER ↵" class="form-control">
+                            <input type="number" name="level" min="1" max="1" placeholder="Type a number & hit ENTER ↵" class="form-control">
                             <button type="button" class="btn btn--primary generate">@lang('Generate')</button>
                         </div>
                         <span class="text--danger required-message d-none">@lang('Please enter a number')</span>
+                        <span class="text--danger required-limit-message d-none">En esta seccion solo puede incorporar un nivel, el resto de los niveles se manejan por los rangos</span>
                     </div>
 
                     <form action="{{ route('admin.referrals.update') }}" method="post" class="d-none levelForm">
@@ -109,9 +110,10 @@
             let numberOfLevel = $this.val();
             let parent = $this.parents('.card-body');
             let html = '';
-            if (numberOfLevel && numberOfLevel > 0){
+            if (numberOfLevel && numberOfLevel == 1){
                 parent.find('.levelForm').removeClass('d-none');
                 parent.find('.required-message').addClass('d-none');
+                parent.find('.required-limit-message').addClass('d-none');
 
                 for (i = 1; i <= numberOfLevel; i++){
                     html += `
@@ -124,7 +126,10 @@
                 }
 
                 parent.find('.referralLevels').html(html);
-            }else {
+            } else if(numberOfLevel > 1) {
+                parent.find('.levelForm').addClass('d-none');
+                parent.find('.required-limit-message').removeClass('d-none');
+            } else {
                 parent.find('.levelForm').addClass('d-none');
                 parent.find('.required-message').removeClass('d-none');
             }
