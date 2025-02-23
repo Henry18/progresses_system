@@ -15,7 +15,7 @@
                                             @if ($val->type == 'checkbox')
                                                 {{ implode(',', $val->value) }}
                                             @elseif($val->type == 'file')
-                                                <a href="{{ route('user.attachment.download', encrypt(getFilePath('verify') . '/' . $val->value)) }}"
+                                                <a href="{{ route('user.download.attachment', encrypt(getFilePath('verify') . '/' . $val->value)) }}"
                                                     class="me-3"><i class="fa fa-file"></i> @lang('Attachment') </a>
                                             @else
                                                 <p>{{ __($val->value) }}</p>
