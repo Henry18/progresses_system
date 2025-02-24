@@ -17,10 +17,8 @@
                                 $string = '<a href="' . route('home') . '?reference=' . auth()->user()->username . '" target="_blank"> <img src="' . getImage(fileManager()->promotions()->path . '/' . @$banner->banner) . '" alt="image"/></a>';
                             @endphp
 
-                            <textarea type="url" id="reflink{{ $banner->id }}" class="form--control form-control" rows="5" readonly>@php echo  $string @endphp</textarea>
-                            <button type="button" data-copytarget="#reflink{{ $banner->id }}"
-                                class="btn btn--base justify-content-center w-100 mt-3 copybtn"><i class="fa fa-copy"></i>
-                                &nbsp; @lang('Copy')</button>
+                            <h2>{{ @$banner->name }}</h2>
+                            
                         </div>
                     </div>
                 </div>
