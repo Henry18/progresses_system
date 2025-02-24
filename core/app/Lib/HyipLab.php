@@ -127,7 +127,10 @@ class HyipLab
         if ($this->setting->invest_commission == 1) {
             $referrer = User::find($user->ref_by);
             $commissionType = 'invest_commission';
-            self::levelCommission($user, $amount, $commissionType, $trx, $this->setting, $referrer);
+            if($referrer !== null && $referrer->total_invests > 0)
+            {
+                self::levelCommission($user, $amount, $commissionType, $trx, $this->setting, $referrer);
+            }
         }
 
         notify($user, 'INVESTMENT', [
