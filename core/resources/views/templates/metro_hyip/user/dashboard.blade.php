@@ -1,7 +1,15 @@
 @extends($activeTemplate . 'layouts.master') @section('content') @php $kyc = getContent('kyc.content', true); @endphp
 <section class="mt-3 mb-60">
 	<div class="notice"></div>
-
+	@if ($user->profile_complete==0)
+	<div class="alert border border--danger" role="alert">
+		<div class="alert__icon d-flex align-items-center text--danger"><i class="fas fa-bell"></i></div>
+		<p class="alert__message">
+			<span class="fw-bold">@lang('Debes Terminar de completar tu perfil')</span><br>
+			<small>@lang('puedes completar tu perfil') <a href="user-data">aqui</a></small>
+		</p>
+	</div>
+	@endif
 	@if ($user->kv == Status::KYC_UNVERIFIED && $user->kyc_rejection_reason)
 	<div class="alert border border--danger" role="alert">
 		<div class="alert__icon d-flex align-items-center text--danger"><i class="fas fa-times-circle"></i>
