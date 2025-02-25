@@ -219,7 +219,7 @@
                 var modal = $('#investModal');
                 plan = $(this).data('plan');
                 console.log(plan);
-                modal.find('.cap_plan').attr('title', '@lang('By activating this option you indicate that you want to receive your invested balance in equal fractions in the last')' + ' ' + plan.capital_months_return + ' ' + '@lang('months of the plan')');
+                modal.find('.cap_plan').attr('title', '@lang('By activating this option you indicate that you want to receive your invested balance in equal fractions in the last')' + ' ' + (plan.repeat_time  - plan.capital_months_return) + ' ' + '@lang('months of the plan')');
 
                 tooltips()
                 modal.find('.planName').text(plan.name)
