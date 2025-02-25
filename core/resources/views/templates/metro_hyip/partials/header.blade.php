@@ -30,7 +30,7 @@
                         @include($activeTemplate . 'partials.language')
                     @endif
                 </ul>
-                <!--<ul class="login-registration-list d-flex flex-wrap align-items-center">
+                <ul class="login-registration-list d-flex flex-wrap align-items-center">
                     @auth
                         <li class="login-registration-list__item"><a href="{{ route('user.home') }}" class="login-registration-list__link btn btn--base btn--sm"> @lang('Dashboard')</a></li>
                         <li class="login-registration-list__item"><a href="{{ route('user.logout') }}" class="login-registration-list__link btn btn--base btn--sm"> @lang('Logout')</a></li>
@@ -38,7 +38,7 @@
                         <li class="login-registration-list__item"><a href="{{ route('user.register') }}" class="login-registration-list__link btn btn--base btn--sm"> @lang('Register')</a></li>
                         <li class="login-registration-list__item"><a href="{{ route('user.login') }}" class="login-registration-list__link btn btn--base btn--sm"> @lang('Login')</a></li>
                     @endauth
-                </ul>-->
+                </ul>
             </div>
         </nav>
     </div>
