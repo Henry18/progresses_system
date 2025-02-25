@@ -9,7 +9,7 @@
     var firebaseConfig = @json(gs('firebase_config'));
 
     function pushNotifyAction(){
-        permission = Notification.permission;
+        /*permission = Notification.permission;
 
         if(!('Notification' in window)){
             notify('info', 'Push notifications not available in your browser. Try Chromium.')
@@ -24,7 +24,7 @@
                     </p>
                 </div>
             `);
-        }
+        }*/
     }
 
     //If enable push notification from admin panel
