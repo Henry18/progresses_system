@@ -107,6 +107,7 @@ class RegisterController extends Controller
         $user->email     = strtolower($data['email']);
         $user->firstname = $data['firstname'];
         $user->lastname  = $data['lastname'];
+        $user->username  = $data['username'];
         $user->password  = Hash::make($data['password']);
         $user->ref_by    = $referUser ? $referUser->id : 0;
         $user->kv = gs('kv') ? Status::NO : Status::YES;

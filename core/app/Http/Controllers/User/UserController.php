@@ -234,6 +234,7 @@ class UserController extends Controller
         if (!$user->email) {
             $validationRule['firstname'] = 'required';
             $validationRule['lastname']  = 'required';
+            $validationRule['username']  = 'required';
             $validationRule['email']     = 'required|email|unique:users';
         }
 
@@ -248,6 +249,7 @@ class UserController extends Controller
         if (!$user->email) {
             $user->firstname = $request->firstname;
             $user->lastname  = $request->lastname;
+            $user->username  = $request->username;
             $user->email = $request->email;
             $user->ev    = gs('ev') ? Status::NO : Status::YES;
         }

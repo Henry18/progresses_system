@@ -176,6 +176,12 @@
                 <span class="text"> @lang('2FA Security') </span>
             </a>
         </li>
+        <li class="sidebar-menu-list__item {{ menuActive('user.twofactor') }}">
+            <a href="{{ route('user.profile.setting') }}" class="sidebar-menu-list__link">
+                <span class="icon"><i class="fas fa-user"></i></span>
+                <span class="text"> @lang('Profile Setting') </span>
+            </a>
+        </li>
         <li class="sidebar-menu-list__item">
             <a href="{{ route('user.logout') }}" class="sidebar-menu-list__link">
                 <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
