@@ -39,7 +39,10 @@
                                                 </div>
                                             </div>
                                         @endif
-
+                                        <div class="form-group col-sm-6">
+                                            <label class="form--label">@lang('DNI')</label>
+                                            <input type="text" class="form--control" name="dni" value="{{ $user->dni }}" required>
+                                        </div>
 
                                         <div class="col-md-6">
                                             <div class="form-group">
