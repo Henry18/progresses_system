@@ -70,6 +70,14 @@ $.each(inputElements, function (index, element) {
     }
 });
 
+function tooltips() {
+  setTimeout(function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title], [data-title], [data-bs-title]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+  }, 100);
+}
 
 
 var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title], [data-title], [data-bs-title]'))

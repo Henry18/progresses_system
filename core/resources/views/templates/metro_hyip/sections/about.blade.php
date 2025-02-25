@@ -23,13 +23,12 @@
                     </p>
                     <ul class="about-content__list">
                         <li class="about-content__item"> <span class="about-content__icon"><i
-                                    class="las la-check"></i></span> {{ __(@$about->data_values->point_one) }}</li>
+                                    class="las la-check"></i></span><strong>{{ __(@$about->data_values->label_point_one) }}</strong> {{ __(@$about->data_values->point_one) }}</li>
                         <li class="about-content__item"> <span class="about-content__icon"><i
-                                    class="las la-check"></i></span> {{ __(@$about->data_values->point_two) }}</li>
+                                    class="las la-check"></i></span><strong>{{ __(@$about->data_values->label_point_two) }}</strong> {{ __(@$about->data_values->point_two) }}</li>
                         <li class="about-content__item"> <span class="about-content__icon"><i
-                                    class="las la-check"></i></span> {{ __(@$about->data_values->point_three) }}</li>
-                        <li class="about-content__item"> <span class="about-content__icon"><i
-                                    class="las la-check"></i></span> {{ __(@$about->data_values->point_three) }}</li>
+                                    class="las la-check"></i></span><strong>{{ __(@$about->data_values->label_point_three) }}</strong> {{ __(@$about->data_values->point_three) }}</li>
+                        
                     </ul>
                 </div>
 

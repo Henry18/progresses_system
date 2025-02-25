@@ -10,7 +10,7 @@
     </div>
     <!-- Sidebar Logo End -->
     <!--==== account start ==== -->
-    <div class="balance">
+    <!--div class="balance">
         <h5 class="balance__title"> @lang('Account Balance') </h5>
         <div class="balance__item">
             <span class="balance__item-wallet"> @lang('Deposit Wallet') </span>
@@ -24,7 +24,7 @@
             <a href="{{ route('user.deposit.index') }}" class="balance__button-one style-one"> @lang('Deposit') </a>
             <a href="{{ route('user.withdraw') }}" class="balance__button-one style-two"> @lang('Withdraw') </a>
         </div>
-    </div>
+    </div-->
     <!--===== account end ===== -->
 
     <!-- ========= Sidebar Menu Start ================ -->
@@ -49,7 +49,7 @@
                 </a>
             </li>
         @endif
-        @if (gs('staking_option')) 
+        @if (gs('staking_option'))
             <li class="sidebar-menu-list__item {{ menuActive('user.staking.index') }} ">
                 <a href="{{ route('user.staking.index') }}" class="sidebar-menu-list__link ">
                     <span class="icon"><i class="fas fa-chart-line"></i></span>
@@ -57,7 +57,7 @@
                 </a>
             </li>
         @endif
-        @if (gs('pool_option')) 
+        @if (gs('pool_option'))
             <li class="sidebar-menu-list__item {{ menuActive(['user.pool.index', 'user.pool.invests']) }} ">
                 <a href="{{ route('user.pool.index') }}" class="sidebar-menu-list__link ">
                     <span class="icon"><i class="fas fa-cubes"></i></span>
@@ -97,7 +97,22 @@
                 </ul>
             </div>
         </li>
-
+        <li class="sidebar-menu-list__item has-dropdown">
+            <a href="javascript:void(0)" class="sidebar-menu-list__link">
+                <span class="icon"><i class="fas fa-money-bill-wave"></i></span>
+                <span class="text">@lang('Token')</span>
+            </a>
+            <div class="sidebar-submenu {{ menuActive(['user.token', 'user.token.grafica']) }}">
+                <ul class="sidebar-submenu-list">
+                    <li class="sidebar-submenu-list__item  {{ menuActive('user.token.grafica') }}">
+                        <a href="{{ route('user.token.grafica') }}" class="sidebar-submenu-list__link">Grafica</a>
+                    </li>
+                    <li class="sidebar-submenu-list__item ">
+                        <a target="_blank" href="https://pancakeswap.finance/?inputCurrency=0x55d398326f99059fF775485246999027B3197955&outputCurrency=0x2e954e60ea4125EfaBda0F0bdedF1a68d6040E23" class="sidebar-submenu-list__link">Comprar Token</a>
+                    </li>
+                </ul>
+            </div>
+        </li>
         @if (gs('b_transfer'))
             <li class="sidebar-menu-list__item {{ menuActive('user.transfer.balance') }}">
                 <a href="{{ route('user.transfer.balance') }}" class="sidebar-menu-list__link">
@@ -106,7 +121,7 @@
                 </a>
             </li>
         @endif
-        
+
         <li class="sidebar-menu-list__item {{ menuActive('user.transactions') }}">
             <a href="{{ route('user.transactions') }}" class="sidebar-menu-list__link">
                 <span class="icon"> <i class="fas fa-exchange-alt"></i> </span>
@@ -159,6 +174,12 @@
             <a href="{{ route('user.twofactor') }}" class="sidebar-menu-list__link">
                 <span class="icon"><i class="fas fa-lock"></i></span>
                 <span class="text"> @lang('2FA Security') </span>
+            </a>
+        </li>
+        <li class="sidebar-menu-list__item {{ menuActive('user.twofactor') }}">
+            <a href="{{ route('user.profile.setting') }}" class="sidebar-menu-list__link">
+                <span class="icon"><i class="fas fa-user"></i></span>
+                <span class="text"> @lang('Profile Setting') </span>
             </a>
         </li>
         <li class="sidebar-menu-list__item">

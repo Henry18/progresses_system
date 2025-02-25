@@ -51,6 +51,7 @@ class RankingController extends Controller
         $userRanking->minimum_invest      = $request->minimum_invest;
         $userRanking->min_referral_invest = $request->team_minimum_invest;
         $userRanking->min_referral        = $request->min_referral;
+        $userRanking->refer_bonus_level        = $request->refer_bonus_level;
         $userRanking->bonus               = $request->bonus;
         $userRanking->save();
 

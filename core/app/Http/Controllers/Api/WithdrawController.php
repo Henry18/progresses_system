@@ -29,8 +29,8 @@ class WithdrawController extends Controller
             $nextWorkingDay       = Carbon::parse($nextWorkingDay)->toDateString();
             $nextWorkingDayRemSec = abs(Carbon::parse($nextWorkingDay)->diffInSeconds());
         }
-
-        $notify[] = 'Withdrawals methods';
+        
+        $notify[] = __('Withdrawals methods');
         return responseSuccess('withdraw_methods', $notify, [
             'next_working_day'         => $nextWorkingDay,
             'is_holiday'               => $isHoliday,
@@ -44,7 +44,7 @@ class WithdrawController extends Controller
     {
         $isHoliday = HyipLab::isHoliDay(now()->toDateTimeString(), gs());
         if ($isHoliday && !gs()->holiday_withdraw) {
-            $notify[] = 'Today is holiday. You\'re unable to withdraw today';
+            $notify[] = __('Today is holiday. You\'re unable to withdraw today');
             return response()->json([
                 'remark'  => 'holiday',
                 'status'  => 'error',
@@ -63,22 +63,22 @@ class WithdrawController extends Controller
 
         $method = WithdrawMethod::where('id', $request->method_code)->active()->first();
         if (!$method) {
-            $notify[] = 'Withdraw method not found.';
+            $notify[] = __('Withdraw method not found.');
             return responseError('validation_error', $notify);
         }
 
         $user = auth()->user();
         if ($request->amount < $method->min_limit) {
-            $notify[] = 'Your requested amount is smaller than minimum amount';
+            $notify[] = __('Your requested amount is smaller than minimum amount');
             return responseError('validation_error', $notify);
         }
         if ($request->amount > $method->max_limit) {
-            $notify[] = 'Your requested amount is larger than maximum amount';
+            $notify[] = __('Your requested amount is larger than maximum amount');
             return responseError('validation_error', $notify);
         }
 
         if ($request->amount > $user->interest_wallet) {
-            $notify[] = 'You do not have sufficient balance for withdraw.';
+            $notify[] = __('You do not have sufficient balance for withdraw.');
             return responseError('validation_error', $notify);
         }
 
@@ -86,7 +86,7 @@ class WithdrawController extends Controller
         $afterCharge = $request->amount - $charge;
 
         if ($afterCharge <= 0) {
-            $notify[] = 'Withdraw amount must be sufficient for charges';
+            $notify[] = __('Withdraw amount must be sufficient for charges');
             return responseError('validation_error', $notify);
         }
 
@@ -104,7 +104,7 @@ class WithdrawController extends Controller
         $withdraw->trx          = getTrx();
         $withdraw->save();
 
-        $notify[] = 'Withdraw request created';
+        $notify[] = __('Withdraw request created');
         return responseSuccess('withdraw_request_created', $notify, [
             'trx'           => $withdraw->trx,
             'withdraw_data' => $withdraw,
@@ -116,7 +116,7 @@ class WithdrawController extends Controller
     {
         $isHoliday = HyipLab::isHoliDay(now()->toDateTimeString(), gs());
         if ($isHoliday && !gs()->holiday_withdraw) {
-            $notify[] = 'Today is holiday. You\'re unable to withdraw today';
+            $notify[] = __('Today is holiday. You\'re unable to withdraw today');
             return responseError('holiday', $notify);
         }
         
@@ -130,14 +130,14 @@ class WithdrawController extends Controller
 
         $withdraw = Withdrawal::with('method', 'user')->where('trx', $request->trx)->where('status', Status::PAYMENT_INITIATE)->orderBy('id', 'desc')->first();
         if (!$withdraw) {
-            $notify[] = 'Withdrawal request not found';
+            $notify[] = __('Withdrawal request not found');
             return responseError('validation_error', $notify);
         }
 
         $method = $withdraw->method;
 
         if ($method->status == Status::DISABLE) {
-            $notify[] = 'Withdraw method not found.';
+            $notify[] = __('Withdraw method not found.');
             return responseError('validation_error', $notify);
         }
 
@@ -157,18 +157,18 @@ class WithdrawController extends Controller
         $user = auth()->user();
         if ($user->ts) {
             if (!$request->authenticator_code) {
-                $notify[] = 'Google authentication is required';
+                $notify[] = __('Google authentication is required');
                 return responseError('validation_error', $notify);
             }
             $response = verifyG2fa($user, $request->authenticator_code);
             if (!$response) {
-                $notify[] = 'Wrong verification code';
+                $notify[] = __('Wrong verification code');
                 return responseError('validation_error', $notify);
             }
         }
 
         if ($withdraw->amount > $user->interest_wallet) {
-            $notify[] = 'Your request amount is larger then your current balance';
+            $notify[] = __('Your request amount is larger then your current balance');
             return responseError('validation_error', $notify);
         }
 

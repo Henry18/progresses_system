@@ -39,13 +39,9 @@
                                                 </div>
                                             </div>
                                         @endif
-
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <label for="username" class="form--label">@lang('Username')</label>
-                                                <input type="text" name="username" class="form--control checkUser" id="username" value="{{ old('username') }}" required>
-                                                <small class="text--danger usernameExist"></small>
-                                            </div>
+                                        <div class="form-group col-sm-6">
+                                            <label class="form--label">@lang('DNI')</label>
+                                            <input type="text" class="form--control" name="dni" value="{{ $user->dni }}" required>
                                         </div>
 
                                         <div class="col-md-6">

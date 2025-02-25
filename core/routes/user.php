@@ -78,6 +78,8 @@ Route::middleware('auth', 'delete.status')->name('user.')->group(function () {
 
                 Route::get('promotional-banners', 'promotionalBanners')->name('promotional.banner');
 
+                Route::get('token-grafica', 'tokenGrafica')->name('token.grafica');
+
                 //Balance Transfer
                 Route::get('transfer-balance', 'transferBalance')->name('transfer.balance');
                 Route::post('transfer-balance', 'transferBalanceSubmit');

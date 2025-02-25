@@ -4543,10 +4543,6 @@ select option {
     padding: 30px 20px;
 }
 
-.dashboard-fluid .sidebar-logo__link img {
-    max-width: 180px;
-    max-height: 100px;
-}
 
 .dashboard-fluid .balance {
     padding: 0 20px;
@@ -4893,7 +4889,7 @@ select option {
     position: relative;
     width: 856px;
     height: 800px;
-    z-index: 1;
+    z-index: -10;
 }
 
 @media screen and (max-width: 1199px) {
@@ -5177,12 +5173,14 @@ select option {
 /* =========================== Banner Section End Here ========================= */
 /* ===========================train section start here=========================== */
 .train-section {
-    width: 100%;
-    height: 75px;
-    position: relative;
     z-index: 555;
-    margin-top: -70px;
     overflow: hidden;
+    position: absolute;
+    width: 112%;
+    height: 187px;
+    transform: rotateZ(21deg);
+    top: 200px;
+    left: -74px;
 }
 
 .train-wrapper {
@@ -5194,22 +5192,17 @@ select option {
     animation: train-move 12s linear infinite;
     animation-delay: 1s;
 }
+.imgnave{
+        transform: rotateZ(-48deg);
+        width: 100px;
+        opacity: 0.8;
+}
 
 .train {
     position: relative;
 }
+body{overflow-x: hidden;}
 
-.train::before {
-    content: "";
-    position: absolute;
-    width: 160px;
-    height: 28px;
-    bottom: -2px;
-    left: -158px;
-    background: url(../../metro_hyip/images/shapes/train-light.png) no-repeat center;
-    background-size: 160px;
-    animation: 0.5s train-light ease-in-out infinite;
-}
 
 .railway {
     width: 100%;
@@ -5402,7 +5395,7 @@ select option {
 }
 
 .about-content__item {
-    display: flex;
+    display: flow;
     color: hsl(var(--white)/0.8);
     margin-bottom: 15px;
     font-weight: 400;
@@ -7586,3 +7579,129 @@ select option {
     
     padding: 15px 30px;
 }
+/* dashboard section css start */
+.d-widget {
+	padding: 20px;
+	background-color: hsl(var(--base));
+	border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	-ms-border-radius: 10px;
+	-o-border-radius: 10px;
+}
+
+.d-widget .icon {
+	width: 50px;
+	height: 50px;
+	text-align: center;
+	line-height: 50px;
+	background-color: #0d0b32;
+	color: hsl(0deg 0% 97.32%);
+	font-size: 32px;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-ms-border-radius: 5px;
+	-o-border-radius: 5px;
+}
+
+.d-widget .amount {
+	color: hsl(var(--base));
+	line-height: 1;
+}
+
+.d-widget .caption {
+	font-size: 14px;
+	color: var(--second_color);
+	font-weight: 600;
+}
+
+.d-widget.color--two {
+	background-color: #309eff;
+}
+
+.d-widget.color--two .icon {
+	color: #309eff;
+}
+
+.d-widget.color--two .amount {
+	color: #309eff;
+}
+
+.d-widget.color--three {
+	background-color: #52c889;
+}
+
+.d-widget.color--three .icon {
+	color: #52c889;
+}
+
+.d-widget.color--three .amount {
+	color: #52c889;
+}
+
+.d-widget.color--four {
+	background-color: #ff9800;
+}
+
+.d-widget.color--four .icon {
+	color: #ff9800;
+}
+
+.d-widget.color--four .amount {
+	color: #ff9800;
+}
+
+.d-widget.color--five {
+	background-color: #00bcd4;
+}
+
+.d-widget.color--five .icon {
+	color: #00bcd4;
+}
+
+.d-widget.color--five .amount {
+	color: #00bcd4;
+}
+
+.d-widget.color--six {
+	background-color: #18dab2;
+}
+
+.d-widget.color--six .icon {
+	color: #18dab2;
+}
+
+.d-widget.color--six .amount {
+	color: #10163a;
+}
+
+.mb-30 {
+    margin-bottom: 30px;
+}
+.accordion-item {
+    background-color: #ffffff00;
+}
+.accordion-item {
+    color: #ffffff;
+    border: none !important;
+}
+.accordion-body {
+    padding: 0;
+}
+.accordion {
+--bs-accordion-border-color: none;
+}
+.accordion {
+    --bs-accordion-color: #ffffff;
+    --bs-accordion-bg: #141443;
+    --bs-accordion-transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
+    --bs-accordion-border-color: #ffffff;
+    --bs-accordion-btn-color: #ffffff;
+    --bs-accordion-active-color: #ffffff;
+    --bs-accordion-active-bg: #3703b0;
+}
+.accordion-item:first-of-type, .accordion-item:last-of-type .accordion-button.collapsed{
+    border: none;
+}
+/* dashboard section css end */

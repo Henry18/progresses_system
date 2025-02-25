@@ -199,7 +199,7 @@
                 maxAmount = gatewayElement.data('max-amount');
 
                 let processingFeeInfo =
-                    `${parseFloat(gateway.percent_charge).toFixed(2)}% with ${parseFloat(gateway.fixed_charge).toFixed(2)} {{ __(gs('cur_text')) }} charge for processing fees`
+                    `${parseFloat(gateway.percent_charge).toFixed(2)}% with ${parseFloat(gateway.fixed_charge).toFixed(2)} {{ __(gs('cur_text')) }} {{__('charge for processing fees')}}`
                 $(".proccessing-fee-info").attr("data-bs-original-title", processingFeeInfo);
 
                 calculation();

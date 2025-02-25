@@ -1,0 +1,1 @@
+ALTER TABLE `plans` ADD `capital_months_return` INT NOT NULL AFTER `capital_back`;

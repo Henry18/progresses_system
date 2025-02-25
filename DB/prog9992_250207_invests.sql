@@ -1,0 +1,2 @@
+ALTER TABLE `invests` ADD `interest_rate` DECIMAL(28,8) NOT NULL AFTER `net_interest`, ADD `mon_interest_rate` DECIMAL(28,8) NOT NULL AFTER `interest_rate`;
+ALTER TABLE `invests` ADD `period_return_capital` INT NOT NULL AFTER `period`, ADD `mon_return_amount` DECIMAL(28,8) NOT NULL AFTER `period_return_capital`;

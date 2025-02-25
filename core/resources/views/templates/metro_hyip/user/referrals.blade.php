@@ -16,7 +16,7 @@
                     </div>
                 </div>
 
-                
+
                 @if ($user->allReferrals->count() > 0 && $maxLevel > 0)
                     <div class="treeview-container">
                         <ul class="treeview">

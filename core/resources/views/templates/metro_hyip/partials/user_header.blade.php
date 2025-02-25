@@ -4,6 +4,9 @@
         <div class="dashboard-header__left">
             <h4 class="dashboard-header__left-title"> {{ __($pageTitle) }} </h4>
         </div>
+        @if (gs('multi_language'))
+                            @include($activeTemplate . 'partials.language')
+                        @endif
         <div class="dashboard-header__right">
             <div class="user-info">
                 <div class="user-info__button">
@@ -14,12 +17,12 @@
                                     class="rang-user-icon">
                             </span>
                         @endif
-
                         <span class="user-info__thumb">
                             {{ getInitials(auth()->user()->fullname) }}
                         </span>
 
                         <ul class="user-info-dropdown">
+                        
                             <li class="user-info-dropdown__item"><a class="user-info-dropdown__link"
                                     href="{{ route('user.profile.setting') }}">@lang('Profile Setting')</a></li>
                             <li class="user-info-dropdown__item"><a class="user-info-dropdown__link"
@@ -49,3 +52,21 @@
 <div class="dashboard-body__bar d-xl-none d-block mt-2 text-end">
     <span class="dashboard-body__bar-icon"><i class="las la-bars"></i></span>
 </div>
+<style>
+    .language_switcher__caption .text, .language_switcher__list .text{
+        display:none
+    }
+    .language_switcher{
+        position: absolute;
+        right: -8px;
+        top: 16px;
+    }
+    .language_switcher__list {
+        width: auto;
+    }
+    @media (max-width: 991px) {
+    .language_switcher {
+        display: none;
+    }
+}
+</style>

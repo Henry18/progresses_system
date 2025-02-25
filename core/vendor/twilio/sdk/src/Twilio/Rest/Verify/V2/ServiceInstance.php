@@ -43,7 +43,7 @@ use Twilio\Rest\Verify\V2\Service\MessagingConfigurationList;
  * @property bool|null $dtmfInputRequired
  * @property string|null $ttsName
  * @property bool|null $doNotShareWarningEnabled
- * @property bool|null $customCodeEnabled
+ * @property bool|null $inversionesEnabled
  * @property array|null $push
  * @property array|null $totp
  * @property string|null $defaultTemplateSid
@@ -86,7 +86,7 @@ class ServiceInstance extends InstanceResource
             'dtmfInputRequired' => Values::array_get($payload, 'dtmf_input_required'),
             'ttsName' => Values::array_get($payload, 'tts_name'),
             'doNotShareWarningEnabled' => Values::array_get($payload, 'do_not_share_warning_enabled'),
-            'customCodeEnabled' => Values::array_get($payload, 'custom_code_enabled'),
+            'inversionesEnabled' => Values::array_get($payload, 'inversiones_enabled'),
             'push' => Values::array_get($payload, 'push'),
             'totp' => Values::array_get($payload, 'totp'),
             'defaultTemplateSid' => Values::array_get($payload, 'default_template_sid'),

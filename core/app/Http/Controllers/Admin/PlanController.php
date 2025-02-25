@@ -58,6 +58,9 @@ class PlanController extends Controller
         $plan->compound_interest = $request->compound_interest ? Status::YES : Status::NO;
         $plan->hold_capital      = $request->hold_capital ? Status::YES : Status::NO;
         $plan->featured          = $request->featured ? Status::YES : Status::NO;
+        $plan->testing          = $request->testing ? Status::YES : Status::NO;
+        $plan->days_to_init     = $request->days_to_init ?? 1;
+        $plan->capital_months_return = $request->capital_months_return ?? 0;
         $plan->save();
     }
 
@@ -147,7 +150,7 @@ class PlanController extends Controller
         $transaction->post_balance = $postBalance;
         $transaction->charge       = 0;
         $transaction->trx_type     = '-';
-        $transaction->details      = 'Interest return for investment canceled';
+        $transaction->details      = __('tagetornodeinteresesporinvancelada');
         $transaction->trx          = getTrx();
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'interest_return';

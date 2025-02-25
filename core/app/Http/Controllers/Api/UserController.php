@@ -294,7 +294,7 @@ class UserController extends Controller {
         $transaction->trx          = $trx1;
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'balance_transfer';
-        $transaction->details      = 'Balance transfer to ' . $receiver->username;
+        $transaction->details      = __('tagbalancetransferto') .' '. $receiver->username;
         $transaction->post_balance = getAmount($user->$wallet);
         $transaction->save();
 
@@ -311,7 +311,7 @@ class UserController extends Controller {
         $transaction->trx          = $trx2;
         $transaction->wallet_type  = 'deposit_wallet';
         $transaction->remark       = 'balance_received';
-        $transaction->details      = 'Balance received from ' . $user->username;
+        $transaction->details      = __('tagbalancereceivedfrom') .' '. $user->username;
         $transaction->post_balance = getAmount($user->deposit_wallet);
         $transaction->save();
 

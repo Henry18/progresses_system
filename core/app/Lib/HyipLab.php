@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Invest;
 use App\Models\Holiday;
 use App\Models\Referral;
+use App\Models\UserReferralsRanking;
+use App\Models\UserRanking;
 use App\Constants\Status;
 use App\Models\Transaction;
 use App\Models\ScheduleInvest;
@@ -56,7 +58,7 @@ class HyipLab
      * @param string $wallet
      * @return void
      */
-    public function invest($amount, $wallet, $compoundTimes = 0)
+    public function invest($amount, $wallet, $compoundTimes = 0, $fractional_capital = 0)
     {
         $plan = $this->plan;
         $user = $this->user;
@@ -87,8 +89,9 @@ class HyipLab
 
         $period = ($plan->lifetime == 1) ? -1 : $plan->repeat_time;
 
-        $next = self::nextWorkingDay($plan->timeSetting->time);
-
+        //$next = self::nextWorkingDay($plan->timeSetting->time);
+        //multiplica los dias para el inicio * 24 horas, y el sistema entonces basado en esas horas le coloca la proxima fecha de pago
+        $next = self::nextWorkingDay($plan->days_to_init * 24);
         $shouldPay = -1;
         if ($period > 0) {
             $shouldPay = $interestAmount * $period;
@@ -101,7 +104,12 @@ class HyipLab
         $invest->initial_amount     = $amount;
         $invest->interest           = $interestAmount;
         $invest->initial_interest   = $interestAmount;
+        $invest->interest_rate      = $plan->interest;
+        $invest->mon_interest_rate  = $plan->interest/21;
+        $invest->period_return_capital = $period - $plan->capital_months_return;
+        $invest->mon_return_amount  = $amount / ($period - $plan->capital_months_return);
         $invest->period             = $period;
+        $invest->rec_total_days     = 21;
         $invest->time_name          = $plan->timeSetting->name;
         $invest->hours              = $plan->timeSetting->time;
         $invest->next_time          = $next;
@@ -113,11 +121,16 @@ class HyipLab
         $invest->compound_times     = $compoundTimes ?? 0;
         $invest->rem_compound_times = $compoundTimes ?? 0;
         $invest->hold_capital       = $plan->hold_capital;
+        $invest->fractional_capital = $fractional_capital;
         $invest->save();
 
         if ($this->setting->invest_commission == 1) {
+            $referrer = User::find($user->ref_by);
             $commissionType = 'invest_commission';
-            self::levelCommission($user, $amount, $commissionType, $trx, $this->setting);
+            if($referrer !== null && $referrer->total_invests > 0)
+            {
+                self::levelCommission($user, $amount, $commissionType, $trx, $this->setting, $referrer);
+            }
         }
 
         notify($user, 'INVESTMENT', [
@@ -182,6 +195,22 @@ class HyipLab
         return $next;
     }
 
+    public static function nextWorkingMinute($minutes) {
+        $now     = now();
+        $setting = gs();
+        $minutes = (int) $minutes;
+        while (0 == 0) {
+            $nextPossible = Carbon::parse($now)->addMinutes($minutes)->toDateTimeString();
+
+            if (!self::isHoliDay($nextPossible, $setting)) {
+                $next = $nextPossible;
+                break;
+            }
+            $now = $now->addDay();
+        }
+        return $next;
+    }
+
     /**
      * Check the date is holiday or not
      *
@@ -216,14 +245,112 @@ class HyipLab
      * @param object $setting
      * @return void
      */
-    public static function levelCommission($user, $amount, $commissionType, $trx, $setting)
+    public static function levelCommission($user, $amount, $commissionType, $trx, $setting, $referrer)
     {
-        $meUser       = $user;
-        $i            = 1;
-        $level        = Referral::where('commission_type', $commissionType)->count();
+        $level = Referral::where('commission_type', $commissionType)->first();
+        $referral_bonus_times_max = 0;
+        $refer_bonus_level = 0;
+        if ($user->ref_by > 0) {
+            if($referrer->user_ranking_id !== 0)
+            {
+                $levelRanking = UserRanking::find($referrer->user_ranking_id);
+                $referral_bonus_times_max = $levelRanking->level;
+                $refer_bonus_level = $levelRanking->refer_bonus_level;
+            }
+
+            $refer_times = UserReferralsRanking::updateOrCreate(
+                [
+                    'codigo_referred' => $user->id,
+                    'codigo_referrer' => $user->ref_by,
+                ],
+                [
+                    'referral_bonus_times_max' => $referral_bonus_times_max,
+                    'referral_ranking' => $referrer->user_ranking_id,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]
+            );
+            $recentCreate = $refer_times->wasRecentlyCreated;
+
+            $refer_bonus_level = ($recentCreate && $refer_times->referral_bonus_times  == 0) ? $refer_bonus_level : $refer_times->referral_bonus_times + 1;
+
+            $bonusPercent = $recentCreate ? $level->percent : $refer_bonus_level;
+
+            if ($recentCreate || $refer_times->referral_bonus_times < $refer_times->referral_bonus_times_max) {
+                $com = ($amount * $bonusPercent) / 100;
+                $referrer->bonus_wallet += $com;
+                $referrer->save();
+
+                $transactions[] = [
+                    'user_id' => $referrer->id,
+                    'amount' => $com,
+                    'post_balance' => $referrer->bonus_wallet,
+                    'charge' => 0,
+                    'trx_type' => '+',
+                    'details' => 'Nivel ' . $refer_bonus_level . ' comisión de referido de ' . $user->username .
+                               ' (Bono #' . ($refer_times->referral_bonus_times  == 0 ? $refer_times->referral_bonus_times : $refer_times->referral_bonus_times + 1) . ' de ' .
+                               $refer_times->referral_bonus_times_max . ')',
+                    'trx' => $trx,
+                    'wallet_type' => 'bonus_wallet',
+                    'remark' => 'referral_commission',
+                    'created_at' => now(),
+                ];
+                Transaction::insert($transactions);
+
+                // Notificación al referidor
+                notify($referrer, 'REFERRAL_COMMISSION', [
+                    'amount' => showAmount($com, currencyFormat:false),
+                    'post_balance' => showAmount($referrer->bonus_wallet, currencyFormat:false),
+                    'trx' => $trx,
+                    'level' => $level,
+                    'type' => 'Invest',
+                ]);
+
+
+                if(!$recentCreate)
+                {
+                    $refer_times->referral_ranking = $referrer->user_ranking_id;
+                    $refer_times->referral_bonus_times += 1;
+                    $refer_times->save();
+                }
+            }
+
+
+        }
+
+       /* $transactions = [];
+
+        $transactions[] = [
+            'user_id' => $refer->id,
+            'amount' => $com,
+            'post_balance' => $refer->bonus_wallet,
+            'charge' => 0,
+            'trx_type' => '+',
+            'details' => 'Nivel ' . $i . ' comisión de referido de ' . $user->username .
+                       ' (Bono #' . $referralRanking->referral_bonus_times . ' de ' .
+                       $referralRanking->referral_bonus_times_max . ')',
+            'trx' => $trx,
+            'wallet_type' => 'bonus_wallet',
+            'remark' => 'referral_commission',
+            'created_at' => now(),
+        ];
+
+        // Notificación al referidor
+        notify($refer, 'REFERRAL_COMMISSION', [
+            'amount' => showAmount($com, currencyFormat:false),
+            'post_balance' => showAmount($refer->bonus_wallet, currencyFormat:false),
+            'trx' => $trx,
+            'level' => ordinal($i),
+            'type' => $commissionType == 'deposit_commission' ? 'Deposit' :
+                     ($commissionType == 'interest_commission' ? 'Interest' : 'Invest'),
+        ]);
+        $meUser = $user;
+        $i = 1;
+        $level = Referral::where('commission_type', $commissionType)->count();
         $transactions = [];
+
         while ($i <= $level) {
-            $me    = $meUser;
+            $me = $meUser;
             $refer = $me->referrer;
             if ($refer == "") {
                 break;
@@ -234,38 +361,62 @@ class HyipLab
                 break;
             }
 
-            $com = ($amount * $commission->percent) / 100;
-            $refer->interest_wallet += $com;
-            $refer->save();
+            $referralRanking = UserReferralsRanking::firstOrCreate(
+                [
+                    'codigo_referred' => $user->id,
+                    'codigo_referrer' => $refer->id,
+                ],
+                [
+                    'referral_bonus_times' => 0,
+                    'referral_bonus_times_max' => $refer->level,
+                    'referral_ranking' => $refer->user_ranking_id,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]
+            );
 
-            $transactions[] = [
-                'user_id'      => $refer->id,
-                'amount'       => $com,
-                'post_balance' => $refer->interest_wallet,
-                'charge'       => 0,
-                'trx_type'     => '+',
-                'details'      => 'level ' . $i . ' Referral Commission From ' . $user->username,
-                'trx'          => $trx,
-                'wallet_type'  => 'interest_wallet',
-                'remark'       => 'referral_commission',
-                'created_at'   => now(),
-            ];
-
-            if ($commissionType == 'deposit_commission') {
-                $comType = 'Deposit';
-            } elseif ($commissionType == 'interest_commission') {
-                $comType = 'Interest';
-            } else {
-                $comType = 'Invest';
+            // Calcular el porcentaje del bono basado en el ranking
+            $bonusPercent = $commission->percent;
+            if ($referralRanking->referral_bonus_times > 0) {
+                // Si no es la primera vez, usar el porcentaje según el ranking
+                $bonusPercent = $bonusPercent * ($referralRanking->referral_ranking / 100);
             }
 
-            notify($refer, 'REFERRAL_COMMISSION', [
-                'amount'       => showAmount($com, currencyFormat:false),
-                'post_balance' => showAmount($refer->interest_wallet, currencyFormat:false),
-                'trx'          => $trx,
-                'level'        => ordinal($i),
-                'type'         => $comType,
-            ]);
+            // Verificar si aún puede recibir bonos
+            if ($referralRanking->referral_bonus_times < $referralRanking->referral_bonus_times_max) {
+                $com = ($amount * $bonusPercent) / 100;
+                $refer->bonus_wallet += $com;
+                $refer->save();
+
+                // Incrementar el contador de bonos
+                $referralRanking->referral_bonus_times++;
+                $referralRanking->save();
+
+                $transactions[] = [
+                    'user_id' => $refer->id,
+                    'amount' => $com,
+                    'post_balance' => $refer->bonus_wallet,
+                    'charge' => 0,
+                    'trx_type' => '+',
+                    'details' => 'Nivel ' . $i . ' comisión de referido de ' . $user->username .
+                               ' (Bono #' . $referralRanking->referral_bonus_times . ' de ' .
+                               $referralRanking->referral_bonus_times_max . ')',
+                    'trx' => $trx,
+                    'wallet_type' => 'bonus_wallet',
+                    'remark' => 'referral_commission',
+                    'created_at' => now(),
+                ];
+
+                // Notificación al referidor
+                notify($refer, 'REFERRAL_COMMISSION', [
+                    'amount' => showAmount($com, currencyFormat:false),
+                    'post_balance' => showAmount($refer->bonus_wallet, currencyFormat:false),
+                    'trx' => $trx,
+                    'level' => ordinal($i),
+                    'type' => $commissionType == 'deposit_commission' ? 'Deposit' :
+                             ($commissionType == 'interest_commission' ? 'Interest' : 'Invest'),
+                ]);
+            }
 
             $meUser = $refer;
             $i++;
@@ -273,7 +424,7 @@ class HyipLab
 
         if (!empty($transactions)) {
             Transaction::insert($transactions);
-        }
+        }*/
     }
 
     /**
@@ -302,7 +453,7 @@ class HyipLab
         $transaction->trx          = getTrx();
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'capital_return';
-        $transaction->details      = showAmount($invest->amount) . ' ' . gs()->cur_text . ' capital back from ' . @$invest->plan->name;
+        $transaction->details      = showAmount($invest->amount) . ' ' . gs()->cur_text . '' . @$invest->plan->name;
         $transaction->save();
     }
 }

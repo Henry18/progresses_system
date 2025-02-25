@@ -87,7 +87,7 @@ class ManageUsersController extends Controller {
 
     public function detail($id) {
         $user      = User::findOrFail($id);
-        $pageTitle = 'User Detail - ' . $user->username;
+        $pageTitle = __('User Detail').' - ' . $user->username;
 
         $totalDeposit     = Deposit::where('user_id', $user->id)->successful()->sum('amount');
         $totalWithdrawals = Withdrawal::where('user_id', $user->id)->approved()->sum('amount');
@@ -196,7 +196,7 @@ class ManageUsersController extends Controller {
         $request->validate([
             'amount'      => 'required|numeric|gt:0',
             'act'         => 'required|in:add,sub',
-            'wallet_type' => 'required|in:deposit_wallet,interest_wallet',
+            'wallet_type' => 'required|in:deposit_wallet,interest_wallet,bonus_wallet',
             'remark'      => 'required|string|max:255',
         ]);
 

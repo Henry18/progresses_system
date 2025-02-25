@@ -45,6 +45,7 @@ class WithdrawController extends Controller
         ]);
         $method = WithdrawMethod::where('id', $request->method_code)->active()->firstOrFail();
         $user   = auth()->user();
+        $wallet = $request->type;
         if ($request->amount < $method->min_limit) {
             $notify[] = ['error', 'Your requested amount is smaller than minimum amount'];
             return back()->withNotify($notify)->withInput($request->all());
@@ -54,12 +55,14 @@ class WithdrawController extends Controller
             return back()->withNotify($notify)->withInput($request->all());
         }
 
-        if ($request->amount > $user->interest_wallet) {
+        if ($request->amount > $user->$wallet) {
             $notify[] = ['error', 'Insufficient balance for withdrawal'];
             return back()->withNotify($notify)->withInput($request->all());
         }
-
         $charge      = $method->fixed_charge + ($request->amount * $method->percent_charge / 100);
+        if($wallet== 'bonus_wallet' ){
+            $charge      = $method->fixed_charge_bonus + ($request->amount * $method->percent_charge_bonus / 100);
+        }
         $afterCharge = $request->amount - $charge;
 
         if ($afterCharge <= 0) {
@@ -77,6 +80,7 @@ class WithdrawController extends Controller
         $withdraw->rate         = $method->rate;
         $withdraw->charge       = $charge;
         $withdraw->final_amount = $finalAmount;
+        $withdraw->withdraw_wallet = $wallet;
         $withdraw->after_charge = $afterCharge;
         $withdraw->trx          = getTrx();
         $withdraw->save();
@@ -96,6 +100,7 @@ class WithdrawController extends Controller
         $withdraw = Withdrawal::with('method', 'user')->where('trx', session()->get('wtrx'))->where('status', Status::PAYMENT_INITIATE)->orderBy('id', 'desc')->firstOrFail();
 
         $method = $withdraw->method;
+        $wallet = $withdraw->withdraw_wallet;
         if ($method->status == Status::DISABLE) {
             abort(404);
         }
@@ -116,7 +121,7 @@ class WithdrawController extends Controller
             }
         }
 
-        if ($withdraw->amount > $user->interest_wallet) {
+        if ($withdraw->amount > $user->$wallet) {
             $notify[] = ['error', 'Your request amount is larger then your current balance.'];
             return back()->withNotify($notify)->withInput($request->all());
         }
@@ -124,13 +129,13 @@ class WithdrawController extends Controller
         $withdraw->status               = Status::PAYMENT_PENDING;
         $withdraw->withdraw_information = $userData;
         $withdraw->save();
-        $user->interest_wallet -= $withdraw->amount;
+        $user->$wallet -= $withdraw->amount;
         $user->save();
 
         $transaction               = new Transaction();
         $transaction->user_id      = $withdraw->user_id;
         $transaction->amount       = $withdraw->amount;
-        $transaction->post_balance = $user->interest_wallet;
+        $transaction->post_balance = $user->$wallet;
         $transaction->charge       = $withdraw->charge;
         $transaction->trx_type     = '-';
         $transaction->details      = 'Withdraw request via ' . $withdraw->method->name;
@@ -152,7 +157,7 @@ class WithdrawController extends Controller
             'charge'          => showAmount($withdraw->charge, currencyFormat: false),
             'rate'            => showAmount($withdraw->rate, currencyFormat: false),
             'trx'             => $withdraw->trx,
-            'post_balance'    => showAmount($user->interest_wallet, currencyFormat: false),
+            'post_balance'    => showAmount($user->$wallet, currencyFormat: false),
         ]);
 
         $notify[] = ['success', 'Withdraw request sent successfully'];

@@ -32,16 +32,6 @@
                                 <span>{{ showAmount($plan->interest, currencyFormat: false) }}{{ $plan->interest_type == 1 ? '%' : gs('cur_text') }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Compound Interest')
-                                <span>
-                                    @if ($plan->compound_interest)
-                                        @lang('Yes')
-                                    @else
-                                        @lang('No')
-                                    @endif
-                                </span>
-                            </li>
-                            <li class="list-group-item d-flex justify-content-between">
                                 @lang('Hold Capital')
                                 <span>
                                     @if ($plan->hold_capital)
@@ -55,7 +45,7 @@
                                 @lang('Repeat Time')
                                 <span>
                                     @if ($plan->repeat_time)
-                                        {{ $plan->repeat_time }} @lang('times')
+                                        {{ $plan->repeat_time }} @lang('Months')
                                     @else
                                         @lang('Lifetime')
                                     @endif
@@ -95,16 +85,16 @@
                                 <span>{{ showDateTime($invest->created_at) }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Initial Interest')
+                                @lang('Initial Interest Pay')
                                 <span>{{ showAmount($invest->initial_interest) }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Current Interest')
-                                <span>{{ showAmount($invest->interest) }}</span>
+                                @lang('Current Interest Pay')
+                                <span>{{ showAmount($invest->amount * ($invest->interest_rate/100)) }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Interest Interval')
-                                <span>@lang('Every ') {{ $invest->time_name }}</span>
+                                @lang('Pay Interest Interval')
+                                <span>@lang('Every') @lang('day')</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 @lang('Status')
@@ -128,18 +118,18 @@
                     <div class="card-body">
                         <ul class="list-group">
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Total Payable')
+                                @lang('Total Time')
                                 <span>
                                     @if ($invest->period != -1)
-                                        {{ $invest->period }} @lang(' times')
+                                        {{ $invest->period }} @lang('Months') ({{ $invest->period * 21 }} @lang('days'))
                                     @else
                                         @lang('Lifetime')
                                     @endif
                                 </span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
-                                @lang('Total Paid')
-                                <span>{{ $invest->return_rec_time }} @lang(' times')</span>
+                                @lang('Elapsed Time')
+                                <span>{{ ($invest->return_rec_time * 21) + (21 - $invest->rec_total_days) }} @lang('days')</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between">
                                 @lang('Total Paid Amount')
@@ -168,6 +158,16 @@
                                 @lang('Net Interest')
                                 <span>{{ showAmount($invest->net_interest) }}</span>
                             </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                @lang('Fractional Capital Pay')
+                                <span>
+                                    @if ($invest->fractional_capital)
+                                        @lang('Yes')
+                                    @else
+                                        @lang('No')
+                                    @endif
+                                </span>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -182,7 +182,8 @@
                     <h5 class="my-2">@lang('All Interests')</h5>
                 @endif
 
-                <table class="table style-two table-responsive--lg">
+                <div class="table-section">
+                <table class="table style-two table--responsive--lg">
                     <thead>
                         <tr>
                             <th>@lang('TRX')</th>
@@ -217,6 +218,7 @@
                         @endforelse
                     </tbody>
                 </table><!-- table end -->
+            </div>
 
                 @if ($transactions->hasPages())
                     <div class="custom--pagination">

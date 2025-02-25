@@ -5,7 +5,7 @@
                 <label class="form-label">{{ __($data->name) }} @if(@$data->instruction) <span data-bs-toggle="tooltip" data-bs-title="{{ __($data->instruction) }}"><i class="fas fa-info-circle"></i></span> @endif @if($data->is_required == 'required' && ($data->type == 'checkbox' || $data->type == 'radio')) <span class="text--danger">*</span> @endif </label>
                 @if($data->type == 'text')
                     <input type="text"
-                    class="form-control form--control"
+                    class="form-control form--control inputidTransaccion"
                     name="{{ $data->label }}"
                     value="{{ old($data->label) }}"
                     @if($data->is_required == 'required') required @endif

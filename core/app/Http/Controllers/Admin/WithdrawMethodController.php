@@ -65,6 +65,8 @@ class WithdrawMethodController extends Controller
         $method->max_limit = $request->max_limit;
         $method->fixed_charge = $request->fixed_charge;
         $method->percent_charge = $request->percent_charge;
+        $method->fixed_charge_bonus = $request->fixed_charge_bonus;
+        $method->percent_charge_bonus = $request->percent_charge_bonus;
         $method->currency = $request->currency;
         $method->description = $request->instruction;
         $method->save();
@@ -123,6 +125,8 @@ class WithdrawMethodController extends Controller
         $method->max_limit      = $request->max_limit;
         $method->fixed_charge   = $request->fixed_charge;
         $method->percent_charge = $request->percent_charge;
+        $method->fixed_charge_bonus   = $request->fixed_charge_bonus;
+        $method->percent_charge_bonus = $request->percent_charge_bonus;
         $method->description    = $request->instruction;
         $method->currency       = $request->currency;
         $method->save();

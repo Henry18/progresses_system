@@ -174,7 +174,7 @@ class SocialLogin
             $transaction->trx          =  getTrx();
             $transaction->wallet_type  = 'deposit_wallet';
             $transaction->remark       = 'registration_bonus';
-            $transaction->details      = 'You have got registration bonus';
+            $transaction->details      = __('tagyouhavegotregistrationbonus');
             $transaction->save();
         }
 

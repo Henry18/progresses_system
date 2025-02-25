@@ -70,7 +70,7 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="card border border--primary">
-                                            <h5 class="card-header bg--primary">@lang('Charge')</h5>
+                                            <h5 class="card-header bg--primary">@lang('Interest Charge')</h5>
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label>@lang('Fixed Charge')</label>
@@ -83,6 +83,27 @@
                                                     <label>@lang('Percent Charge')</label>
                                                     <div class="input-group">
                                                         <input type="number" step="any" class="form-control" name="percent_charge" value="{{ old('percent_charge') }}" required>
+                                                        <div class="input-group-text">%</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="card border border--primary">
+                                            <h5 class="card-header bg--primary">@lang('Bonus Charge')</h5>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label>@lang('Fixed Charge')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="fixed_charge_bonus" value="{{ old('fixed_charge_bonus') }}" required />
+                                                        <div class="input-group-text"> {{ __(gs('cur_text')) }} </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@lang('Percent Charge')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="percent_charge_bonus" value="{{ old('percent_charge_bonus') }}" required>
                                                         <div class="input-group-text">%</div>
                                                     </div>
                                                 </div>

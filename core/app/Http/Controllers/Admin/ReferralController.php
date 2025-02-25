@@ -14,9 +14,9 @@ class ReferralController extends Controller
         $pageTitle       = 'Manage Referral';
         $referrals       = Referral::get();
         $commissionTypes = [
-            'deposit_commission'       => 'Deposit Commission',
+            //'deposit_commission'       => 'Deposit Commission',
             'invest_commission'        => 'Invest Commission',
-            'invest_return_commission' => 'Interest Commission',
+            //'invest_return_commission' => 'Interest Commission',
         ];
         return view('admin.referral.index', compact('pageTitle', 'referrals', 'commissionTypes'));
     }

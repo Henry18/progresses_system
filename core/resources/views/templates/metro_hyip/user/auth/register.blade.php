@@ -56,8 +56,13 @@
                                                 <input type="text" class="form--control" name="lastname" value="{{ old('lastname') }}" required>
                                             </div>
                                         </div>
-
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label class="form--label">@lang('Username')</label>
+                                                <input type="text" class="form--control" name="username" value="{{ old('username') }}" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
                                             <div class="form-group">
                                                 <label for="email" class="form--label">@lang('Email Address')</label>
                                                 <input type="text" name="email" class="form--control checkUser" id="email" value="{{ old('email') }}" required>

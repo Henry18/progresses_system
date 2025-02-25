@@ -27,7 +27,7 @@
 
 @php echo loadExtension('google-analytics') @endphp
 
-<body>
+<body class="elementor-1717">
     @stack('fbComment')
 
     <div class="preloader">

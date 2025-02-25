@@ -6,6 +6,7 @@
         })
         ->where('status', 1)
         ->where('featured', 1)
+        ->where('testing', 0)
         ->get();
     $gatewayCurrency = null;
     if (auth()->check()) {

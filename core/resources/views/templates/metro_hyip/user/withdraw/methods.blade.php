@@ -44,6 +44,10 @@
                     <form action="{{ route('user.withdraw.money') }}" method="post" class="withdraw-form">
                         @csrf
                         <div class="gateway-card">
+                        <select name="type" id="type" class="form-control wallet_type">
+                            <option value="interest_wallet" selected>Billetera de Intereses</option>
+                            <option value="bonus_wallet">Billetera de Bonos</option>
+                        </select>
                             <div class="row justify-content-center gy-sm-4 gy-3">
                                 <div class="col-lg-6">
                                     <div class="payment-system-list is-scrollable gateway-option-list">
@@ -159,11 +163,25 @@
         (function($) {
 
             var amount = parseFloat($('.amount').val() || 0);
+            var walletType = ''
             var gateway, minAmount, maxAmount;
+            let percentCharge = 0;
+            let fixedCharge = 0;
+            let totalPercentCharge = 0;
 
 
             $('.amount').on('input', function(e) {
+                walletType = $('.wallet_type').val();
                 amount = parseFloat($(this).val());
+                if (!amount) {
+                    amount = 0;
+                }
+                calculation();
+            });
+            $('.wallet_type').on('change', function(e) {
+                walletType = $(this).val();
+
+                amount = parseFloat($('.amount').val() || 0);
                 if (!amount) {
                     amount = 0;
                 }
@@ -182,10 +200,6 @@
                 minAmount = gatewayElement.data('min-amount');
                 maxAmount = gatewayElement.data('max-amount');
 
-                let processingFeeInfo =
-                    `${parseFloat(gateway.percent_charge).toFixed(2)}% with ${parseFloat(gateway.fixed_charge).toFixed(2)} {{ __(gs('cur_text')) }} charge for processing fees`
-                $(".proccessing-fee-info").attr("data-bs-original-title", processingFeeInfo);
-
                 calculation();
             }
 
@@ -203,14 +217,14 @@
             function calculation() {
                 if (!gateway) return;
                 $(".gateway-limit").text(minAmount + " - " + maxAmount);
-                let percentCharge = 0;
-                let fixedCharge = 0;
-                let totalPercentCharge = 0;
 
                 if (amount) {
-                    percentCharge = parseFloat(gateway.percent_charge);
-                    fixedCharge = parseFloat(gateway.fixed_charge);
+                    percentCharge = walletType == 'interest_wallet' ? parseFloat(gateway.percent_charge) : parseFloat(gateway.percent_charge_bonus);
+                    fixedCharge = walletType == 'interest_wallet' ? parseFloat(gateway.fixed_charge) : parseFloat(gateway.fixed_charge_bonus);
                     totalPercentCharge = parseFloat(amount / 100 * percentCharge);
+                    let processingFeeInfo =
+                    `${parseFloat(percentCharge).toFixed(2)}% with ${parseFloat(fixedCharge).toFixed(2)} {{ __(gs('cur_text')) }} {{__('charge for processing fees')}}`
+                $(".proccessing-fee-info").attr("data-bs-original-title", processingFeeInfo);
                 }
 
                 let totalCharge = parseFloat(totalPercentCharge + fixedCharge);
@@ -250,3 +264,39 @@
         })(jQuery);
     </script>
 @endpush
+<style>
+    #type {
+  appearance: none;
+  background-color: #1a1754;
+  color: #ffffff;
+  border: 2px solid #5a48e0;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='white'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 15px;
+  margin-bottom: 12px;
+}
+
+#type:hover {
+  background-color: #2b267a;
+  border-color: #7a65ff;
+}
+
+#type:focus {
+  border-color: #a28bff;
+  box-shadow: 0 0 5px rgba(162, 139, 255, 0.5);
+}
+
+#type option {
+  background-color: #1a1754;
+  color: white;
+  padding: 5px;
+}
+
+</style>
