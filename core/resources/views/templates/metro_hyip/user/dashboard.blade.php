@@ -6,7 +6,7 @@
 		<div class="alert__icon d-flex align-items-center text--danger"><i class="fas fa-bell"></i></div>
 		<p class="alert__message">
 			<span class="fw-bold">@lang('Debes Terminar de completar tu perfil')</span><br>
-			<small>@lang('puedes completar tu perfil') <a href="user-data">aqui</a></small>
+			<small>@lang('puedes completar tu perfil') <a href="user-data" class="text--base-two">aqui</a></small>
 		</p>
 	</div>
 	@endif

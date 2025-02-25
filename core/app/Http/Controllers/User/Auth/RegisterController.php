@@ -35,7 +35,7 @@ class RegisterController extends Controller
         } else {
             return view('Template::registration_disabled', compact('pageTitle'));
         }
-        
+
     }
 
 
@@ -57,6 +57,7 @@ class RegisterController extends Controller
             'firstname' => 'required',
             'lastname'  => 'required',
             'email'     => 'required|string|email|unique:users',
+            'username'     => 'required|unique:users|min:6',
             'password'  => ['required', 'confirmed', $passwordValidation],
             'captcha'   => 'sometimes|required',
             'agree'     => $agree
@@ -197,7 +198,7 @@ class RegisterController extends Controller
         }
 
         $parentUser = User::find($user->ref_by);
-        
+
         if($parentUser){
             notify($parentUser, 'REFERRAL_JOIN', [
                 'ref_username' => $user->username

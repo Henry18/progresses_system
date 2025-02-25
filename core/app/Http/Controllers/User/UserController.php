@@ -227,14 +227,13 @@ class UserController extends Controller
             'country_code' => 'required|in:' . $countryCodes,
             'country'      => 'required|in:' . $countries,
             'mobile_code'  => 'required|in:' . $mobileCodes,
-            'username'     => 'required|unique:users|min:6',
+            'dni'  => 'required|string:' . $mobileCodes,
             'mobile'       => ['required', 'regex:/^([0-9]*)$/', Rule::unique('users')->where('dial_code', $request->mobile_code)],
         ];
 
         if (!$user->email) {
             $validationRule['firstname'] = 'required';
             $validationRule['lastname']  = 'required';
-            $validationRule['username']  = 'required';
             $validationRule['email']     = 'required|email|unique:users';
         }
 
@@ -256,7 +255,7 @@ class UserController extends Controller
 
         $user->country_code = $request->country_code;
         $user->mobile       = $request->mobile;
-        $user->username     = $request->username;
+        $user->dni     = $request->dni;
 
         $user->address      = $request->address;
         $user->city         = $request->city;
