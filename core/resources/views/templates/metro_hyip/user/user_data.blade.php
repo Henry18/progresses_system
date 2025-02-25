@@ -40,13 +40,6 @@
                                             </div>
                                         @endif
 
-                                        <div class="col-sm-12">
-                                            <div class="form-group">
-                                                <label for="username" class="form--label">@lang('Username')</label>
-                                                <input type="text" name="username" class="form--control checkUser" id="username" value="{{ old('username') }}" required>
-                                                <small class="text--danger usernameExist"></small>
-                                            </div>
-                                        </div>
 
                                         <div class="col-md-6">
                                             <div class="form-group">
