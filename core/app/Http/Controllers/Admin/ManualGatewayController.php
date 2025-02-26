@@ -72,6 +72,7 @@ class ManualGatewayController extends Controller
         $gatewayCurrency->max_amount = $request->max_limit;
         $gatewayCurrency->fixed_charge = $request->fixed_charge;
         $gatewayCurrency->percent_charge = $request->percent_charge;
+        $gatewayCurrency->percent_charge_first_deposit = $request->percent_charge_first_deposit;
         $gatewayCurrency->rate = $request->rate;
         $gatewayCurrency->save();
 
@@ -125,6 +126,7 @@ class ManualGatewayController extends Controller
             $singleCurrency->max_amount = $request->max_limit;
             $singleCurrency->fixed_charge = $request->fixed_charge;
             $singleCurrency->percent_charge = $request->percent_charge;
+            $singleCurrency->percent_charge_first_deposit = $request->percent_charge_first_deposit;
             $singleCurrency->rate = $request->rate;
             $singleCurrency->save();
         }

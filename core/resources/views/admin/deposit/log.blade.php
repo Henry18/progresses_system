@@ -20,6 +20,7 @@
                             <th>@lang('Initiated')</th>
                             <th>@lang('User')</th>
                             <th>@lang('Amount')</th>
+                            <th>@lang('First Deposit Bonus')</th>
                             <th>@lang('Conversion')</th>
                             <th>@lang('Status')</th>
                             <th>@lang('Action')</th>
@@ -62,6 +63,7 @@
                                     {{ showAmount($deposit->amount+$deposit->charge) }}
                                     </strong>
                                 </td>
+                                <td>{{ showAmount($deposit->first_deposit_bonus) }}</td>
                                 <td>
                                     {{ showAmount(1) }} =  {{ showAmount($deposit->rate,currencyFormat:false) }} {{__($deposit->method_currency)}}
                                     <br>

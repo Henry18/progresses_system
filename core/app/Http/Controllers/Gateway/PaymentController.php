@@ -133,6 +133,13 @@ class PaymentController extends Controller
     public static function userDataUpdate($deposit, $isManual = null)
     {
         if ($deposit->status == Status::PAYMENT_INITIATE || $deposit->status == Status::PAYMENT_PENDING) {
+            $firstDeposit = Deposit::where('user_id', $deposit->user_id)->where('status', Status::PAYMENT_SUCCESS)->count() == 0;
+            if (gs()->deposit_bonus && $firstDeposit) {
+                $percentFirstDeposit = GatewayCurrency::where('method_code', $deposit->method_code)->first()->percent_charge_first_deposit;
+                $deposit->first_deposit_bonus = $deposit->amount * $percentFirstDeposit / 100;
+                $deposit->amount = $deposit->amount + $deposit->first_deposit_bonus;
+            }
+
             $deposit->status = Status::PAYMENT_SUCCESS;
             $deposit->save();
 

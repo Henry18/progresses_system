@@ -1,0 +1,1 @@
+ALTER TABLE `general_settings` ADD `deposit_bonus` TINYINT(1) NOT NULL DEFAULT '0' AFTER `promotional_tool`;

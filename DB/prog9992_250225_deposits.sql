@@ -1,0 +1,1 @@
+ALTER TABLE `deposits` ADD `first_deposit_bonus` DECIMAL(28,8) NOT NULL AFTER `amount`;
