@@ -1,0 +1,1 @@
+ALTER TABLE `gateway_currencies` ADD `percent_charge_first_deposit` DECIMAL(5,2) NOT NULL DEFAULT '0.0' AFTER `max_amount`;

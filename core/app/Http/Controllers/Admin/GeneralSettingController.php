@@ -97,6 +97,7 @@ class GeneralSettingController extends Controller
         $general->agree                = $request->agree ? Status::ENABLE : Status::DISABLE;
         $general->multi_language       = $request->multi_language ? Status::ENABLE : Status::DISABLE;
         $general->b_transfer           = $request->b_transfer ? Status::ENABLE : Status::DISABLE;
+        $general->deposit_bonus     = $request->deposit_bonus ? Status::ENABLE : Status::DISABLE;
         $general->promotional_tool     = $request->promotional_tool ? Status::ENABLE : Status::DISABLE;
         $general->signup_bonus_control = $request->signup_bonus_control ? Status::ENABLE : Status::DISABLE;
         $general->holiday_withdraw     = $request->holiday_withdraw ? Status::ENABLE : Status::DISABLE;

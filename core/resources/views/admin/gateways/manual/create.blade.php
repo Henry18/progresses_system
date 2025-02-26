@@ -94,6 +94,20 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                                        <div class="card border border--primary mt-3">
+                                            <h5 class="card-header bg--primary">@lang('First Deposit Bonus')</h5>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label>@lang('Percent Charge')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="percent_charge_first_deposit" required value="{{ old('percent_charge_first_deposit') }}">
+                                                        <div class="input-group-text">%</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <div class="col-12">
                                         <div class="card border border--primary mt-3">

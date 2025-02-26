@@ -7,6 +7,18 @@
                 @csrf
                 <div class="card-body">
                     <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                            <p class="fw-bold mb-0">@lang('First Deposit Bonus')</p>
+                                <p class="mb-0">
+                                    <small>@lang('If you enable this module, users will be eligible for the first deposit bonus that you configured in payment gateways') <a href="{{ route('admin.gateway.manual.index') }}">@lang('Click here')</a></small>
+                                </p>
+                            </div>
+                            <div class="form-group">
+                                <input type="checkbox" data-width="100%" data-size="large" data-onstyle="-success" data-offstyle="-danger" data-bs-toggle="toggle" data-height="35" data-on="@lang('Enable')" data-off="@lang('Disable')" name="deposit_bonus"
+                                    @if (gs('deposit_bonus')) checked @endif>
+                            </div>
+                        </li>
                         <li class="list-group-item d-flex flex-wrap flex-sm-nowrap gap-2 justify-content-between align-items-center">
                             <div>
                                 <p class="fw-bold mb-0">@lang('User Registration')</p>
