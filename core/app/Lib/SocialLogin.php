@@ -141,7 +141,7 @@ class SocialLogin
         $newUser->password = Hash::make($password);
         $newUser->firstname = $firstName;
         $newUser->lastname = $lastName;
-        $user->ref_by    = $referUser ? $referUser->id : 0;
+        $newUser->ref_by    = $referUser ? $referUser->id : 0;
 
         $newUser->status = Status::VERIFIED;
         $newUser->kv = $general->kv ? Status::NO : Status::YES;
