@@ -30,6 +30,12 @@
                                         @endif
                                     </select>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>@lang('Meta Robots') <small>(@lang('optional'))</small></label>
+                                    <input type="text" class="form-control" name="meta_robots" value="{{ isset($seo->data_values->meta_robots) ? $seo->data_values->meta_robots : '' }}" placeholder="e.g. noindex, follow">
+                                </div>
+
                                 <div class="form-group">
                                     <label>@lang('Meta Description')</label>
                                     <textarea name="description" rows="3" class="form-control" required>{{ @$seo->data_values->description }}</textarea>

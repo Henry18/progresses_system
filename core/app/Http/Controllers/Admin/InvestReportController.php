@@ -13,86 +13,101 @@ class InvestReportController extends Controller
 {
     public function dashboard()
     {
-        $pageTitle = 'Investment Statistics';
-
-        $widget['total_invest']           = Transaction::where('remark', 'invest')->sum('amount');
-        $widget['invest_deposit_wallet']  = Transaction::where('wallet_type', 'deposit_wallet')->where('remark', 'invest')->sum('amount');
-        $widget['invest_interest_wallet'] = Transaction::where('wallet_type', 'interest_wallet')->where('remark', 'invest')->sum('amount');
-
+        $pageTitle                = 'Investment Statistics';
         $widget['profit_to_give'] = Invest::where('status', Status::INVEST_RUNNING)->where('period', '>', 0)->sum('should_pay');
         $widget['profit_paid']    = Invest::where('status', Status::INVEST_RUNNING)->where('period', '>', 0)->sum('paid');
-
-        $interestByPlans = Invest::where('paid', '>', 0)->selectRaw("SUM(paid) as amount, plan_id")->with('plan')->groupBy('plan_id')->orderBy('amount', 'desc')->get();
-        $totalInterest   = $interestByPlans->sum('amount');
-
-        $interestByPlans = $interestByPlans->mapWithKeys(function ($invest) {
-            return [
-                $invest->plan->name => (float) $invest->amount,
-            ];
-        });
-
-        $recentInvests = Invest::with('plan')->orderBy('id', 'desc')->limit(3)->get();
-
-        $firstInvestYear = Invest::selectRaw("DATE_FORMAT(created_at, '%Y') as date")->first();
-
-        return view('admin.investment.statistics', compact('pageTitle', 'widget', 'interestByPlans', 'recentInvests', 'totalInterest', 'firstInvestYear'));
+        $recentInvests            = Invest::with('plan')->orderBy('id', 'desc')->limit(3)->get();
+        $firstInvestYear          = Invest::selectRaw("DATE_FORMAT(created_at, '%Y') as date")->first();
+        $firstInvestDate          = Invest::orderBy('id', 'asc')->first('created_at');
+        $lastInvestDate           = Invest::orderBy('id', 'desc')->first('created_at');
+        return view('admin.investment.statistics', compact('pageTitle', 'widget', 'recentInvests', 'firstInvestYear', 'firstInvestDate', 'lastInvestDate'));
     }
 
     public function investStatistics(Request $request)
     {
-        if ($request->time == 'year') {
-            $time     = now()->startOfYear();
-            $prevTime = now()->startOfYear()->subYear();
-        } elseif ($request->time == 'month') {
+        $prevTime       = '';
+        $startDate      = Carbon::parse($request->start_date);
+        $endDate        = Carbon::parse($request->end_date);
+        $durationInDays = (int) $startDate->diffInDays($endDate);
+
+        if ($request->data_type == 'Today') {
+            $time     = now()->startOfDay();
+            $prevTime = now()->yesterday()->startOfDay();
+        } elseif ($request->data_type == 'Yesterday') {
+            $time     = now()->yesterday()->startOfDay();
+            $prevTime = now()->subDays(2)->startOfDay();
+        } elseif ($request->data_type == 'Last 7 Days') {
+            $time     = now()->subDays(6)->startOfDay();
+            $prevTime = now()->subDays(13)->startOfDay();
+        } elseif ($request->data_type == 'Last 15 Days') {
+            $time     = now()->subDays(14)->startOfDay();
+            $prevTime = now()->subDays(29)->startOfDay();
+        } elseif ($request->data_type == 'Last 30 Days') {
+            $time     = now()->subDays(29)->startOfDay();
+            $prevTime = now()->subDays(59)->startOfDay();
+        } elseif ($request->data_type == 'This Month') {
             $time     = now()->startOfMonth();
             $prevTime = now()->startOfMonth()->subMonth();
-        } else {
-            $time     = now()->startOfWeek();
-            $prevTime = now()->startOfWeek()->subWeek();
+        } elseif ($request->data_type == 'Last 6 Months') {
+            $time     = now()->subMonths(5)->startOfMonth();
+            $prevTime = now()->subMonths(11)->startOfMonth();
+        } elseif ($request->data_type == 'This Year') {
+            $time     = now()->startOfYear();
+            $prevTime = now()->startOfYear()->subYear();
+        } elseif ($request->data_type == 'Custom Range') {
+            $time     = now()->parse($startDate)->subDays($durationInDays - 1);
+            $prevTime = now()->parse($startDate)->subDays(2 * $durationInDays - 1);
         }
 
-        $invests     = Invest::where('created_at', '>=', $time)->selectRaw("SUM(amount) as amount, DATE_FORMAT(created_at, '%Y-%m-%d') as date")->groupBy('date')->get();
+        $groupByFormat = $durationInDays > 120 ? '%Y-%M' : '%d-%M-%Y';
+
+        $invests = Invest::whereBetween('created_at', [$startDate, $endDate])->selectRaw("SUM(amount) as amount, DATE_FORMAT(created_at, ?) as date", [$groupByFormat])->groupBy('date')
+            ->orderBy('created_at', 'ASC')
+            ->get();
+
         $totalInvest = $invests->sum('amount');
+
+        if ($prevTime) {
+            $prevInvest = Invest::whereDate('created_at', '>=', $prevTime)->whereDate('created_at', '<', $time)->sum('amount');
+        }
 
         $invests = $invests->mapWithKeys(function ($invest) {
             return [
-                $invest->date => (float) $invest->amount,
+                $invest->date => getAmount((float) $invest->amount),
             ];
         });
 
-        $prevInvest = Invest::where('created_at', '>=', $prevTime)->where('created_at', '<', $time)->sum('amount');
-        $investDiff = ($prevInvest ? $totalInvest / $prevInvest * 100 - 100 : 0);
-        if ($investDiff > 0) {
-            $upDown = 'up';
-        } else {
-            $upDown = 'down';
+        $investDiff = 0;
+        $upDown     = null;
+
+        if ($prevTime) {
+            $investDiff = ($prevInvest ? $totalInvest / $prevInvest * 100 - 100 : 0);
+            $upDown     = $investDiff > 0 ? 'up' : 'down';
+            $investDiff = abs($investDiff);
         }
-        $investDiff = abs($investDiff);
+
         return [
             'invests'      => $invests,
             'total_invest' => $totalInvest,
             'invest_diff'  => round($investDiff, 2),
             'up_down'      => $upDown,
+            'pre_time'     => $prevTime,
         ];
     }
 
     public function investStatisticsByPlan(Request $request)
     {
-        if ($request->time == 'year') {
-            $time = now()->startOfYear();
-        } elseif ($request->time == 'month') {
-            $time = now()->startOfMonth();
-        } elseif ($request->time == 'week') {
-            $time = now()->startOfWeek();
-        } else {
-            $time = date('0000-00-00 00:00:00');
-        }
+        $startDate = Carbon::parse($request->start_date);
+        $endDate   = Carbon::parse($request->end_date);
+        $status    = null;
 
-        $investChart = Invest::with('plan')->where('created_at', '>=', $time)->groupBy('plan_id')->selectRaw("SUM(amount) as investAmount, plan_id")->orderBy('investAmount', 'desc');
+        $investChart = Invest::with('plan')->whereDate('created_at', '>=', $startDate)->whereDate('created_at', '<=', $endDate)->groupBy('plan_id')->selectRaw("SUM(amount) as investAmount, plan_id")->orderBy('investAmount', 'desc');
         if ($request->invest_type == 'active') {
             $investChart = $investChart->where('status', Status::INVEST_RUNNING);
+            $status      = Status::INVEST_RUNNING;
         } elseif ($request->invest_type == 'closed') {
             $investChart = $investChart->where('status', Status::INVEST_CLOSED);
+            $status      = Status::INVEST_CLOSED;
         }
 
         $investChart = $investChart->get();
@@ -100,24 +115,18 @@ class InvestReportController extends Controller
         return [
             'invest_data'  => $investChart,
             'total_invest' => $investChart->sum('investAmount'),
+            'status'       => $status,
         ];
     }
 
     public function investInterestStatistics(Request $request)
     {
-        if ($request->time == 'year') {
-            $time = now()->startOfYear();
-        } elseif ($request->time == 'month') {
-            $time = now()->startOfMonth();
-        } elseif ($request->time == 'week') {
-            $time = now()->startOfWeek();
-        } else {
-            $time = date('0000-00-00 00:00:00');
-        }
-        
-        $runningInvests = Invest::where('status', Status::INVEST_RUNNING)->where('created_at', '>=', $time)->sum('amount');
-        $expiredInvests = Invest::where('status', Status::INVEST_CLOSED)->where('created_at', '>=', $time)->sum('amount');
-        $interests      = Transaction::where('remark', 'interest')->where('created_at', '>=', $time)->sum('amount');
+        $startDate = Carbon::parse($request->start_date);
+        $endDate   = Carbon::parse($request->end_date);
+
+        $runningInvests = Invest::where('status', Status::INVEST_RUNNING)->whereDate('created_at', '>=', $startDate)->whereDate('created_at', '<=', $endDate)->sum('amount');
+        $expiredInvests = Invest::where('status', Status::INVEST_CLOSED)->whereDate('created_at', '>=', $startDate)->whereDate('created_at', '<=', $endDate)->sum('amount');
+        $interests      = Transaction::where('remark', 'interest')->whereDate('created_at', '>=', $startDate)->whereDate('created_at', '<=', $endDate)->sum('amount');
 
         return [
             'running_invests' => showAmount($runningInvests),
@@ -147,11 +156,49 @@ class InvestReportController extends Controller
             $investsData[]   = @$invests->where('date', $date)->first()->amount ?? 0;
             $interestsData[] = @$interests->where('date', $date)->first()->amount ?? 0;
         }
-        
+
         return [
             'keys'      => array_values($dataDates),
             'invests'   => $investsData,
             'interests' => $interestsData,
         ];
+    }
+
+    public function invest(Request $request)
+    {
+        $startDate = $request->start_date;
+        $endDate   = $request->end_date;
+
+        $depositWalletInvest  = Transaction::whereBetween('created_at', [$startDate, $endDate])->where('wallet_type', 'deposit_wallet')->where('remark', 'invest')->sum('amount');
+        $interestWalletInvest = Transaction::whereBetween('created_at', [$startDate, $endDate])->where('wallet_type', 'interest_wallet')->where('remark', 'invest')->sum('amount');
+
+        $totalInvest = $depositWalletInvest + $interestWalletInvest;
+
+        return [
+            'total_invest'           => $totalInvest,
+            'deposit_wallet_invest'  => $depositWalletInvest,
+            'interest_wallet_invest' => $interestWalletInvest,
+        ];
+    }
+
+    public function interestStatistics(Request $request)
+    {
+        $startDate = $request->start_date;
+        $endDate   = $request->end_date;
+
+        $interestByPlans = Invest::whereDate('created_at', '>=', $startDate)->whereDate('created_at', '<=', $endDate)->where('paid', '>', 0)->selectRaw("SUM(paid) as amount, plan_id")->with('plan')->groupBy('plan_id')->orderBy('amount', 'desc')->get();
+        $totalInterest   = $interestByPlans->sum('amount');
+
+        $interestByPlans = $interestByPlans->mapWithKeys(function ($invest) {
+            return [
+                $invest->plan->name => (float) $invest->amount,
+            ];
+        });
+
+        $day = false;
+
+        $html = view('admin.partials.interest_statistics', compact('interestByPlans', 'totalInterest', 'day'))->render();
+
+        return ['html' => $html];
     }
 }

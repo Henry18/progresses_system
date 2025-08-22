@@ -141,6 +141,7 @@ class PageBuilderController extends Controller
             'social_title'=>$request->social_title,
             'social_description'=>$request->social_description,
             'keywords'=>$request->keywords ,
+            'meta_robots'=>$request->meta_robots
         ];
         $page->save();
 

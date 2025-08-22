@@ -12,6 +12,7 @@ use App\Rules\FileTypeValidate;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Lib\RequiredConfig;
 
 class FrontendController extends Controller
 {
@@ -103,6 +104,7 @@ class FrontendController extends Controller
                 $validationRule['image_input'] = ['nullable', 'image', new FileTypeValidate(['jpeg', 'jpg', 'png'])];
                 continue;
             }
+            if($inputField == 'meta_robots') continue;
             $validationRule[$inputField] = ['required'];
             if ($inputField == 'slug') {
                 $validationRule[$inputField] = [Rule::unique('frontends')->where(function ($query) use ($request) {
@@ -142,15 +144,16 @@ class FrontendController extends Controller
             if ($imgJson) {
                 foreach ($imgJson as $imgKey => $imgValue) {
                     $imgData = @$request->image_input[$imgKey];
+                    $oldImage = @$content->data_values->$imgKey;
                     if (is_file($imgData)) {
                         try {
-                            $inputContentValue[$imgKey] = $this->storeImage($imgJson, $type, $key, $imgData, $imgKey, @$content->data_values->$imgKey);
+                            $inputContentValue[$imgKey] = $this->storeImage($imgJson, $type, $key, $imgData, $imgKey, $oldImage);
                         } catch (\Exception $exp) {
                             $notify[] = ['error', 'Couldn\'t upload the image'];
                             return back()->withNotify($notify);
                         }
                     } else if (isset($content->data_values->$imgKey)) {
-                        $inputContentValue[$imgKey] = $content->data_values->$imgKey;
+                        $inputContentValue[$imgKey] = $oldImage;
                     }
                 }
             }
@@ -166,6 +169,13 @@ class FrontendController extends Controller
             $notify[] = ['info', 'Configure SEO content for ranking'];
             $notify[] = ['success', 'Content updated successfully'];
             return to_route('admin.frontend.sections.element.seo', [$key, $content->id])->withNotify($notify);
+        }
+
+        if ($request->seo_image) {
+            RequiredConfig::configured('seo');
+        }
+        if ($content->data_keys == 'policy_pages.element') {
+            RequiredConfig::configured('policy_content');
         }
 
         $notify[] = ['success', 'Content updated successfully'];
@@ -238,6 +248,7 @@ class FrontendController extends Controller
             'social_title'       => $request->social_title,
             'social_description' => $request->social_description,
             'keywords'           => $request->keywords,
+            'meta_robots'=>$request->meta_robots
         ];
         $data->save();
 

@@ -1,4 +1,5 @@
-<script src="{{asset('assets/global/js/firebase/firebase-8.3.2.js')}}"></script>
+<script src="{{asset('assets/global/js/firebase/firebase-app.js')}}"></script>
+<script src="{{asset('assets/global/js/firebase/firebase-messaging.js')}}"></script> 
 
 <script>
     "use strict";
@@ -9,22 +10,22 @@
     var firebaseConfig = @json(gs('firebase_config'));
 
     function pushNotifyAction(){
-        /*permission = Notification.permission;
+        permission = Notification.permission;
 
         if(!('Notification' in window)){
             notify('info', 'Push notifications not available in your browser. Try Chromium.')
         }
         else if(permission === 'denied' || permission == 'default'){ //Notice for users dashboard
             $('.notice').append(`
-                <div class="alert border border--danger" role="alert">
+                <div class="alert border border--danger alert--danger" role="alert">
                     <div class="alert__icon d-flex align-items-center text--danger"><i class="fas fa-bell"></i></div>
-                    <p class="alert__message">
-                        <span class="fw-bold">@lang('Please Allow / Reset Browser Notification')</span><br>
+                    <p class="alert__message alert__content">
+                        <span class="fw-bold">@lang('Please Allow / Reset Browser Notification ')</span><br>
                         <small>@lang('If you want to get push notification then you have to allow notification from your browser')</small>
                     </p>
                 </div>
             `);
-        }*/
+        }
     }
 
     //If enable push notification from admin panel

@@ -397,10 +397,10 @@
   color: #5b6e88;
   background: transparent;
   border: none;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 .exit-btn:hover {
-  color: #4634ff ;
+  color: #4634ff;
 }
 .exit-btn .fullscreen-close {
   margin-left: -25px;
@@ -443,7 +443,7 @@
 }
 @media screen and (min-width: 768px) {
   .interest-scheme {
-    gap: .5rem;
+    gap: 0.5rem;
   }
 }
 
@@ -562,5 +562,19 @@
   }
   .plan-item-two {
     padding: 14px 15px;
+  }
 }
+
+#investTotalPicker span,
+#investInterestPicker span,
+#investmentPlanPicker span,
+#investmentPicker span,
+#totalInvestPicker span,
+#totalInterestPicker span,
+#investInterestStatisticsPicker span {
+  font-size: 14px;
+}
+
+.chart-info-toggle {
+  cursor: pointer;
 }

@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\RequiredConfig;
 use App\Models\NotificationTemplate;
-use App\Notify\Sms;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 
@@ -28,6 +28,8 @@ class NotificationController extends Controller
         $general->email_from_name = $request->email_from_name;
         $general->email_template = $request->email_template;
         $general->save();
+
+        RequiredConfig::configured('notification_template');
 
         $notify[] = ['success','Global email template updated successfully'];
         return back()->withNotify($notify);

@@ -11,7 +11,7 @@ class SupportTicket extends Model
     public function fullname(): Attribute
     {
         return new Attribute(
-            get:fn () => $this->name,
+            get:fn () => $this->user ? $this->user->fullname : $this->name,
         );
     }
 

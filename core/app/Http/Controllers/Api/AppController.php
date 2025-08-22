@@ -27,7 +27,7 @@ use stdClass;
 class AppController extends Controller
 {
     use SupportTicketManager;
-    
+
     public function __construct()
     {
         $this->userType     = 'user';
@@ -52,16 +52,10 @@ class AppController extends Controller
     {
         $notify[] = 'Logo & Favicon';
 
-        return response()->json([
-            'remark'  => 'logo_favicon',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => [
-                'logo'    => siteLogo(),
-                'favicon' => siteFavicon(),
-            ],
+        return responseSuccess('logo_favicon', $notify, [
+            'logo'    => siteLogo(),
+            'favicon' => siteFavicon(),
         ]);
-
     }
 
     public function getCountries()
@@ -89,11 +83,7 @@ class AppController extends Controller
 
         if (($code && !in_array($code, $languageCodes))) {
             $notify[] = 'Invalid code given';
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('validation_error',$notify);
         }
 
         if (!$code) {
@@ -142,7 +132,7 @@ class AppController extends Controller
     {
         $faq      = getContent('faq.element', orderById: true);
         $notify[] = 'FAQ';
-        
+
         return responseSuccess('faq', $notify, ['faq' => $faq]);
     }
 
@@ -298,6 +288,7 @@ class AppController extends Controller
         return responseSuccess('section_data', $notify, $data);
     }
 
+
     public function subscribe(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -339,11 +330,11 @@ class AppController extends Controller
     {
         $data = [
             'top_investors' => Invest::with('user')
-            ->selectRaw('SUM(amount) as totalAmount, user_id')
-            ->orderBy('totalAmount', 'desc')
-            ->groupBy('user_id')
-            ->limit(8)
-            ->get(),
+                ->selectRaw('SUM(amount) as totalAmount, user_id')
+                ->orderBy('totalAmount', 'desc')
+                ->groupBy('user_id')
+                ->limit(8)
+                ->get(),
             'content' => @getContent('top_investor.content', true)['data_values'],
         ];
 
@@ -356,79 +347,79 @@ class AppController extends Controller
         $latestDeposit = Deposit::with('user', 'gateway')->where('status', 1)->latest()->limit(10)->get();
         $fakeDeposit = Frontend::where('data_keys', 'transaction.element')->whereJsonContains('data_values->trx_type', 'deposit')->limit(10)->get();
         $deposits = $latestDeposit->merge($fakeDeposit)->sortByDesc('created_at')->take(10)->values();
-        
+
         $latestWithdraw = Withdrawal::with('user', 'method')->where('status', 1)->latest()->limit(10)->get();
         $fakeWithdraw = Frontend::where('data_keys', 'transaction.element')->whereJsonContains('data_values->trx_type', 'withdraw')->limit(10)->get();
         $withdrawals = $latestWithdraw->merge($fakeWithdraw)->sortByDesc('created_at')->take(10)->values();
-        
+
         $data = [
             'content' => @getContent('transaction.content', true)['data_values'],
             'deposits' => $deposits,
             'withdrawals' => $withdrawals,
         ];
-        
+
         $notify = 'Latest Transaction';
         return responseSuccess('latest_transaction', $notify, $data);
     }
 
     public function plans(Request $request)
-    { 
+    {
         $plans = Plan::with('timeSetting')->whereHas('timeSetting', function ($time) {
             $time->where('status', Status::ENABLE);
         })->where('status', Status::ENABLE);
 
-        if($request->fromSection){
+        if ($request->fromSection) {
             $plans = $plans->where('featured', 1);
         }
-        
+
         $plans = $plans->get();
 
         $modifiedPlans = [];
         $general       = gs();
-        
+
         foreach ($plans as $plan) {
             if ($plan->lifetime == 0) {
-                $totalReturn = 'Total ' . $plan->interest * $plan->repeat_time . ($plan->interest_type == 1 ? '%' : ' '.$general->cur_text);
-        
-                if($request->is_web == Status::YES){
+                $totalReturn = 'Total ' . $plan->interest * $plan->repeat_time . ($plan->interest_type == 1 ? '%' : ' ' . $general->cur_text);
+
+                if ($request->is_web == Status::YES) {
                     $totalReturn = $plan->capital_back == 1 ? $totalReturn . ' + <span class="badge badge--success">Capital</span>' : $totalReturn;
-                }else{
+                } else {
                     $totalReturn = $plan->capital_back == 1 ? $totalReturn . ' + Capital' : $totalReturn;
                 }
-        
+
                 $repeatTime       = 'For ' . $plan->repeat_time . ' ' . $plan->timeSetting->name;
                 $interestValidity = 'Per ' . $plan->timeSetting->time . ' hours for ' . $plan->repeat_time . ' times';
             } else {
-                $totalReturn      = 'Lifetime Earning'; 
+                $totalReturn      = 'Lifetime Earning';
                 $repeatTime       = 'For Lifetime';
                 $interestValidity = 'Per ' . $plan->timeSetting->time . ' hours for lifetime';
             }
-        
+
             $modifiedPlans[] = [
                 'id'                => $plan->id,
                 'name'              => $plan->name,
                 'minimum'           => $plan->minimum,
                 'maximum'           => $plan->maximum,
                 'fixed_amount'      => $plan->fixed_amount,
-                'return'            => showAmount($plan->interest, currencyFormat: false) . ($plan->interest_type == 1 ? '%' : ' '.$general->cur_text),
+                'return'            => showAmount($plan->interest, currencyFormat: false) . ($plan->interest_type == 1 ? '%' : ' ' . $general->cur_text),
                 'interest_duration' => 'Every ' . $plan->timeSetting->name,
                 'repeat_time'       => $repeatTime,
                 'total_return'      => $totalReturn,
                 'interest_validity' => $interestValidity,
                 'hold_capital'      => $plan->hold_capital,
                 'compound_interest' => $plan->compound_interest,
-        
+
                 'interest' => $plan->interest,
                 'interest_type' => $plan->interest_type,
                 'raw_interest_type' => $plan->repeat_time,
                 'capital_back' => $plan->capital_back,
             ];
         }
-        
+
         $data = [
             'plans' => $modifiedPlans
         ];
-        
+
         $notify = 'Plans';
         return responseSuccess('plans', $notify, $data);
     }
@@ -485,7 +476,7 @@ class AppController extends Controller
 
             $result['description'] = 'Return ' . showAmount($interestAmount) . ' Every ' . $timeName . ' For ' . $ret . ' ' . $timeName . '. Total ' . $total;
             $result['totalMoney']  = $totalMoney;
-            $result['netProfit']   = 'Net Profit '.showAmount($totalMoney - $request->investAmount);
+            $result['netProfit']   = 'Net Profit ' . showAmount($totalMoney - $request->investAmount);
         } else {
             $result['description'] = 'Return ' . showAmount($interestAmount) . ' Every ' . $timeName . ' For Lifetime';
         }
@@ -509,14 +500,14 @@ class AppController extends Controller
         $blogs       = Frontend::where('id', '!=', $blog->id)->where('tempname', activeTemplateName())->where('data_keys', 'blog.element')->latest()->limit(5)->get();
         $seoContents = $blog->seo_content;
         $seoImage    = @$seoContents->image ? frontendImage('blog', $seoContents->image, getFileSize('seo'), true) : null;
-        
+
         $data = [
             'blog' => $blog,
             'blogs' => $blogs,
             'seoContents' => $seoContents,
             'seoImage' => $seoImage,
         ];
-        
+
         $notify = 'Blog Details';
         return responseSuccess('blog_details', $notify, $data);
     }
@@ -532,5 +523,4 @@ class AppController extends Controller
         $notify = 'Blogs';
         return responseSuccess('blogs', $notify, $data);
     }
-
 }

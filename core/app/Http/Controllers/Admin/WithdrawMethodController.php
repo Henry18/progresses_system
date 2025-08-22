@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Lib\FormProcessor;
+use App\Lib\RequiredConfig;
 use App\Models\WithdrawMethod;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
@@ -65,14 +66,13 @@ class WithdrawMethodController extends Controller
         $method->max_limit = $request->max_limit;
         $method->fixed_charge = $request->fixed_charge;
         $method->percent_charge = $request->percent_charge;
-        $method->fixed_charge_bonus = $request->fixed_charge_bonus;
-        $method->percent_charge_bonus = $request->percent_charge_bonus;
         $method->currency = $request->currency;
         $method->description = $request->instruction;
         $method->save();
 
-
-        $notify[] = ['success', 'Withdraw method added successfully'];
+        RequiredConfig::configured('withdrawal_method');
+        
+        $notify[] = ['success', 'Withdrawal method added successfully'];
         return to_route('admin.withdraw.method.index')->withNotify($notify);
     }
 
@@ -125,14 +125,12 @@ class WithdrawMethodController extends Controller
         $method->max_limit      = $request->max_limit;
         $method->fixed_charge   = $request->fixed_charge;
         $method->percent_charge = $request->percent_charge;
-        $method->fixed_charge_bonus   = $request->fixed_charge_bonus;
-        $method->percent_charge_bonus = $request->percent_charge_bonus;
         $method->description    = $request->instruction;
         $method->currency       = $request->currency;
         $method->save();
 
 
-        $notify[] = ['success', 'Withdraw method updated successfully'];
+        $notify[] = ['success', 'Withdrawal method updated successfully'];
         return back()->withNotify($notify);
     }
 

@@ -279,7 +279,7 @@
                 }
             },
             "title": "text",
-            "slug": "text",
+            "slug": "title",
             "description": "textarea-nic",
             "modal": false
         }
@@ -386,7 +386,7 @@
         "name": "Policy Pages",
         "element": {
             "title": "text",
-            "slug": "text",
+            "slug": "title",
             "details": "textarea-nic",
             "modal": false
         }

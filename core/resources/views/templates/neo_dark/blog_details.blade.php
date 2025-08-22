@@ -16,7 +16,9 @@
                             <div class="single-post__thumb">
                                 <img src="{{ frontendImage('blog', $blog->data_values->image) }}" alt="@lang('image')">
                             </div>
-                            <p>{{ strip_tags($blog->data_values->description) }}</p>
+                            <div>
+                                @php echo @$blog->data_values->description @endphp
+                            </div>
                         </div>
 
 

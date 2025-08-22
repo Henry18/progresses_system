@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Lib\RequiredConfig;
 use App\Models\TimeSetting;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,8 @@ class TimeSettingController extends Controller
         $this->validation($request);
         $time = new TimeSetting();
         $this->submitData($time, $request);
+
+        RequiredConfig::configured('time_setting');
 
         $notify[] = ['success', 'Time schedule added successfully'];
         return back()->withNotify($notify);

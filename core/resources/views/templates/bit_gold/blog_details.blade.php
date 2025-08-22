@@ -11,7 +11,9 @@
                         </div><!-- blog-details__thumb end -->
                         <div class="blog-details__content">
                             <h4 class="blog-details__title">{{ __(@$blog->data_values->title) }}</h4>
-                            <p>{{ strip_tags(@$blog->data_values->description) }}</p>
+                            <div>
+                                @php echo @$blog->data_values->description @endphp
+                            </div>
                         </div><!-- blog-details__content end -->
                         <div class="blog-details__footer">
                             <h4 class="caption">@lang('Share This Post')</h4>

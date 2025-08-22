@@ -21,11 +21,11 @@ class ProcessController extends Controller
         $razorAcc = json_decode($deposit->gatewayCurrency()->gateway_parameter);
 
         //  API request and response for creating an order
-        $api_key = $razorAcc->key_id;
-        $api_secret = $razorAcc->key_secret;
+        $apiKey = $razorAcc->key_id;
+        $apiSecret = $razorAcc->key_secret;
 
         try {
-            $api = new Api($api_key, $api_secret);
+            $api = new Api($apiKey, $apiSecret);
             $order = $api->order->create(
                 array(
                     'receipt' => $deposit->trx,

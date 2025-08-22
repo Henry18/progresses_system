@@ -15,6 +15,8 @@ use App\Models\User;
  */
 class UserNotificationSender
 {
+
+    private $isSingleNotification = false;
     /**
      * Send notifications to all or selected users based on the request parameters.
      * 
@@ -59,6 +61,7 @@ class UserNotificationSender
         if (!$this->isTemplateEnabled($request->via)) {
             return $this->redirectWithNotify('warning', 'Default notification template is not enabled');
         }
+        $this->isSingleNotification = true;
         $imageUrl = $this->handlePushNotificationImage($request);
         $user     = User::findOrFail($userId);
 
@@ -151,7 +154,7 @@ class UserNotificationSender
                 session()->put('PUSH_IMAGE_URL', $imageUrl);
                 return $imageUrl;
             }
-            return session()->get('PUSH_IMAGE_URL');
+            return $this->isSingleNotification ? null : session()->get('PUSH_IMAGE_URL');
         }
         return null;
     }

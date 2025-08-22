@@ -19,8 +19,8 @@ use Laramin\Utility\VugiChugi;
 
 function systemDetails() {
     $system['name']          = 'hyiplab';
-    $system['version']       = '5.4.1';
-    $system['build_version'] = '5.1.4';
+    $system['version']       = '5.6';
+    $system['build_version'] = '5.1.13';
     $system['h_verifier']    = str_rot13('ivfre_ulvcyno');
     return $system;
 }
@@ -64,7 +64,7 @@ function activeTemplateName() {
 }
 
 function siteLogo($type = null) {
-    $name = $type ? "/logo_$type.svg" : '/logo.svg';
+    $name = $type ? "/logo_$type.png" : '/logo.png';
     return getImage(getFilePath('logoIcon') . $name);
 }
 function siteFavicon() {
@@ -215,7 +215,7 @@ function notify($user, $templateName, $shortCodes = null, $sendVia = null, $crea
     $notify->send();
 }
 
-function getPaginate($paginate = null) {
+function getPaginate($paginate = 20) {
     if (!$paginate) {
         $paginate = gs('paginate_number');
     }
