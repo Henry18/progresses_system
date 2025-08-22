@@ -68,7 +68,7 @@ class CronConfigurationController extends Controller
         return back()->withNotify($notify);
     }
 
-    public function CronJobDelete($id)
+    public function cronJobDelete($id)
     {
         $cronJob = CronJob::where('is_default', Status::NO)->where('id', $id)->firstOrFail();
         $cronJob->delete();

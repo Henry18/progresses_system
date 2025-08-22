@@ -14,6 +14,7 @@ class GeneralSetting extends Model {
         'socialite_credentials' => 'object',
         'firebase_config'       => 'object',
         'off_day'               => 'object',
+        'config_progress'       => 'object',
     ];
 
     protected $hidden = ['email_template', 'mail_config', 'sms_config', 'system_info'];

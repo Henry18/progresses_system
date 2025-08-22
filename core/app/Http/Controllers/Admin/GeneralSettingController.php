@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Lib\RequiredConfig;
 use App\Models\Frontend;
 use App\Models\Holiday;
 use App\Rules\FileTypeValidate;
@@ -72,6 +73,7 @@ class GeneralSettingController extends Controller
         $timezoneFile = config_path('timezone.php');
         $content      = '<?php $timezone = "' . $timezone . '" ?>';
         file_put_contents($timezoneFile, $content);
+        RequiredConfig::configured('general_setting');
         $notify[] = ['success', 'General setting updated successfully'];
         return back()->withNotify($notify);
     }
@@ -97,7 +99,6 @@ class GeneralSettingController extends Controller
         $general->agree                = $request->agree ? Status::ENABLE : Status::DISABLE;
         $general->multi_language       = $request->multi_language ? Status::ENABLE : Status::DISABLE;
         $general->b_transfer           = $request->b_transfer ? Status::ENABLE : Status::DISABLE;
-        $general->deposit_bonus     = $request->deposit_bonus ? Status::ENABLE : Status::DISABLE;
         $general->promotional_tool     = $request->promotional_tool ? Status::ENABLE : Status::DISABLE;
         $general->signup_bonus_control = $request->signup_bonus_control ? Status::ENABLE : Status::DISABLE;
         $general->holiday_withdraw     = $request->holiday_withdraw ? Status::ENABLE : Status::DISABLE;
@@ -153,6 +154,7 @@ class GeneralSettingController extends Controller
                 return back()->withNotify($notify);
             }
         }
+        RequiredConfig::configured('logo_favicon');
         $notify[] = ['success', 'Logo & favicon updated successfully'];
         return back()->withNotify($notify);
     }
@@ -325,7 +327,7 @@ class GeneralSettingController extends Controller
     }
 
     public function offDaySubmit(Request $request)
-    {
+    {   
         $totalOffDay = count($request->off_day ?? []);
 
         if ($totalOffDay == 7) {
@@ -335,6 +337,8 @@ class GeneralSettingController extends Controller
         $general          = gs();
         $general->off_day = $request->off_day;
         $general->save();
+
+        RequiredConfig::configured('holiday_setting');
 
         $notify[] = ['success', 'Weekly Holiday Setting Updated'];
         return back()->withNotify($notify);

@@ -81,19 +81,6 @@ class LoginController extends Controller
             'access_token' => $tokenResult,
             'token_type' => 'Bearer'
         ]);
-
-        $response[] = 'Login Successful';
-        return response()->json([
-            'remark'  => 'login_success',
-            'status'  => 'success',
-            'message' => ['success' => $response],
-            'data'    => [
-                'user'         => auth()->user(),
-                'access_token' => $tokenResult,
-                'token_type'   => 'Bearer',
-            ],
-        ]);
-
     }
 
     public function findUsername()

@@ -1,0 +1,11 @@
+{
+    "version":"5.6",
+    "changes":[
+        "[ADD] New template (hyip_dark)",
+        "[ADD] bKash Payment Gateway",
+        "[ADD] Drag & Drop Image Upload for Admin Panel",
+        "[ADD] Reminder to Complete Required Admin Configurations",
+        "[PATCH] Latest Security Patch",
+        "[PATCH] Latest System Patch"
+    ]
+}

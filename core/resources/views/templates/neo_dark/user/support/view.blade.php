@@ -47,7 +47,7 @@
                             @if($message->admin_id == 0)
                                 <div class="row border border-primary border-radius-3 my-3 py-3 mx-2">
                                     <div class="col-md-3 border-end text-end">
-                                        <h5 class="my-3">{{ $message->ticket->name }}</h5>
+                                        <h5 class="my-3">{{ $message->ticket->fullname }}</h5>
                                     </div>
                                     <div class="col-md-9">
                                         <p class="text-muted fw-bold my-3">

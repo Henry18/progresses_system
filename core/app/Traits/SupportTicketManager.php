@@ -305,19 +305,20 @@ trait SupportTicketManager {
         return back()->withNotify($notify);
     }
 
-    protected function storeSupportAttachments($messageId) {
+    protected function storeSupportAttachments($messageId)
+    {
         $path = getFilePath('ticket');
 
-        foreach ($this->files as $file) {
-            try {
-                $attachment                     = new SupportAttachment();
+        try {
+            foreach ($this->files as  $file) {
+                $attachment = new SupportAttachment();
                 $attachment->support_message_id = $messageId;
-                $attachment->attachment         = fileUploader($file, $path);
+                $attachment->attachment = fileUploader($file, $path);
                 $attachment->save();
-            } catch (\Exception $exp) {
-                $notify[] = ['error', 'File could not upload'];
-                return $notify;
             }
+        } catch (\Exception $exp) {
+            $notify[] = ['error', 'File could not upload'];
+            return $notify;
         }
 
         return 200;

@@ -239,7 +239,7 @@ class FileManager
 			if (method_exists($this,$method)) {
 				$this->$method(...$args);
 			}else{
-				throw new \Exception('File key or method doesn\'t exists.');
+				throw new \Exception("File key or method: $method doesn't exists.");
 			}
 		}
 	}

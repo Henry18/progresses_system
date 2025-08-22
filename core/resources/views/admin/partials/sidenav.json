@@ -297,6 +297,12 @@
                 "title": "Staking Invest",
                 "route_name": "admin.staking.invest",
                 "menu_active": "admin.staking.invest"
+            },
+            {
+                "keyword": ["Statistics", "Staking Statistics", "Staking Management", "Investment Activity", "Investment Tracking", "Staking Overview"],
+                "title": "Statistics",
+                "route_name": "admin.staking.statistics",
+                "menu_active": "admin.staking.statistics"
             }
         ]
     },
@@ -317,6 +323,12 @@
                 "title": "Pool Invest",
                 "route_name": "admin.pool.invest",
                 "menu_active": "admin.pool.invest"
+            },
+            {
+                "keyword": ["Statistics", "Pool Statistics", "Pool Management", "Investment Activity", "Investment Tracking", "Pool Overview"],
+                "title": "Statistics",
+                "route_name": "admin.pool.statistics",
+                "menu_active": "admin.pool.statistics"
             }
         ]
     },   

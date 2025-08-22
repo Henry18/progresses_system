@@ -4,9 +4,15 @@
     <meta name="keywords" content="{{ implode(',',@$seoContents->keywords ?? $seo->keywords) }}">
     <link rel="shortcut icon" href="{{ siteFavicon() }}" type="image/x-icon">
 
+    <link rel="canonical" href="{{ url()->current() }}" />
+
+    @if ((isset($seoContents->meta_robots) && $seoContents->meta_robots) || (isset($seo->meta_robots) && $seo->meta_robots))
+        <meta name="robots" content="{{ isset($seoContents->meta_robots) && $seoContents->meta_robots ? $seoContents->meta_robots : $seo->meta_robots }}" />
+    @endif
+
     {{--<!-- Apple Stuff -->--}}
     <link rel="apple-touch-icon" href="{{ siteLogo() }}">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="{{ gs()->siteName($pageTitle) }}">
     {{--<!-- Google / Search Engine Tags -->--}}
@@ -18,7 +24,7 @@
     <meta property="og:title" content="{{ @$seoContents->social_title ?? $seo->social_title }}">
     <meta property="og:description" content="{{ @$seoContents->social_description ?? $seo->social_description }}">
     <meta property="og:image" content="{{ $seoImage ?? getImage(getFilePath('seo') .'/'. $seo->image) }}">
-    <meta property="og:image:type" content="image/{{ pathinfo(getImage(getFilePath('seo')) .'/'. $seo->image)['extension'] }}">
+    <meta property="og:image:type" content="image/{{ pathinfo($seoImage ?? getImage(getFilePath('seo')) .'/'. $seo->image)['extension'] }}">
     @php $socialImageSize = explode('x', getFileSize('seo')) @endphp
     <meta property="og:image:width" content="{{ $socialImageSize[0] }}">
     <meta property="og:image:height" content="{{ $socialImageSize[1] }}">

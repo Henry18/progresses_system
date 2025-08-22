@@ -79,7 +79,7 @@ class Push extends NotifyProcess implements Notifiable {
                 $data['notification'] = [
                     'body'  => $message,
                     'title' => $this->getTitle(),
-                    'image' => asset(getFilePath('push')) . '/' . $this->pushImage,
+                    'image'=> $this->pushImage ? asset(getFilePath('push')).'/'.$this->pushImage : null,
                 ];
 
                 $data['data'] = [

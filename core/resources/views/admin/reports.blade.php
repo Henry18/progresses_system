@@ -42,7 +42,7 @@
           <i class="las la-times"></i>
         </button>
       </div>
-      <form action class="disableSubmission" method="post">
+      <form class="disableSubmission" method="post">
         @csrf
         <div class="modal-body">
           <div class="form-group">

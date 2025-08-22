@@ -55,11 +55,11 @@
                             <div class="row border border--primary border-radius-3 my-3 mx-0">
 
                                 <div class="col-md-3 border-end text-md-end text-start">
-                                    <h5 class="my-3">{{ $ticket->name }}</h5>
+                                    <h5 class="my-3">{{ $ticket->fullname }}</h5>
                                     @if ($ticket->user_id != null)
-                                        <p><a href="{{ route('admin.users.detail', $ticket->user_id) }}">&#64;{{ $ticket->name }}</a></p>
+                                        <p><a href="{{ route('admin.users.detail', $ticket->user_id) }}">&#64;{{ $ticket->user->username }}</a></p>
                                     @else
-                                        <p>@<span>{{ $ticket->name }}</span></p>
+                                        <p>@<span>{{ $ticket->fullname }}</span></p>
                                     @endif
                                     <button class="btn btn--danger btn-sm my-3 confirmationBtn" data-question="@lang('Are you sure to delete this message?')" data-action="{{ route('admin.ticket.delete', $message->id) }}"><i class="la la-trash"></i> @lang('Delete')</button>
                                 </div>

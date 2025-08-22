@@ -46,13 +46,13 @@ class SmsGateway{
 	public function clickatell()
 	{
 		$message = urlencode($this->message);
-		$api_key = $this->config->clickatell->api_key;
-		@file_get_contents("https://platform.clickatell.com/messages/http/send?apiKey=$api_key&to=$this->to&content=$message");
+		$apiKey = $this->config->clickatell->api_key;
+		file_get_contents("https://platform.clickatell.com/messages/http/send?apiKey=$apiKey&to=$this->to&content=$message");
 	}
 
 	public function infobip(){
 		$message = urlencode($this->message);
-		@file_get_contents("https://api.infobip.com/api/v3/sendsms/plain?user=".$this->config->infobip->username."&password=".$this->config->infobip->password."&sender=$this->from&SMSText=$message&GSM=$this->to&type=longSMS");
+		file_get_contents("https://api.infobip.com/api/v3/sendsms/plain?user=".$this->config->infobip->username."&password=".$this->config->infobip->password."&sender=$this->from&SMSText=$message&GSM=$this->to&type=longSMS");
 	}
 
 	public function messageBird(){
@@ -75,7 +75,7 @@ class SmsGateway{
 
 	public function smsBroadcast(){
 		$message = urlencode($this->message);
-		@file_get_contents("https://api.smsbroadcast.com.au/api-adv.php?username=".$this->config->sms_broadcast->username."&password=".$this->config->sms_broadcast->password."&to=$this->to&from=$this->from&message=$message&ref=112233&maxsplit=5&delay=15");
+		file_get_contents("https://api.smsbroadcast.com.au/api-adv.php?username=".$this->config->sms_broadcast->username."&password=".$this->config->sms_broadcast->password."&to=$this->to&from=$this->from&message=$message&ref=112233&maxsplit=5&delay=15");
 	}
 
 	public function twilio(){

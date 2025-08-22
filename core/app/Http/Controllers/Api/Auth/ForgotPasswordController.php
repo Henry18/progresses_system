@@ -13,17 +13,13 @@ use Illuminate\Validation\Rules\Password;
 class ForgotPasswordController extends Controller
 {
     public function sendResetCodeEmail(Request $request)
-    {
+    {   
         $validator = Validator::make($request->all(), [
             'value' => 'required',
-        ]);
+        ]); 
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return responseError('validation_error', $validator->errors()->all());
         }
 
         $fieldType = $this->findFieldType();
@@ -31,11 +27,7 @@ class ForgotPasswordController extends Controller
 
         if (!$user) {
             $notify[] = 'The account could not be found';
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('validation_error', $notify);
         }
 
         PasswordReset::where('email', $user->email)->delete();
@@ -58,13 +50,9 @@ class ForgotPasswordController extends Controller
 
         $email      = $user->email;
         $response[] = 'Verification code sent to mail';
-        return response()->json([
-            'remark'  => 'code_sent',
-            'status'  => 'success',
-            'message' => ['success' => $response],
-            'data'    => [
-                'email' => $email,
-            ],
+
+        return responseSuccess('code_sent', $response, [
+            'email' => $email,
         ]);
     }
 
@@ -76,29 +64,17 @@ class ForgotPasswordController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return responseError('validation_error', $validator->errors()->all());
         }
         $code = $request->code;
 
         if (PasswordReset::where('token', $code)->where('email', $request->email)->count() != 1) {
             $notify[] = 'Verification code doesn\'t match';
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('validation_error', $notify);
         }
 
         $response[] = 'You can change your password.';
-        return response()->json([
-            'remark'  => 'verified',
-            'status'  => 'success',
-            'message' => ['success' => $response],
-        ]);
+        return responseSuccess('verified', $response);
     }
 
     public function reset(Request $request)
@@ -107,20 +83,13 @@ class ForgotPasswordController extends Controller
         $validator = Validator::make($request->all(), $this->rules());
 
         if ($validator->fails()) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return responseError('validation_error', $validator->errors()->all());
         }
 
         $reset = PasswordReset::where('token', $request->token)->orderBy('created_at', 'desc')->first();
         if (!$reset) {
             $response[] = 'Invalid verification code';
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['success' => $response],
-            ]);
+            return responseError('validation_error', $response);
         }
 
         $user           = User::where('email', $reset->email)->first();
@@ -137,11 +106,7 @@ class ForgotPasswordController extends Controller
         ], ['email']);
 
         $response[] = 'Password changed successfully';
-        return response()->json([
-            'remark'  => 'password_changed',
-            'status'  => 'success',
-            'message' => ['success' => $response],
-        ]);
+        return responseSuccess('password_changed', $response);
     }
 
     protected function rules()

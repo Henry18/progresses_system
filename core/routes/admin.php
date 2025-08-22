@@ -81,6 +81,12 @@ Route::middleware('admin')->group(function () {
             Route::post('save/{id?}', 'saveStaking')->name('save');
             Route::post('status/{id?}', 'stakingStatus')->name('status');
             Route::get('/invest', 'stakingInvest')->name('invest');
+            Route::get('/statistics', 'stakingStatistics')->name('statistics');
+            Route::get('/invest-statistics', 'totalInvestStatistics')->name('invest.statistics');
+            Route::get('/interest-statistics', 'totalInterestStatistics')->name('interest.statistics');
+            Route::get('/invest/plan', 'investPlan')->name('invest.plan');
+            Route::get('/interest/plan', 'interestPlan')->name('interest.plan');
+            Route::get('invest-interest-chart', 'investInterestChart')->name('interest.chart');
         });
 
         Route::name('pool.')->prefix('pool')->group(function () {
@@ -89,6 +95,11 @@ Route::middleware('admin')->group(function () {
             Route::post('status/{id?}', 'poolStatus')->name('status');
             Route::post('dispatch', 'dispatchPool')->name('dispatch');
             Route::get('/invest', 'poolInvest')->name('invest');
+
+            Route::get('/statistics', 'poolStatistics')->name('statistics');
+            Route::get('/invest-statistics', 'poolInvestStatistics')->name('invest.statistics');
+            Route::get('/invest/plan', 'poolInvestPlan')->name('invest.plan');
+            Route::get('pool-invest-interest-chart', 'poolInvestInterestChart')->name('invest.interest.chart');
         });
 
     });
@@ -228,6 +239,8 @@ Route::middleware('admin')->group(function () {
         Route::get('invest-statistics-by-plan', 'investStatisticsByPlan')->name('statistics.plan');
         Route::get('invest-interest-statistics', 'investInterestStatistics')->name('interest');
         Route::get('invest-interest-chart', 'investInterestChart')->name('interest.chart');
+        Route::get('invest', 'invest')->name('invest');
+        Route::get('interest-statistics', 'interestStatistics')->name('interest.statistics');
     });
 
 

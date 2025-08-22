@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 @section('panel')
-    <div class="row mb-none-30 justify-content-center">
-        <div class="col-xl-4 col-md-6 mb-30">
+    <div class="row justify-content-center gy-4">
+        <div class="col-xl-4 col-md-6">
             <div class="card overflow-hidden box--shadow1">
                 <div class="card-body">
                     <h5 class="mb-20 text-muted">@lang('Deposit Via') @if($deposit->method_code < 5000) {{ __(@$deposit->gateway->name) }} @else @lang('Google Pay') @endif</h5>
@@ -17,7 +17,7 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             @lang('Username')
                             <span class="fw-bold">
-                                <a href="{{ route('admin.users.detail', $deposit->user_id) }}"><span>@</span>{{ @$deposit->user->username }}</a>
+                                <a href="{{ route('admin.users.detail', $deposit->user_id) }}"><span>@</span>{{ $deposit->user?->username }}</a>
                             </span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -57,9 +57,8 @@
                         </li>
                         @if($deposit->admin_feedback)
                             <li class="list-group-item">
-                                <strong>@lang('Admin Response')</strong>
-                                <br>
-                                <p>{{__($deposit->admin_feedback)}}</p>
+                                <span class="text-black">@lang('Admin Response')</span>
+                                <p class="mt-1">{{__($deposit->admin_feedback)}}</p>
                             </li>
                         @endif
                     </ul>
@@ -67,7 +66,7 @@
             </div>
         </div>
         @if($details || $deposit->status == Status::PAYMENT_PENDING)
-        <div class="col-xl-8 col-md-6 mb-30">
+        <div class="col-xl-8 col-md-6">
             <div class="card overflow-hidden box--shadow1">
                 <div class="card-body">
                     <h5 class="card-title border-bottom pb-2">@lang('User Deposit Information')</h5>
@@ -131,8 +130,8 @@
                     @csrf
                     <input type="hidden" name="id" value="{{ $deposit->id }}">
                     <div class="modal-body">
-                        <p>@lang('Are you sure to') <span class="fw-bold">@lang('reject')</span> <span class="fw-bold text--success">{{ showAmount($deposit->amount)}}</span> @lang('deposit of') <span class="fw-bold">{{ @$deposit->user->username }}</span>?</p>
-
+                        <p>@lang('Are you sure to') <span class="fw-bold">@lang('reject')</span> <span class="fw-bold text--success">{{ showAmount($deposit->amount)}}</span> @lang('deposit of') <span class="fw-bold">{{ $deposit->user?->username }}</span>?</p>
+                        
                         <div class="form-group">
                             <label class="mt-2">@lang('Reason for Rejection')</label>
                             <textarea name="message" maxlength="255" class="form-control" rows="5" required>{{ old('message') }}</textarea>

@@ -52,8 +52,7 @@
                 </div>
 
                 <div class="card-body">
-                    <div class="submitRequired bg--warning d-none form-change-alert"><i
-                            class="fas fa-exclamation-triangle"></i>
+                    <div class="submitRequired bg--warning d-none form-change-alert"><i class="fas fa-exclamation-triangle"></i>
                         @lang('You\'ve to click on the Update Now button to apply the changes')</div>
                     <form action="{{ route('admin.frontend.manage.section.update', $pData->id) }}" method="post">
                         @csrf
@@ -213,7 +212,7 @@
                 let closestForm = $(this).closest('form');
                 closestForm.find('[type=submit]').addClass('disabled')
                 let slug = $(this).val();
-                slug = slug.toLowerCase().replace(/ /g,'-').replace(/[^\w-]+/g,'');
+                slug = slug.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
                 $(this).val(slug)
                 if (slug) {
                     $('.slug-verification').removeClass('d-none');

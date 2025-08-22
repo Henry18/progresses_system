@@ -7,37 +7,40 @@
                 <div class="col-12">
                     <div class="card full-view">
                         <div class="card-header">
-                            <div class="row g-2 align-items-center">
-                                <div class="col-sm-6">
-                                    <h5 class="card-title mb-0">@lang('Total Invests')</h5>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <h5 class="card-title mb-0">@lang('Total Invests')</h5>
+                                <div class="">
+                                    <button class="exit-btn d-sm-none d-md-block d-xl-none">
+                                        <i class="fullscreen-open las la-compress openFullscreen"></i>
+                                    </button>
                                 </div>
-                                <div class="col-sm-6 text-sm-end">
-                                    <div class="d-flex justify-content-sm-end gap-2">
-                                        <button class="exit-btn">
-                                            <i class="fullscreen-open las la-compress" onclick="openFullscreen();"></i>
-                                            <i class="fullscreen-close las la-compress-arrows-alt" onclick="closeFullscreen();"></i>
+                                <div>
+                                    <div class="d-flex justify-content-end gap-2 flex-wrap">
+                                        <div id="investTotalPicker" class="border p-1 cursor-pointer rounded">
+                                            <i class="la la-calendar"></i>&nbsp;
+                                            <span></span> <i class="la la-caret-down"></i>
+                                        </div>
+                                        <button class="exit-btn d-none d-sm-block d-md-none d-xl-block">
+                                            <i class="fullscreen-open las la-compress openFullscreen"></i>
                                         </button>
-                                        <select name="invest_time" class="widget_select">
-                                            <option value="week">@lang('Current Week')</option>
-                                            <option value="month">@lang('Current Month')</option>
-                                            <option value="year" selected>@lang('Current Year')</option>
-                                        </select>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="card-body text-center pb-0 px-0">
-                            <div class="row align-items-center">
-                                <div class="col-md-4">
-                                    <p>@lang('This') <span class="time_type"></span> @lang('invest')</p>
-                                </div>
-                                <div class="col-md-4">
-                                    <h3><span>{{ gs('cur_sym') }}</span><span class="total_invest"></span></h3>
-                                </div>
-                                <div class="col-md-4">
-                                    <p class="up_down">
+                            <div class="px-2">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <p>@lang('Investments for ')<span class="time_type"></span></p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h3><span>{{ gs('cur_sym') }}</span><span class="total_invest"></span></h3>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p class="up_down">
 
-                                    </p>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                             <div class="my_invest_canvas"></div>
@@ -47,56 +50,58 @@
                 <div class="col-xxl-6">
                     <div class="card h-100">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">@lang('Investments')</h5>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <h5 class="card-title mb-0">@lang('Investments')</h5>
+                                <div id="investmentPicker" class="border p-1 cursor-pointer rounded">
+                                    <i class="la la-calendar"></i>&nbsp;
+                                    <span></span> <i class="la la-caret-down"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            @if ($widget['total_invest'] > 0)
-                                <div class="card-container">
-                                    <div class="investments-scheme">
-                                        <div class="investments-scheme-item">
-                                            <p class="mb-0">@lang('Total Investments')</p>
-                                            <h3 class="mb-6">
-                                                <small>{{ gs('cur_sym') }}</small>{{ showAmount($widget['total_invest'], currencyFormat: false) }}
+                        <div class="card-body investment-report">
+                            <div class="card-container">
+                                <div class="investments-scheme">
+                                    <div class="investments-scheme-item">
+                                        <p class="mb-0">@lang('Total Investments')</p>
+                                        <h3 class="mb-6">
+                                            <span class="totalInvest"></span>
+                                        </h3>
+                                    </div>
+                                    <div class="investments-scheme-arrow">
+                                        <div class="text-end">
+                                            <i class="las la-arrow-down text--success" style="transform: rotate(30deg);"></i>
+                                        </div>
+                                        <div class="text-start">
+                                            <i class="las la-arrow-down text--success" style="transform: rotate(-30deg);"></i>
+                                        </div>
+                                    </div>
+                                    <div class="investments-scheme-group">
+                                        <div class="investments-scheme-content">
+                                            <p class="font-12">@lang('Deposit Wallet')</p>
+                                            <h3 class="deposit-amount counter">
+                                                <span class="text--success depositWalletInvest"></span>
                                             </h3>
+                                            <p class="mb-0 font-12">
+                                                <i class="feather icon-users"></i>
+                                                <strong>
+                                                    <span class="depositWalletInvestPercentage"></span>
+                                                </strong>
+                                            </p>
                                         </div>
-                                        <div class="investments-scheme-arrow">
-                                            <div class="text-end">
-                                                <i class="las la-arrow-down text--success" style="transform: rotate(30deg);"></i>
-                                            </div>
-                                            <div class="text-start">
-                                                <i class="las la-arrow-down text--success" style="transform: rotate(-30deg);"></i>
-                                            </div>
-                                        </div>
-                                        <div class="investments-scheme-group">
-                                            <div class="investments-scheme-content">
-                                                <p class="font-12">@lang('Deposit Wallet')</p>
-                                                <h3 class="deposit-amount text--success counter">
-                                                    {{ showAmount($widget['invest_deposit_wallet']) }}
-                                                </h3>
-                                                <p class="mb-0 font-12">
-                                                    <i class="feather icon-users"></i>
-                                                    <strong>
-                                                        {{ showAmount(($widget['invest_deposit_wallet'] / $widget['total_invest']) * 100, currencyFormat: false) }}%
-                                                    </strong>
-                                                </p>
-                                            </div>
-                                            <div class="investments-scheme-content">
-                                                <p class="font-12">@lang('Interest Wallet')</p>
-                                                <h3 class="deposit-amount text--success counter">
-                                                    {{ showAmount($widget['invest_interest_wallet']) }}
-                                                </h3>
-                                                <p class="mb-0 font-12"><i class="feather icon-users"></i>
-                                                    <strong>
-                                                        {{ showAmount(($widget['invest_interest_wallet'] / $widget['total_invest']) * 100, currencyFormat: false) }}%
-                                                    </strong>
-                                                </p>
-                                            </div>
+                                        <div class="investments-scheme-content">
+                                            <p class="font-12">@lang('Interest Wallet')</p>
+                                            <h3 class="deposit-amount counter">
+                                                <span class="text--success interestWalletInvest"></span>
+                                            </h3>
+                                            <p class="mb-0 font-12"><i class="feather icon-users"></i>
+                                                <strong>
+                                                    <span class="interestWalletInvestPercentage"></span>
+                                                </strong>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
-                            @else
-                                <h5 class="text-center">@lang('Invest not found')</h5>
-                            @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -152,33 +157,15 @@
                 <div class="col-12">
                     <div class="card h-100">
                         <div class="card-header">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h5 class="card-title mb-0">@lang('Interest Statistics by Plan')</h5>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <h5 class="card-title mb-0">@lang('Interest Statistics by Plan')</h5>
+                                <div id="investInterestStatisticsPicker" class="border p-1 cursor-pointer rounded">
+                                    <i class="la la-calendar"></i>&nbsp;
+                                    <span></span> <i class="la la-caret-down"></i>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="chart-container">
-                                <div class="chart-info">
-                                    <a href="#" class="chart-info-toggle">
-                                        <img src="{{ asset('assets/images/collapse.svg') }}" alt="image" class="chart-info-img">
-                                    </a>
-                                    <div class="chart-info-content">
-                                        <ul class="chart-info-list">
-                                            @foreach ($interestByPlans as $key => $invest)
-                                                <li class="chart-info-list-item">
-                                                    <i class="fas fa-plane planPointInterest me-2"></i>{{ __($key) }}
-                                                    {{ showAmount(($invest / $totalInterest) * 100, currencyFormat: false) }}%
-                                                </li>
-                                            @endforeach
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="chart-area">
-                                    <canvas id="interest_by_plan" height="250" class="chartjs-chart"></canvas>
-                                </div>
-                            </div>
+                        <div class="card-body invest-interest-statistics">
                         </div>
                     </div>
                 </div>
@@ -191,18 +178,13 @@
                         <div class="card-header">
                             <div class="row align-items-center">
                                 <div class="col-12">
-                                    <div class="row g-2 align-items-center">
-                                        <div class="col-sm-6">
-                                            <h5 class="card-title mb-0">@lang('Invest & Interest')</h5>
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <h5 class="card-title mb-0">@lang('Invest & Interest')</h5>
+                                        <div id="investInterestPicker" class="border p-1 cursor-pointer rounded">
+                                            <i class="la la-calendar"></i>&nbsp;
+                                            <span></span> <i class="la la-caret-down"></i>
                                         </div>
-                                        <div class="col-sm-6 text-sm-end">
-                                            <select name="invest_interest_time" class="widget_select" id="plan_statistics_time">
-                                                <option value="all">@lang('All Time')</option>
-                                                <option value="week">@lang('Current Week')</option>
-                                                <option value="month">@lang('Current Month')</option>
-                                                <option value="year">@lang('Current Year')</option>
-                                            </select>
-                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -213,21 +195,21 @@
                                     <p class="mb-0">@lang('Running Invest')</p>
                                     <h5 class="mb-1 text-success runningInvests"></h5>
                                     <p class="mb-0">
-                                        <a href="{{ route('admin.report.invest.history') }}?status={{ Status::INVEST_RUNNING }}" class="btn btn-sm btn-success-rgba font-12 px-2">@lang('History')</a>
+                                        <a href="{{ route('admin.report.invest.history') }}?status={{ Status::INVEST_RUNNING }}" class="btn btn-sm btn-success-rgba font-12 px-2 investHistory">@lang('History')</a>
                                     </p>
                                 </div>
                                 <div class="interest-scheme__content text-sm-center">
                                     <p class="mb-0 font-12">@lang('Closed Invest')</p>
                                     <h5 class="mb-1 text--warning counter expiredInvests"></h5>
                                     <p class="mb-0">
-                                        <a href="{{ route('admin.report.invest.history') }}?status={{ Status::INVEST_CLOSED }}"><button type="button" class="btn btn-sm btn-warning-rgba font-12 px-2">@lang('History')</button></a>
+                                        <a href="{{ route('admin.report.invest.history') }}?status={{ Status::INVEST_CLOSED }}" class="btn btn-sm btn-warning-rgba font-12 px-2 investHistory">@lang('History')</a>
                                     </p>
                                 </div>
                                 <div class="interest-scheme__content text-sm-end">
                                     <p class="mb-0 font-12">@lang('Interest')</p>
                                     <h5 class="mb-1 text--primary interests"></h5>
                                     <p class="mb-0">
-                                        <a href="{{ route('admin.report.transaction') }}?remark=interest" class="btn btn-sm btn-primary-rgba font-12 px-2 speedUp">@lang('History')</a>
+                                        <a href="{{ route('admin.report.transaction') }}?remark=interest" class="btn btn-sm btn-primary-rgba font-12 px-2 investHistory speedUp">@lang('History')</a>
                                     </p>
                                 </div>
                             </div>
@@ -237,23 +219,21 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <div class="row g-2 align-items-center">
-                                <div class="col-sm-6 col-md-12 col-xl-5">
+                            <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                                <div>
                                     <h5 class="card-title mb-0">@lang('Investment Statistics by Plan')</h5>
                                 </div>
-                                <div class="col-sm-6 col-md-12 col-xl-7">
-                                    <div class="pair-option justify-content-md-start justify-content-xl-end">
+                                <div>
+                                    <div class="d-flex align-items-center flex-wrap gap-2">
                                         <select name="plan_statistics_invests" class="widget_select">
                                             <option value="all">@lang('All Invests')</option>
                                             <option value="active">@lang('Active Invests')</option>
                                             <option value="closed">@lang('Closed Invests')</option>
                                         </select>
-                                        <select name="plan_statistics_time" class="widget_select">
-                                            <option value="all">@lang('All Time')</option>
-                                            <option value="week">@lang('Current Week')</option>
-                                            <option value="month">@lang('Current Month')</option>
-                                            <option value="year">@lang('Current Year')</option>
-                                        </select>
+                                        <div id="investmentPlanPicker" class="border p-1 cursor-pointer rounded">
+                                            <i class="la la-calendar"></i>&nbsp;
+                                            <span></span> <i class="la la-caret-down"></i>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -261,9 +241,9 @@
                         <div class="card-body">
                             <div class="chart-container">
                                 <div class="chart-info">
-                                    <a href="#" class="chart-info-toggle">
+                                    <span href="javascript:void(0)" class="chart-info-toggle">
                                         <img src="{{ asset('assets/images/collapse.svg') }}" alt="image" class="chart-info-img">
-                                    </a>
+                                    </span>
                                     <div class="chart-info-content">
                                         <ul class="chart-info-list plan-info-data"></ul>
                                     </div>
@@ -331,7 +311,10 @@
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <div class="card-title mb-0">@lang('Recent Investments')</div>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <h5 class="card-title mb-0">@lang('Recent Investments')</h5>
+                                <a href="{{ route('admin.report.invest.history') }}" class="btn btn-sm btn--primary">@lang('View All')</a>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="plan-list d-flex flex-wrap flex-xxl-column gap-3 gap-xxl-0">
@@ -388,32 +371,80 @@
     </style>
 @endpush
 
-@push('script')
+@push('style-lib')
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/admin/css/daterangepicker.css') }}">
+@endpush
+
+@push('script-lib')
     <script src="{{ asset('assets/global/js/chart.js.2.8.0.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/moment.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/js/daterangepicker.min.js') }}"></script>
+@endpush
+
+
+@push('script')
     <script>
         'use strict';
         (function($) {
-            $('[name=invest_time]').on('change', function() {
-                let time = $(this).val();
+            const firstInvestDate = moment("{{ $firstInvestDate }}", "YYYY-MM-DD HH:mm:ss");
+            const lastInvestDate = moment("{{ $lastInvestDate }}", "YYYY-MM-DD HH:mm:ss");
+            const start = moment().subtract(30, 'days');
+            const end = moment();
+
+            const dateRangeOptions = {
+                startDate: start,
+                endDate: end,
+                ranges: {
+                    'All': [firstInvestDate, lastInvestDate],
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                    'Last 15 Days': [moment().subtract(14, 'days'), moment()],
+                    'Last 30 Days': [moment().subtract(30, 'days'), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last 6 Months': [moment().subtract(6, 'months').startOf('month'), moment().endOf('month')],
+                    'This Year': [moment().startOf('year'), moment().endOf('year')],
+                },
+                maxDate: moment()
+            }
+
+            const changeDatePickerText = (element, startDate, endDate) => {
+                $(element).html(startDate.format('MMMM D, YYYY') + ' - ' + endDate.format('MMMM D, YYYY'));
+            }
+
+            //invest total
+            const investTotal = (startDate, endDate, chosenLabel) => {
+                const data = {
+                    start_date: startDate.format('YYYY-MM-DD'),
+                    end_date: endDate.format('YYYY-MM-DD'),
+                    chosen_label: chosenLabel
+                }
+
+                let time = $('#investTotalPicker span').text();
                 var url = "{{ route('admin.invest.report.statistics') }}";
+
                 $.get(url, {
-                    time: time
+                    data_type: data.chosen_label,
+                    start_date: data.start_date,
+                    end_date: data.end_date,
                 }, function(response) {
                     $('.time_type').text(time);
                     $('.total_invest').text(response.total_invest.toFixed(2));
-
-                    let upDown = `<small>Previous ${time} invest was zero</small>`;
+                    let upDown = `<small>Previous invest was zero</small>`;
                     if (response.invest_diff != 0) {
                         if (response.up_down == 'up') {
                             var className = 'success'
                         } else {
                             var className = 'danger';
                         }
-                        upDown =
-                            `<span class="badge badge-${className}-inverse font-16">${response.invest_diff}%<i class="las la-arrow-${response.up_down}"></i></span>`;
+                        upDown = `<span class="badge badge-${className}-inverse font-16">${response.invest_diff}%<i class="las la-arrow-${response.up_down}"></i></span>`;
+                    }
+                    if (!response.pre_time) {
+                        $('.up_down').html('');
+                    } else {
+                        $('.up_down').html(upDown);
                     }
 
-                    $('.up_down').html(upDown);
                     $('.my_invest_canvas').html(
                         '<canvas height="150" id="invest_chart" class="chartjs-chart mt-4"></canvas>'
                     )
@@ -428,13 +459,11 @@
                                     @for ($i = 0; $i < 365; $i++)
                                         '#6c5ce7',
                                     @endfor
-
                                 ],
                                 borderColor: [
                                     'rgba(231, 80, 90, 0.75)'
                                 ],
                                 borderWidth: 0,
-
                             }]
                         },
                         options: {
@@ -469,15 +498,119 @@
                         }
                     });
                 });
-            }).change();
+            }
 
-            $('[name=plan_statistics_time]').on('change', function() {
-                let time = $('[name=plan_statistics_time]').val();
+            $('#investTotalPicker').daterangepicker(dateRangeOptions, (start, end) => changeDatePickerText('#investTotalPicker span', start, end));
+            $('#investTotalPicker').on('apply.daterangepicker', (event, picker) => investTotal(picker.startDate, picker.endDate, picker.chosenLabel));
+
+            changeDatePickerText('#investTotalPicker span', start, end);
+            investTotal(start, end, 'Last 30 Days')
+
+
+            //investments
+            let curSymbol = '{{ gs('cur_sym') }}';
+            const investmentReport = (startDate, endDate) => {
+                const data = {
+                    start_date: startDate.format('YYYY-MM-DD'),
+                    end_date: endDate.format('YYYY-MM-DD')
+                }
+                var url = "{{ route('admin.invest.report.invest') }}";
+
+                $.get(url, {
+                    start_date: data.start_date,
+                    end_date: data.end_date,
+                }, function(response) {
+                    let totalInvest = response.total_invest;
+                    let depositWalletInvest = parseFloat(response.deposit_wallet_invest);
+                    let interestWalletInvest = parseFloat(response.interest_wallet_invest);
+
+                    let depositWalletInvestPercentage = (depositWalletInvest / totalInvest) * 100;
+                    let interestWalletInvestPercentage = (interestWalletInvest / totalInvest) * 100;
+
+                    $('.totalInvest').html(`<small>${curSymbol}</small>` + totalInvest.toFixed(2));
+                    $('.depositWalletInvest').text(curSymbol + depositWalletInvest.toFixed(2));
+                    $('.interestWalletInvest').text(curSymbol + interestWalletInvest.toFixed(2));
+
+                    $('.depositWalletInvestPercentage').text(depositWalletInvestPercentage > 0 ? depositWalletInvestPercentage.toFixed(2) + '%' : '0.00%');
+                    $('.interestWalletInvestPercentage').text(interestWalletInvestPercentage > 0 ? interestWalletInvestPercentage.toFixed(2) + '%' : '0.00%');
+                });
+            }
+            $('#investmentPicker').daterangepicker(dateRangeOptions, (start, end) => changeDatePickerText('#investmentPicker span', start, end));
+            $('#investmentPicker').on('apply.daterangepicker', (event, picker) => investmentReport(picker.startDate, picker.endDate));
+            changeDatePickerText('#investmentPicker span', start, end);
+            investmentReport(start, end)
+
+            //invest interest
+            const investInterest = (startDate, endDate) => {
+                let searchByDate = "date=" + $('#investInterestPicker span').text();
+
+                const data = {
+                    start_date: startDate.format('YYYY-MM-DD'),
+                    end_date: endDate.format('YYYY-MM-DD')
+                }
+                var url = "{{ route('admin.invest.report.interest') }}";
+                $.get(url, {
+                    start_date: data.start_date,
+                    end_date: data.end_date,
+                }, function(response) {
+                    $('.runningInvests').text(`${response.running_invests}`);
+                    $('.expiredInvests').text(`${response.expired_invests}`);
+                    $('.interests').text(`${response.interests}`);
+
+                    $('.investHistory').each(function() {
+                        let currentHref = $(this).attr('href');
+
+                        if (currentHref) {
+                            if (currentHref.includes('date=')) {
+                                currentHref = currentHref.replace(/date=[^&]+/, searchByDate);
+                            } else {
+                                currentHref = currentHref + '&' + searchByDate;
+                            }
+                            $(this).attr('href', currentHref);
+                        }
+                    });
+
+                });
+            }
+            $('#investInterestPicker').daterangepicker(dateRangeOptions, (start, end) => changeDatePickerText('#investInterestPicker span', start, end));
+            $('#investInterestPicker').on('apply.daterangepicker', (event, picker) => investInterest(picker.startDate, picker.endDate));
+            changeDatePickerText('#investInterestPicker span', start, end);
+            investInterest(start, end)
+
+
+            // Interest Statistics by Plan
+            const investInterestStatistics = (startDate, endDate) => {
+                const data = {
+                    start_date: startDate.format('YYYY-MM-DD'),
+                    end_date: endDate.format('YYYY-MM-DD')
+                }
+                var url = "{{ route('admin.invest.report.interest.statistics') }}";
+                $.get(url, {
+                    start_date: data.start_date,
+                    end_date: data.end_date,
+                }, function(response) {
+                    $('.invest-interest-statistics').html(response.html);
+                    planColors();
+                });
+            }
+            $('#investInterestStatisticsPicker').daterangepicker(dateRangeOptions, (start, end) => changeDatePickerText('#investInterestStatisticsPicker span', start, end));
+            $('#investInterestStatisticsPicker').on('apply.daterangepicker', (event, picker) => investInterestStatistics(picker.startDate, picker.endDate));
+            changeDatePickerText('#investInterestStatisticsPicker span', start, end);
+            investInterestStatistics(start, end)
+
+            // Investment Statistics by Plan
+            const investPlan = (startDate, endDate) => {
+                const data = {
+                    start_date: startDate.format('YYYY-MM-DD'),
+                    end_date: endDate.format('YYYY-MM-DD')
+                }
                 let investType = $('[name=plan_statistics_invests]').val();
                 var url = "{{ route('admin.invest.report.statistics.plan') }}";
+
                 $.get(url, {
-                    time: time,
-                    invest_type: investType
+                    start_date: data.start_date,
+                    end_date: data.end_date,
+                    invest_type: investType,
                 }, function(response) {
                     $('.plan_invest_canvas').html(
                         '<canvas height="250" id="plan_invest_statistics"></canvas>');
@@ -486,12 +619,15 @@
                     let investAmount = [];
                     let planName = [];
                     let planUrl = "{{ route('admin.report.invest.history') }}";
+                    let searchByDate = "date=" + $('#investmentPlanPicker span').text();
+                    let status = response.status ?? '';
+
                     $.each(invests, function(key, invest) {
                         let investPercent = (invest.investAmount / response.total_invest) * 100;
                         investAmount.push(parseFloat(invest.investAmount).toFixed(2));
                         planName.push(invest.plan.name);
                         planInfo +=
-                            `<li class="chart-info-list-item"><i class="fas fa-plane planPoint me-2"></i>${investPercent.toFixed(2)}% - ${invest.plan.name} <a href="${planUrl}?search=${invest.plan.name}"><i class="las la-info-circle"></i></a></li>`
+                            `<li class="chart-info-list-item"><i class="fas fa-plane planPoint me-2"></i>${investPercent.toFixed(2)}% - ${invest.plan.name} <a href="${planUrl}?search=${invest.plan.name}&${searchByDate}&status=${status}"><i class="las la-info-circle"></i></a></li>`
                     });
                     $('.plan-info-data').html(planInfo);
 
@@ -512,7 +648,7 @@
                                 display: false
                             },
                             tooltips: {
-                                callbacks: {
+                                callbacks: { 
                                     label: (tooltipItem, data) => data.datasets[0].data[
                                         tooltipItem.index] + ' {{ gs('cur_text') }}'
                                 }
@@ -525,25 +661,19 @@
                         var planPoint = $(planPoint)
                         planPoint.css('color', planColors()[key])
                     })
-
                 });
-            }).change();
+            }
+            $('#investmentPlanPicker').daterangepicker(dateRangeOptions, (start, end) => changeDatePickerText('#investmentPlanPicker span', start, end));
+            $('#investmentPlanPicker').on('apply.daterangepicker', (event, picker) => investPlan(picker.startDate, picker.endDate));
+            changeDatePickerText('#investmentPlanPicker span', start, end);
+            investPlan(start, end)
+
 
             $('[name=plan_statistics_invests]').on('change', function() {
                 $('[name=plan_statistics_time]').trigger('change');
+                let picker = $('#investmentPlanPicker').data('daterangepicker');
+                $('#investmentPlanPicker').trigger('apply.daterangepicker', [picker, picker.startDate, picker.endDate]);
             });
-
-            $('[name=invest_interest_time]').on('change', function() {
-                let time = $(this).val();
-                var url = "{{ route('admin.invest.report.interest') }}";
-                $.get(url, {
-                    time: time
-                }, function(response) {
-                    $('.runningInvests').text(`${response.running_invests}`);
-                    $('.expiredInvests').text(`${response.expired_invests}`);
-                    $('.interests').text(`${response.interests}`);
-                });
-            }).change();
 
             $('[name=invest_interest_year]').on('change', function() {
                 let year = $('[name=invest_interest_year]').val();
@@ -643,40 +773,7 @@
             });
 
 
-            var doughnutChartID = document.getElementById("interest_by_plan").getContext('2d');
-            var doughnutChart = new Chart(doughnutChartID, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: @json($interestByPlans->values()),
-                        borderColor: 'transparent',
-                        backgroundColor: planColors(),
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    cutoutPercentage: 75,
-                    legend: {
-                        position: 'bottom'
-                    },
-                    title: {
-                        display: false,
-                        text: 'Chart.js Doughnut Chart'
-                    },
-                    animation: {
-                        animateScale: true,
-                        animateRotate: true
-                    },
-                    tooltips: {
-                        callbacks: {
-                            label: (tooltipItem, data) => data.datasets[0].data[tooltipItem.index] +
-                                ' {{ gs('cur_text') }}'
-                        }
-                    }
-                }
-            });
-
-            var planPointInterests = $('.planPointInterest');
+            var planPointInterests = $(document).find('.planPointInterest');
             planPointInterests.each(function(key, planPointInterest) {
                 var planPointInterest = $(planPointInterest)
                 planPointInterest.css('color', planColors()[key])
@@ -711,61 +808,41 @@
                 ]
             }
 
-            let chartToggle = $('.chart-info-toggle');
-            let chartContent = $(".chart-info-content");
-            if (chartToggle || chartContent) {
-                chartToggle.each(function() {
-                    $(this).on("click", function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        $(this).siblings().toggleClass("is-open");
-                    });
-                });
-                chartContent.each(function() {
-                    $(this).on("click", function(e) {
-                        e.stopPropagation();
-                    });
-                });
-                $(document).on("click", function() {
-                    chartContent.removeClass("is-open");
-                });
-            }
+            $(document).on('click', '.chart-info-toggle', function() {
+                let content = $(this).siblings().first().toggleClass('is-open');
+            });
 
-            $('.exit-btn').on('click', function() {
-                $(this).toggleClass('active');
+            $(document).on('click', '.openFullscreen', function() {
+                let fullView = $(this).closest('.full-view');
+
+                if (!document.fullscreenElement) {
+                    fullView.find('.cursor-pointer').addClass('d-none');
+                    fullView[0].requestFullscreen();
+                } else {
+                    document.exitFullscreen();
+                    fullView.find('.cursor-pointer').removeClass('d-none');
+                }
+            });
+
+            $(document).on('fullscreenchange', function() {
+                if (!document.fullscreenElement) {
+                    $('.full-view .cursor-pointer').removeClass('d-none');
+                }
             });
 
         })(jQuery);
-        var elems = document.querySelector(".full-view");
-
-        function openFullscreen() {
-            if (elems.requestFullscreen) {
-                elems.requestFullscreen();
-            } else if (elems.mozRequestFullScreen) {
-                /* Firefox */
-                elems.mozRequestFullScreen();
-            } else if (elems.webkitRequestFullscreen) {
-                /* Chrome, Safari & Opera */
-                elems.webkitRequestFullscreen();
-            } else if (elems.msRequestFullscreen) {
-                /* IE/Edge */
-                elems.msRequestFullscreen();
-            }
-        }
-
-        function closeFullscreen() {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.mozCancelFullScreen) {
-                /* Firefox */
-                document.mozCancelFullScreen();
-            } else if (document.webkitExitFullscreen) {
-                /* Chrome, Safari and Opera */
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                /* IE/Edge */
-                document.msExitFullscreen();
-            }
-        }
     </script>
+@endpush
+
+
+@push('style')
+    <style>
+        .widget_select {
+            height: 34px;
+        }
+
+        .card-body.investment-report {
+            min-height: 236px;
+        }
+    </style>
 @endpush

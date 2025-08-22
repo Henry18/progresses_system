@@ -21,4 +21,5 @@
             </div><!-- body-wrapper end -->
         </div>
     </div>
+    <x-config-process />
 @endsection

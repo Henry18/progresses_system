@@ -67,32 +67,20 @@ class RegisterController extends Controller
 
         if (!gs('registration')) {
             $notify[] = 'Registration not allowed';
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('validation_error', $notify);
         }
 
 
         $validator = $this->validator($request->all());
         if ($validator->fails()) {
-            return response()->json([
-                'remark' => 'validation_error',
-                'status' => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return responseError('validation_error', $validator->errors()->all());
         }
 
         if ($request->is_web) {
             $request->{'g-recaptcha-response'} = $request->recaptcha;
             if(!verifyCaptcha()){
                 $notify[] = 'Invalid captcha provided';
-                return response()->json([
-                    'remark'=>'captcha_error',
-                    'status'=>'error',
-                    'message'=>['error'=>$notify],
-                ]);
+                return responseError('validation_error', $notify);
             }
         }
 
@@ -102,12 +90,7 @@ class RegisterController extends Controller
         $response['user'] = $user;
         $response['token_type'] = 'Bearer';
         $notify[] = 'Registration successful';
-        return response()->json([
-            'remark' => 'registration_success',
-            'status' => 'success',
-            'message' => ['success' => $notify],
-            'data' => $response
-        ]);
+        return responseSuccess('registration_success', $notify, $response);
     }
 
 

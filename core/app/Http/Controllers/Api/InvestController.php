@@ -36,13 +36,8 @@ class InvestController extends Controller
         }
 
         if($request->is_web){
-            return response()->json([
-                'remark'  => 'my_invest',
-                'status'  => 'success',
-                'message' => ['success' => $notify],
-                'data'    => [
-                    'invests' => $myInvests->paginate(getPaginate()),
-                ],
+            return responseSuccess('my_invest', $notify, [
+                'invests' => $myInvests->paginate(getPaginate()),
             ]);
         }
 
@@ -101,13 +96,8 @@ class InvestController extends Controller
             $modifiedInvest = $myInvests;
         }
 
-        return response()->json([
-            'remark'  => 'my_invest',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => [
-                'invests' => $modifiedInvest,
-            ],
+        return responseSuccess('my_invest', $notify, [
+            'invests' => $modifiedInvest,
         ]);
     }
 
@@ -117,25 +107,16 @@ class InvestController extends Controller
 
         if (!$invest) {
             $notify[] = 'Investment not found';
-            return response()->json([
-                'remark'  => 'not_found',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_found', $notify);
         }
 
         $transactions = Transaction::where('invest_id', $invest->id)->orderBy('id', 'desc')->paginate(getPaginate());
-
         $notify[] = 'Investment details';
-        return response()->json([
-            'remark'  => 'investment_details',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => [
-                'invest'       => $invest,
-                'transactions' => $transactions,
-                'eligible_capital_back' => $invest->eligibleCapitalBack(),
-            ],
+
+        return responseSuccess('investment_details', $notify, [
+            'invest'       => $invest,
+            'transactions' => $transactions,
+            'eligible_capital_back' => $invest->eligibleCapitalBack(),
         ]);
     }
 
@@ -144,11 +125,7 @@ class InvestController extends Controller
         $validator = $this->validation($request);
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return responseError('validation_error', $validator->errors()->all());
         }
 
         $amount = $request->amount;
@@ -161,33 +138,21 @@ class InvestController extends Controller
 
         if (!$plan) {
             $notify[] = 'Plan not found';
-            return response()->json([
-                'remark'  => 'not_found',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_found', $notify);
         }
 
         $planValidation = $this->planInfoValidation($plan, $request);
 
         if (is_array($planValidation)) {
             $notify[] = current($planValidation);
-            return response()->json([
-                'remark'  => key($planValidation),
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError(key($planValidation), $notify);
         }
 
         if ($request->invest_time == 'schedule' && gs('schedule_invest')) {
             $request->merge(['wallet_type'=> $request->wallet]);
             HyipLab::saveScheduleInvest($request);
             $notify[] = 'Invest scheduled successfully'; 
-            return response()->json([
-                'remark'  => 'invest_scheduled',
-                'status'  => 'success',
-                'message' => ['success' => $notify],
-            ]);
+            return responseSuccess('invest_scheduled', $notify);
         }
 
         if ($wallet != 'deposit_wallet' && $wallet != 'interest_wallet') {
@@ -197,20 +162,12 @@ class InvestController extends Controller
 
             if (!$gate) {
                 $notify[] = 'Gateway not found';
-                return response()->json([
-                    'remark'  => 'not_found',
-                    'status'  => 'error',
-                    'message' => ['error' => $notify],
-                ]);
+                return responseError('not_found', $notify);
             }
 
             if ($gate->min_amount > $amount || $gate->max_amount < $amount) {
                 $notify[] = 'Please follow deposit limit';
-                return response()->json([
-                    'remark'  => 'limit_error',
-                    'status'  => 'error',
-                    'message' => ['error' => $notify],
-                ]);
+                return responseError('limit_error', $notify);
             }
 
             $deposit = PaymentController::insertDeposit($gate, $amount, $plan, $request->compound_interest);
@@ -234,37 +191,24 @@ class InvestController extends Controller
                     'gateway_data' => $gatewayData
                 ]);
             }else{
-                return response()->json([
-                    'remark'  => 'deposit_success',
-                    'status'  => 'success',
-                    'message' => ['success' => $notify],
-                    'data'    => [
-                        'redirect_url' => route('deposit.app.confirm', encrypt($deposit->id)),
-                        'deposit' => $deposit
-                    ],
-                ]); 
+                return responseSuccess('deposit_success', $notify, [
+                    'redirect_url' => route('deposit.app.confirm', encrypt($deposit->id)),
+                    'deposit' => $deposit
+                ]);
             }
 
         }
 
         if ($user->$wallet < $amount) {
             $notify[] = 'Insufficient balance';
-            return response()->json([
-                'remark'  => 'insufficient_balance',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('insufficient_balance', $notify);
         }
 
         $hyip = new HyipLab($user, $plan);
         $hyip->invest($amount, $wallet, $request->compound_interest);
 
         $notify[] = 'Invested to plan successfully';
-        return response()->json([
-            'remark'  => 'invested',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-        ]);
+        return responseSuccess('invested', $notify);
     }
 
     private function validation($request)
@@ -331,21 +275,13 @@ class InvestController extends Controller
 
         if (!$invest) {
             $notify[] = 'Investment not found';
-            return response()->json([
-                'remark'  => 'not_found',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_found', $notify);
         }
 
         if ($request->capital == 'capital_back') {
             HyipLab::capitalReturn($invest);
             $notify[] = 'Capital added to your wallet successfully';
-            return response()->json([
-                'remark'  => 'capital_added',
-                'status'  => 'success',
-                'message' => ['success' => $notify],
-            ]);
+            return responseSuccess('capital_added', $notify);
         }
 
         $plan = Plan::whereHas('timeSetting', function ($timeSetting) {
@@ -354,11 +290,7 @@ class InvestController extends Controller
 
         if (!$plan) {
             $notify[] = 'This plan currently unavailable';
-            return response()->json([
-                'remark'  => 'not_available',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_available', $notify);
         }
 
         HyipLab::capitalReturn($invest);
@@ -366,11 +298,7 @@ class InvestController extends Controller
         $hyip->invest($invest->amount, 'interest_wallet', $invest->compound_times);
 
         $notify[] = 'Reinvested to plan successfully';
-        return response()->json([
-            'remark'  => 'reinvest_success',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-        ]);
+        return responseSuccess('reinvest_success', $notify);
     }
 
     public function allPlans(Request $request)
@@ -422,13 +350,8 @@ class InvestController extends Controller
 
         $notify[] = 'All Plans';
 
-        return response()->json([
-            'remark'  => 'plan_data',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => [
-                'plans' => $modifiedPlans,
-            ],
+        return responseSuccess('plan_data', $notify, [
+            'plans' => $modifiedPlans,
         ]);
     }
 
@@ -437,11 +360,7 @@ class InvestController extends Controller
         $general = gs();
         if (!$general->schedule_invest) {
             $notify[] = 'Schedule invest currently not available.';
-            return response()->json([
-                'remark'  => 'not_available',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_available', $notify);
         }
         $scheduleInvests = ScheduleInvest::with('plan.timeSetting')->where('user_id', auth()->id())->orderBy('id', 'desc')->apiQuery();
 
@@ -475,13 +394,9 @@ class InvestController extends Controller
 
         $notify[] = 'Schedule Invests';
 
-        return response()->json([
-            'remark'  => 'schedule_invest',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => ['schedule_invests' => $scheduleInvests],
+        return responseSuccess('schedule_invest', $notify, [
+            'schedule_invests' => $scheduleInvests,
         ]);
-
     }
 
     public function scheduleStatus($id)
@@ -489,11 +404,7 @@ class InvestController extends Controller
         $scheduleInvest = ScheduleInvest::where('user_id', auth()->id())->find($id);
         if (!$scheduleInvest) {
             $notify[] = 'Schedule invest not found';
-            return response()->json([
-                'remark'  => 'not_found',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_found', $notify);
         }
 
         $scheduleInvest->status = !$scheduleInvest->status;
@@ -501,22 +412,14 @@ class InvestController extends Controller
         $notification = $scheduleInvest->status ? 'enabled' : 'disabled';
 
         $notify[] = "Schedule invest $notification successfully";
-        return response()->json([
-            'remark'  => 'status_changed',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-        ]);
+        return responseSuccess('status_changed', $notify);
     }
 
     public function staking()
     {
         if (!gs('staking_option')) {
             $notify[] = 'Staking currently not available';
-            return response()->json([
-                'remark'  => 'not_available',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_available', $notify);
         }
 
         $stakings   = Staking::active()->get();
@@ -524,27 +427,17 @@ class InvestController extends Controller
 
         $notify[] = 'Staking List';
 
-        return response()->json([
-            'remark'  => 'staking',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => [
-                'staking'     => $stakings,
-                'my_stakings' => $myStakings,
-            ],
+        return responseSuccess('staking', $notify, [
+            'staking'     => $stakings,
+            'my_stakings' => $myStakings,
         ]);
-
     }
 
     public function saveStaking(Request $request)
     {
         if (!gs('staking_option')) {
             $notify[] = 'Staking currently not available';
-            return response()->json([
-                'remark'  => 'not_available',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_available', $notify);
         }
 
         $min = getAmount(gs('staking_min_amount'));
@@ -557,11 +450,7 @@ class InvestController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return responseError('validation_error', $validator->errors()->all());
         }
 
         $user   = auth()->user();
@@ -569,23 +458,14 @@ class InvestController extends Controller
 
         if ($user->$wallet < $request->amount) {
             $notify[] = 'Insufficient balance';
-            return response()->json([
-                'remark'  => 'insufficient_balance',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
-
+            return responseError('insufficient_balance', $notify);
         }
 
         $staking = Staking::active()->find($request->duration);
 
         if (!$staking) {
             $notify[] = 'Staking not found';
-            return response()->json([
-                'remark'  => 'not_found',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_found', $notify);
         }
 
         $interest = $request->amount * $staking->interest_percent / 100;
@@ -607,53 +487,36 @@ class InvestController extends Controller
         $transaction->post_balance = $user->$wallet;
         $transaction->charge       = 0;
         $transaction->trx_type     = '-';
-        $transaction->details      = __('tagstakinginvestment');
+        $transaction->details      = 'Staking investment';
         $transaction->trx          = getTrx();
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'staking_invest';
         $transaction->save();
 
         $notify[] = 'Staking investment added successfully';
-        return response()->json([
-            'remark'  => 'staking_save',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-        ]);
-
+        return responseSuccess('staking_save', $notify);
     }
 
     public function pools()
     {
         if (!gs('pool_option')) {
             $notify[] = 'Pool currently not available.';
-            return response()->json([
-                'remark'  => 'not_available',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_available', $notify);
         }
 
         $pools = Pool::active()->where('share_interest', Status::NO)->get();
 
         $notify[] = 'Pool List';
-        return response()->json([
-            'remark'  => 'pools',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => ['pools' => $pools],
+        return responseSuccess('pools', $notify, [
+            'pools' => $pools,
         ]);
-
     }
 
     public function poolInvests()
     {
         if (!gs('pool_option')) {
             $notify[] = 'Pool currently not available.';
-            return response()->json([
-                'remark'  => 'not_available',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_available', $notify);
         }
         $poolInvests = PoolInvest::with('pool')->where('user_id', auth()->id())->orderBy('id', 'desc')->apiQuery();
 
@@ -668,24 +531,16 @@ class InvestController extends Controller
         });
 
         $notify[] = 'My Pool Invests';
-        return response()->json([
-            'remark'  => 'pool_invests',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => ['pool_invests' => $poolInvests],
+        return responseSuccess('pool_invests', $notify, [
+            'pool_invests' => $poolInvests,
         ]);
-
     }
 
     public function savePoolInvest(Request $request)
     {
         if (!gs('pool_option')) {
             $notify[] = 'Pool currently not available.';
-            return response()->json([
-                'remark'  => 'not_available',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_available', $notify);
         }
 
         $validator = Validator::make($request->all(), [
@@ -696,11 +551,7 @@ class InvestController extends Controller
 
         if ($validator->fails()) {
             if ($validator->fails()) {
-                return response()->json([
-                    'remark'  => 'validation_error',
-                    'status'  => 'error',
-                    'message' => ['error' => $validator->errors()->all()],
-                ]);
+                return responseError('validation_error', $validator->errors()->all());
             }
 
         }
@@ -709,11 +560,7 @@ class InvestController extends Controller
 
         if (!$pool) {
             $notify[] = 'Pool not found';
-            return response()->json([
-                'remark'  => 'not_found',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_found', $notify);
         }
 
         $user   = auth()->user();
@@ -721,29 +568,17 @@ class InvestController extends Controller
 
         if ($pool->start_date <= now()) {
             $notify[] = 'The investment period for this pool has ended.';
-            return response()->json([
-                'remark'  => 'date_over',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('date_over', $notify);
         }
 
         if ($request->amount > $pool->amount - $pool->invested_amount) {
             $notify[] = 'Pool invest over limit!';
-            return response()->json([
-                'remark'  => 'limit_over',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('limit_over', $notify);
         }
 
         if ($user->$wallet < $request->amount) {
             $notify[] = 'Insufficient balance';
-            return response()->json([
-                'remark'  => 'insufficient_balance',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('insufficient_balance', $notify);
         }
 
         $poolInvest = PoolInvest::where('user_id', $user->id)->where('pool_id', $pool->id)->where('status', 1)->first();
@@ -769,29 +604,21 @@ class InvestController extends Controller
         $transaction->post_balance = $user->$wallet;
         $transaction->charge       = 0;
         $transaction->trx_type     = '-';
-        $transaction->details      = __('tagpoolinvestment');
+        $transaction->details      = 'Pool investment';
         $transaction->trx          = getTrx();
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'pool_invest';
         $transaction->save();
 
         $notify[] = 'Pool investment added successfully';
-        return response()->json([
-            'remark'  => 'investment_successfully',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-        ]);
+        return responseSuccess('investment_successfully', $notify);
     }
 
     public function ranking()
     {
         if (!gs()->user_ranking) {
             $notify[] = 'User ranking currently not available.';
-            return response()->json([
-                'remark'  => 'not_available',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('not_available', $notify);
         }
 
         $userRankings = UserRanking::active()->get();
@@ -819,16 +646,11 @@ class InvestController extends Controller
         });
 
         $notify[] = 'User rankings list';
-        return response()->json([
-            'remark'  => 'user_ranking',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data' => [
-                'user_rankings' => $userRankings,
-                'next_ranking'  => $nextRanking,
-                'user'          => $user,
-                'image_path'    => getFilePath('userRanking'),
-            ]
-        ]);        
+        return responseSuccess('user_ranking', $notify, [
+            'user_rankings' => $userRankings,
+            'next_ranking'  => $nextRanking,
+            'user'          => $user,
+            'image_path'    => getFilePath('userRanking'),
+        ]);
     }
 }

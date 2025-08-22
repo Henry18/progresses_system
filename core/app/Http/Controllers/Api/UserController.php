@@ -57,33 +57,28 @@ class UserController extends Controller {
         }
 
         $notify[] = 'User Dashboard';
+        
+        return responseSuccess('dashboard', $notify, [
+            'user'              => $user,
+            'total_invest'      => $totalInvest,
+            'total_deposit'     => $totalDeposit,
+            'total_withdrawal'  => $totalWithdraw,
+            'referral_earnings' => $referralEarings,
+            'pending_deposit'   => $pendingDeposit,
+            'pending_withdraw'  => $pendingWithdraw,
 
-        return response()->json([
-            'remark'  => 'dashboard',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => [
-                'user'              => $user,
-                'total_invest'      => $totalInvest,
-                'total_deposit'     => $totalDeposit,
-                'total_withdrawal'  => $totalWithdraw,
-                'referral_earnings' => $referralEarings,
-                'pending_deposit'   => $pendingDeposit,
-                'pending_withdraw'  => $pendingWithdraw,
+            'is_show_first_deposit_alert'  => $isShowFirstDepositAlert,
+            'pending_withdrawals'  => $pendingWithdrawals,
+            'pending_deposits'  => $pendingDeposits,
+            'is_holiday'  => $isHoliday,
+            'transactions'  => $transactions,
 
-                'is_show_first_deposit_alert'  => $isShowFirstDepositAlert,
-                'pending_withdrawals'  => $pendingWithdrawals,
-                'pending_deposits'  => $pendingDeposits,
-                'is_holiday'  => $isHoliday,
-                'transactions'  => $transactions,
+            'total_invest'  => $totalInvest,
+            'total_deposit'  => $totalDeposit,
+            'total_withdraw'  => $totalWithdraw,
+            'referral_earnings'  => $referralEarnings,
 
-                'total_invest'  => $totalInvest,
-                'total_deposit'  => $totalDeposit,
-                'total_withdraw'  => $totalWithdraw,
-                'referral_earnings'  => $referralEarnings,
-
-                'next_working_day_rem_sec' => $nextWorkingDayRemSec,
-            ],
+            'next_working_day_rem_sec' => $nextWorkingDayRemSec,
         ]);
     }
 
@@ -205,17 +200,12 @@ class UserController extends Controller {
 
         $notify[] = 'My referrals list';
 
-        return response()->json([
-            'remark'  => 'referral_list',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-            'data'    => [
-                'max_level' => $maxLevel,
-                'is_show_treeview' => ($user->allReferrals->count() > 0 && $maxLevel > 0),
-                'referrals' => $referrals,
-                'referrer' => $user->referrer,
-                'get_user' => $user
-            ],
+        return responseSuccess('referral_list', $response, [
+            'max_level' => $maxLevel,
+            'is_show_treeview' => ($user->allReferrals->count() > 0 && $maxLevel > 0),
+            'referrals' => $referrals,
+            'referrer' => $user->referrer,
+            'get_user' => $user
         ]);
     }
 
@@ -227,44 +217,26 @@ class UserController extends Controller {
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'remark'  => 'validation_error',
-                'status'  => 'error',
-                'message' => ['error' => $validator->errors()->all()],
-            ]);
+            return responseError('validation_error', $validator->errors()->all());
         }
 
         $user = auth()->user();
         if ($user->username == $request->username) {
             $notify[] = 'You cannot transfer balance to your own account';
-            return response()->json([
-                'remark'  => 'error_own_account',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
-
+            return responseError('error_own_account', $notify);
         }
 
         $receiver = User::where('username', $request->username)->first();
         if (!$receiver) {
             $notify[] = 'Oops! Receiver not found';
-            return response()->json([
-                'remark'  => 'not_found',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
-
+            return responseError('not_found', $notify);
         }
 
         if ($user->ts) {
             $response = verifyG2fa($user, $request->authenticator_code);
             if (!$response) {
                 $notify[] = 'Wrong verification code';
-                return response()->json([
-                    'remark'  => 'wrong_code',
-                    'status'  => 'error',
-                    'message' => ['error' => $notify],
-                ]);
+                return responseError('wrong_code', $notify);
             }
         }
 
@@ -275,11 +247,7 @@ class UserController extends Controller {
 
         if ($user->$wallet < $afterCharge) {
             $notify[] = 'You have no sufficient balance to this wallet';
-            return response()->json([
-                'remark'  => 'insufficient_balance',
-                'status'  => 'error',
-                'message' => ['error' => $notify],
-            ]);
+            return responseError('insufficient_balance', $notify);
         }
 
         $user->$wallet -= $afterCharge;
@@ -294,7 +262,7 @@ class UserController extends Controller {
         $transaction->trx          = $trx1;
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'balance_transfer';
-        $transaction->details      = __('tagbalancetransferto') .' '. $receiver->username;
+        $transaction->details      = 'Balance transfer to ' . $receiver->username;
         $transaction->post_balance = getAmount($user->$wallet);
         $transaction->save();
 
@@ -311,7 +279,7 @@ class UserController extends Controller {
         $transaction->trx          = $trx2;
         $transaction->wallet_type  = 'deposit_wallet';
         $transaction->remark       = 'balance_received';
-        $transaction->details      = __('tagbalancereceivedfrom') .' '. $user->username;
+        $transaction->details      = 'Balance received from ' . $user->username;
         $transaction->post_balance = getAmount($user->deposit_wallet);
         $transaction->save();
 
@@ -334,12 +302,7 @@ class UserController extends Controller {
         ]);
 
         $notify[] = 'Balance transferred successfully';
-
-        return response()->json([
-            'remark'  => 'balance_transfer',
-            'status'  => 'success',
-            'message' => ['success' => $notify],
-        ]);
+        return responseSuccess('balance_transfer', $notify);
     }
 
     public function kycForm() {

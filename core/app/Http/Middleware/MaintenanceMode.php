@@ -20,7 +20,7 @@ class MaintenanceMode
                     'remark'=>'maintenance_mode',
                     'status'=>'error',
                     'message'=>['error'=>$notify]
-                ]);
+            ]);
             }else{
                 return to_route('maintenance');
             }

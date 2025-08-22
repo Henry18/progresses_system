@@ -4,6 +4,10 @@ function checkhexcolor($color)
 {
     return preg_match('/^#[a-f0-9]{6}$/i', $color);
 }
+
+$color = '';
+$secondColor = '';
+
 if (isset($_GET['color']) and $_GET['color'] != '') {
     $color = "#" . $_GET['color'];
 }
