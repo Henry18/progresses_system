@@ -1,0 +1,334 @@
+{
+    "banner": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Banner Content",
+        "content": {
+            "images": {
+                "background_image": {
+                    "size": "1905x470"
+                },
+                "shape_one": {
+                    "size": "255x135"
+                },
+                "shape_two": {
+                    "size": "240x185"
+                },
+                "coin_one": {
+                    "size": "70x70"
+                },
+                "coin_two": {
+                    "size": "70x70"
+                },
+                "coin_three": {
+                    "size": "65x65"
+                },
+                "coin_four": {
+                    "size": "70x70"
+                }
+            },
+            "heading": "text",
+            "subheading": "text",
+            "button_text_one": "text",
+            "button_url_one": "text",
+            "button_text_two": "text",
+            "button_url_two": "text"
+        }
+    },
+    "ranking": {
+        "builder": true,
+        "name": "Ranking Section",
+        "content": {
+            "heading": "text",
+            "subheading": "text"
+        }
+    },
+    "cta": {
+        "builder": true,
+        "name": "Call to Action Section",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "480x540"
+                },
+                "shape": {
+                    "size": "240x195"
+                }
+            },
+            "heading": "text",
+            "subheading": "text",
+            "count_digit": "text",
+            "count_text": "text",
+            "button_text" : "text",
+            "button_url" : "text"
+        }
+    },
+    "latest_transaction": {
+        "builder": true,
+        "name": "Latest Transaction Section",
+        "content": {
+            "heading": "text",
+            "subheading": "text"
+        }
+    },
+    "feature": {
+        "builder": true,
+        "name": "Feature Section",
+        "element": {
+            "images": {
+                "image": {
+                    "size": "35x35"
+                }
+            },
+            "title": "text",
+            "description": "textarea",
+            "modal": true
+        }
+    },
+    "how_it_work": {
+        "builder": true,
+        "name": "How it Work Section",
+        "content": {
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "title": "text",
+            "description": "textarea",
+            "modal": true
+        }
+    },
+    "calculator": {
+        "builder": true,
+        "name": "Calculator Section",
+        "content": {
+            "heading": "text",
+            "subheading": "text"
+        }
+    },
+    "plan": {
+        "builder": true,
+        "name": "Plan Section",
+        "content": {
+            "heading": "text",
+            "subheading": "text"
+        }
+    },
+    "why_choose": {
+        "builder": true,
+        "name": "Why Choose Us",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "570x600"
+                }
+            },
+            "heading": "text",
+            "subheading": "text",
+            "first_counter_text": "text",
+            "first_counter_prefix": "text",
+            "first_counter_digit": "text",
+            "second_counter_text": "text",
+            "second_counter_prefix": "text",
+            "second_counter_digit": "text"
+        },
+        "element": {
+            "icon": "icon",
+            "title": "text",
+            "modal": true
+        }
+    },
+    "faq": {
+        "builder": true,
+        "name": "FAQ Section",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "835x570"
+                }
+            },
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "question": "text",
+            "answer": "textarea",
+            "modal": true
+        }
+    },
+    "breadcrumb": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Breadcrumb",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "1920x360"
+                }
+            }
+        }
+    },
+    "testimonial": {
+        "builder": true,
+        "name": "Testimonial",
+        "content": {
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "images": {
+                "image": {
+                    "size": "100x120"
+                }
+            },
+            "name": "text",
+            "designation": "text",
+            "rating": "text",
+            "quote": "textarea",
+            "modal": true
+        }
+    },
+    "top_investor": {
+        "builder": true,
+        "name": "Top Investor",
+        "content": {
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "name": "text",
+            "designation": "text",
+            "amount": "text",
+            "modal": true
+        }
+    },
+    "blog": {
+        "builder": true,
+        "name": "Blog Section",
+        "content": {
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "images": {
+                "image": {
+                    "size": "965x500",
+                    "thumb": "415x270"
+                }
+            },
+            "title": "text",
+            "slug": "title",
+            "description": "textarea-nic",
+            "modal": false
+        }
+    },
+    "footer": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Footer",
+        "content": {
+            "images": {
+                "left_image": {
+                    "size": "190x350"
+                },
+                "right_image": {
+                    "size": "890x735"
+                }
+            },
+            "description": "textarea"
+        }
+    },
+    "social_icon": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Social Icon",
+        "element": {
+            "icon": "icon",
+            "url": "text",
+            "modal": true
+        }
+    },
+    "contact": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Contact",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "495x550"
+                }
+            },
+            "heading": "text",
+            "subheading": "text"
+        },
+        "element": {
+            "icon": "icon",
+            "title": "text",
+            "content": "text",
+            "modal": true
+        }
+    },
+    "login": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Login Page",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "600x715"
+                }
+            },
+            "heading": "text"
+        }
+    },
+    "registration": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Registration Page",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "600x715"
+                }
+            },
+            "heading": "text"
+        }
+    },
+    "policy_pages": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Policy Pages",
+        "element": {
+            "title": "text",
+            "slug": "title",
+            "details": "textarea-nic",
+            "modal": false
+        }
+    },
+    "kyc": {
+        "builder": true,
+        "no_selection": true,
+        "name": "KYC Content",
+        "content": {
+            "required": "text",
+            "pending": "text",
+            "reject": "text"
+        }
+    },
+    "register_disable": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Registration Disable",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "280x280"
+                }
+            },
+            "heading": "text",
+            "subheading": "text",
+            "button_name": "text",
+            "button_url": "text"
+        }
+    }
+}

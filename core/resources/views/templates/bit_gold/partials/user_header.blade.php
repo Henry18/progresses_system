@@ -70,7 +70,7 @@
                                 @endif
                             </ul>
                             @if (gs('multi_language'))
-                                    @include($activeTemplate.'partials.language')
+                                    @include('Template::partials.language')
                                 @endif
                         </div>
                     </div>

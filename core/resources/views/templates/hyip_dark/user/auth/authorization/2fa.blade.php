@@ -1,4 +1,4 @@
-@extends($activeTemplate .'layouts.frontend')
+@extends('Template::layouts.frontend')
 
 @section('content')
     <div class="my-120">
@@ -10,7 +10,7 @@
                             @csrf
                             <p class="verification-text mb-3">@lang('Enter the 6-digit verification code from your Google Authenticator app')</p>
 
-                            @include($activeTemplate.'partials.verification_code')
+                            @include('Template::partials.verification_code')
 
                             <div class="form--group">
                                 <button type="submit" class="btn btn--base w-100 btn--lg">@lang('Submit')</button>

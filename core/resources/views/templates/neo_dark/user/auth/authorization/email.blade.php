@@ -1,4 +1,4 @@
-@extends($activeTemplate .'layouts.frontend')
+@extends('Template::layouts.frontend')
 @section('content')
 <div class="pt-60 pb-60">
     <div class="container">
@@ -9,7 +9,7 @@
                         @csrf
                         <p class="verification-text mt-3 mb-3">@lang('A 6 digit verification code sent to your email address'):  {{ showEmailAddress(auth()->user()->email) }}</p>
 
-                        @include($activeTemplate.'partials.verification_code')
+                        @include('Template::partials.verification_code')
 
                         <div class="mb-3">
                             <button type="submit" class="btn btn--base w-100">@lang('Submit')</button>

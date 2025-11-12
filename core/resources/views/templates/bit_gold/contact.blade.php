@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 @section('content')
     @php
         $contactContent = getContent('contact.content', true);

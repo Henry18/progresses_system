@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="row justify-content-center mb-none-50">
-            @include($activeTemplate . 'partials.plan', ['plans' => $plans])
+            @include('Template::partials.plan', ['plans' => $plans])
         </div>
     </div>
 </section>

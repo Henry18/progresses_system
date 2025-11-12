@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.' . $layout)
+@extends('Template::layouts.' . $layout)
 
 @section('content')
     <div class="dashboard-inner {{ $layout == 'frontend' ? 'pt-120 pb-120 container' : '' }}">

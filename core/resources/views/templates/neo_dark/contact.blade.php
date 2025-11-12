@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 @section('content')
     @php
     $contact = getContent('contact.content', true);
@@ -79,5 +79,5 @@
 
 @push('script')
     <script src="https://maps.google.com/maps/api/js?key={{ trim(@$contact->data_values->map_api_key) }}"></script>
-    <script src="{{ asset($activeTemplateTrue . 'js/map.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/map.js') }}"></script>
 @endpush

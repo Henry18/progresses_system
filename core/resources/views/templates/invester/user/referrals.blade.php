@@ -1,4 +1,4 @@
-@extends($activeTemplate.'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
 
 <div class="dashboard-inner">
@@ -23,7 +23,7 @@
                     <div class="treeview-container">
                         <ul class="treeview">
                         <li class="items-expanded"> {{ $user->fullname }} ( {{ $user->username }} )
-                                @include($activeTemplate.'partials.under_tree',['user'=>$user,'layer'=>0,'isFirst'=>true])
+                                @include('Template::partials.under_tree',['user'=>$user,'layer'=>0,'isFirst'=>true])
                             </li>
                         </ul>
                     </div>

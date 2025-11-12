@@ -1,6 +1,6 @@
 @foreach ($pools as $pool)
     <div class="col-xl-3 col-lg-4 col-md-6">
-        <div class="package-card text-center bg_img" data-background="{{ asset($activeTemplateTrue . '/images/bg/bg-4.png') }}">
+        <div class="package-card text-center bg_img" data-background="{{ asset(activeTemplate(true) . '/images/bg/bg-4.png') }}">
             <h4 class="package-card__title base--color mb-2">{{ __($pool->name) }}</h4>
 
             <ul class="package-card__features mt-4">

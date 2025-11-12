@@ -35,7 +35,6 @@ class FrontendController extends Controller
         }
         $extraTemplates = json_decode(getTemplates(), true);
         return view('admin.frontend.templates', compact('pageTitle', 'templates', 'extraTemplates'));
-
     }
 
     public function templatesActive(Request $request)
@@ -104,7 +103,7 @@ class FrontendController extends Controller
                 $validationRule['image_input'] = ['nullable', 'image', new FileTypeValidate(['jpeg', 'jpg', 'png'])];
                 continue;
             }
-            if($inputField == 'meta_robots') continue;
+            if ($inputField == 'meta_robots') continue;
             $validationRule[$inputField] = ['required'];
             if ($inputField == 'slug') {
                 $validationRule[$inputField] = [Rule::unique('frontends')->where(function ($query) use ($request) {
@@ -130,31 +129,19 @@ class FrontendController extends Controller
                 $content->save();
             }
         }
-        if ($type == 'data') {
-            $inputContentValue['image'] = @$content->data_values->image;
-            if ($request->hasFile('image_input')) {
-                try {
-                    $inputContentValue['image'] = fileUploader($request->image_input, getFilePath('seo'), getFileSize('seo'), @$content->data_values->image);
-                } catch (\Exception $exp) {
-                    $notify[] = ['error', 'Couldn\'t upload the image'];
-                    return back()->withNotify($notify);
-                }
-            }
-        } else {
-            if ($imgJson) {
-                foreach ($imgJson as $imgKey => $imgValue) {
-                    $imgData = @$request->image_input[$imgKey];
-                    $oldImage = @$content->data_values->$imgKey;
-                    if (is_file($imgData)) {
-                        try {
-                            $inputContentValue[$imgKey] = $this->storeImage($imgJson, $type, $key, $imgData, $imgKey, $oldImage);
-                        } catch (\Exception $exp) {
-                            $notify[] = ['error', 'Couldn\'t upload the image'];
-                            return back()->withNotify($notify);
-                        }
-                    } else if (isset($content->data_values->$imgKey)) {
-                        $inputContentValue[$imgKey] = $oldImage;
+       if ($imgJson) {
+            foreach ($imgJson as $imgKey => $imgValue) {
+                $imgData = $request->image_input && array_key_exists($imgKey, $request->image_input) ? $request->image_input[$imgKey] : null;
+                $oldImage = isset($content?->data_values?->$imgKey) && $content?->data_values?->$imgKey ? $content?->data_values?->$imgKey : null;
+                if (is_file($imgData)) {
+                    try {
+                        $inputContentValue[$imgKey] = $this->storeImage($imgJson, $type, $key, $imgData, $imgKey, $oldImage);
+                    } catch (\Exception $exp) {
+                        $notify[] = ['error', 'Couldn\'t upload the image'];
+                        return back()->withNotify($notify);
                     }
+                } else if ($content?->data_values?->$imgKey) {
+                    $inputContentValue[$imgKey] = $oldImage;
                 }
             }
         }
@@ -171,9 +158,6 @@ class FrontendController extends Controller
             return to_route('admin.frontend.sections.element.seo', [$key, $content->id])->withNotify($notify);
         }
 
-        if ($request->seo_image) {
-            RequiredConfig::configured('seo');
-        }
         if ($content->data_keys == 'policy_pages.element') {
             RequiredConfig::configured('policy_content');
         }
@@ -248,13 +232,12 @@ class FrontendController extends Controller
             'social_title'       => $request->social_title,
             'social_description' => $request->social_description,
             'keywords'           => $request->keywords,
-            'meta_robots'=>$request->meta_robots
+            'meta_robots' => $request->meta_robots
         ];
         $data->save();
 
         $notify[] = ['success', 'SEO content updated successfully'];
         return back()->withNotify($notify);
-
     }
 
     protected function storeImage($imgJson, $type, $key, $image, $imgKey, $oldImage = null)
@@ -425,4 +408,45 @@ class FrontendController extends Controller
         $fileManager->removeDirectory($location);
     }
 
+    public function updateSeoContent(Request $request)
+    {
+        $validated = $request->validate([
+            'image' => ['nullable', new FileTypeValidate(['jpeg', 'jpg', 'png'])],
+            'keywords' => 'required|array|min:1',
+            'keywords.*' => 'required|string',
+            'meta_robots' => 'nullable|string',
+            'description' => 'required|string',
+            'social_title' => 'required|string',
+            'social_description' => 'required|string',
+        ]);
+
+        $seo = Frontend::where('data_keys', 'seo.data')->first();
+
+        $oldData = $seo->data_values ? json_decode(json_encode($seo->data_values), true) : [];
+
+        $data = array_merge($oldData ?? [], $validated);
+
+        if ($request->hasFile('image')) {
+            try {
+                $image = fileUploader($request->image, getFilePath('seo'), getFileSize('seo'), $seo?->data_values?->image ?? null);
+                $data['image'] = $image;
+            } catch (\Exception $exp) {
+                $notify[] = ['error', 'Couldn\'t upload the image'];
+                return back()->withNotify($notify);
+            }
+        }
+
+        if (!$seo) {
+            $seo = new Frontend();
+            $seo->data_keys = 'seo.data';
+        }
+
+        $seo->data_values = $data;
+        $seo->save();
+
+        RequiredConfig::configured('seo');
+
+        $notify[] = ['success', 'SEO content updated successfully'];
+        return back()->withNotify($notify);
+    }
 }

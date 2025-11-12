@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 @section('content')
     <!-- blog-details start -->
     <section class="blog-details pt-150 pb-150">

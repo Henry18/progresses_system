@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 
 @section('content')
     <div class="blog-section my-120">
@@ -32,7 +32,7 @@
                         </div>
                     </div>
                 @empty
-                    @include($activeTemplate . 'partials.empty')
+                    @include('Template::partials.empty')
                 @endforelse
             </div>
             {{ paginateLinks($blogs) }}
@@ -41,7 +41,7 @@
 
     @if ($sections != null)
         @foreach (json_decode($sections) as $sec)
-            @include($activeTemplate . 'sections.' . $sec)
+            @include('Template::sections.' . $sec)
         @endforeach
     @endif
 @endsection

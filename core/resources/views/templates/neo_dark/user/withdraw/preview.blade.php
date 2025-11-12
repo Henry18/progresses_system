@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
     <section class="pb-150 pt-150">
         <div class="container">

@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
     <div class="dashboard-inner">
         <div class="mb-4">
@@ -8,7 +8,7 @@
         </div>
 
         <div class="mt-4">
-            @include($activeTemplate . 'partials.invest_history', ['invests' => $invests])
+            @include('Template::partials.invest_history', ['invests' => $invests])
 
             @if ($invests->hasPages())
                 <div class="custom--pagination">

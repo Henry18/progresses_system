@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 
 @section('content')
     <div class="row gy-4 justify-content-center">
@@ -53,7 +53,7 @@
                         </a>
                     </div>
                 </div>
-                @include($activeTemplate.'partials.invest_history',['invests'=>$invests])
+                @include('Template::partials.invest_history',['invests'=>$invests])
             </div>
         </div>
     </div>

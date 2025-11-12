@@ -53,7 +53,7 @@ class CronController extends Controller
                 }
             }
             $cron->last_run = now();
-            $cron->next_run = now()->addSeconds($cron->schedule->interval);
+            $cron->next_run = now()->addSeconds((int) $cron->schedule->interval);
             $cron->save();
 
             $cronLog->end_at = $cron->last_run;

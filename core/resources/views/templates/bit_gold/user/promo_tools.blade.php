@@ -1,4 +1,4 @@
-@extends($activeTemplate.'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
 
 <section class="cmn-section">

@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.app')
+@extends('Template::layouts.app')
 
 @php
     $policyPages = getContent('policy_pages.element', false, null, true);
@@ -8,7 +8,7 @@
 @section('panel')
     <section class="account py-60">
         <div class="account__shape">
-            <img src="{{ asset($activeTemplateTrue .'images/shapes/contact-s.png') }}" alt="">
+            <img src="{{ asset(activeTemplate(true) .'images/shapes/contact-s.png') }}" alt="">
         </div>
         <div class="container">
             <div class="row gy-4 justify-content-center">
@@ -30,7 +30,7 @@
                         <span class="account-form__subtitle"> {{ __(@$registerContent->data_values->subheading) }} </span>
                         <h5 class="account-form__title"> {{ __(@$registerContent->data_values->heading) }} </h5>
 
-                        @include($activeTemplate.'partials.social_login')   
+                        @include('Template::partials.social_login')   
 
                         <div class="row gy-4">
 

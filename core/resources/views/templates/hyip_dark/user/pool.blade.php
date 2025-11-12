@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 
 @section('content')
     <div class="row justify-content-center gy-5">
@@ -10,6 +10,6 @@
             </div>
         </div>
 
-        @include($activeTemplate . 'partials.pool', ['pools' => $pools])
+        @include('Template::partials.pool', ['pools' => $pools])
     </div>
 @endsection

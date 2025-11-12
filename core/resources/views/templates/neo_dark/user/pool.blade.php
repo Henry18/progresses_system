@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 
 @section('content')
     <section class="pt-60 pb-60">
@@ -11,7 +11,7 @@
                         </a>
                     </div>
                 </div>
-                @include($activeTemplate . 'partials.pool', ['pools' => $pools])
+                @include('Template::partials.pool', ['pools' => $pools])
             </div>
         </div>
     </section>

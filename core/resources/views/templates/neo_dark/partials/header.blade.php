@@ -5,7 +5,7 @@
                 <div class="header-top-content d-flex flex-wrap align-items-center justify-content-between">
                     <div class="header-top-left">
                         @if (gs('multi_language'))
-                            @include($activeTemplate . 'partials.language')
+                            @include('Template::partials.language')
                         @endif
                     </div>
                     <div class="header-top-right">
@@ -35,7 +35,7 @@
                         <ul class="navbar-nav main-menu ms-auto">
                             <li><a href="{{ route('home') }}">{{ trans('Home') }}</a></li>
                             @php
-                                $pages = App\Models\Page::where('tempname', $activeTemplate)->where('is_default', 0)->get();
+                                $pages = App\Models\Page::where('tempname', activeTemplate())->where('is_default', 0)->get();
                             @endphp
                             @foreach ($pages as $k => $data)
                                 <li><a href="{{ route('pages', [$data->slug]) }}">{{ __($data->name) }}</a></li>

@@ -11,6 +11,6 @@
     <div id="particles"></div>
 </section>
 @push('script-lib')
-<script src="{{asset($activeTemplateTrue.'js/particles.min.js')}}"></script>
-<script src="{{asset($activeTemplateTrue.'js/colorJs.php?color='.gs('base_color'))}}"></script>
+<script src="{{asset(activeTemplate(true).'js/particles.min.js')}}"></script>
+<script src="{{asset(activeTemplate(true).'js/colorJs.php?color='.gs('base_color'))}}"></script>
 @endpush

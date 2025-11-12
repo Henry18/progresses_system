@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.app')
+@extends('Template::layouts.app')
 @section('panel')
     <div class="preloader">
         <div class="animated-preloader"></div>
@@ -17,7 +17,7 @@
                             <a href="{{ route('plan') }}">@lang('Plan')</a>
                         </li>
                         @php
-                            $pages = App\Models\Page::where('tempname', $activeTemplate)->where('is_default', 0)->get();
+                            $pages = App\Models\Page::where('tempname', activeTemplate())->where('is_default', 0)->get();
                         @endphp
                         @foreach ($pages as $k => $data)
                             <li><a href="{{ route('pages', [$data->slug]) }}">{{ __($data->name) }}</a></li>
@@ -40,7 +40,7 @@
                         @endif
                     </ul>
                     @if (gs('multi_language'))
-                        @include($activeTemplate . 'partials.language')
+                        @include('Template::partials.language')
                     @endif
                     <div class="header-trigger-wrapper d-flex d-lg-none align-items-center">
                         <div class="header-trigger">

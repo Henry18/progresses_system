@@ -47,7 +47,6 @@ class UserController extends Controller
 
         $data['submittedWithdrawals']  = Withdrawal::where('status', '!=', Status::PAYMENT_INITIATE)->where('user_id', $user->id)->sum('amount');
         $data['successfulWithdrawals'] = Withdrawal::approved()->where('user_id', $user->id)->sum('amount');
-        $data['successfulbonusWithdrawals'] = Withdrawal::approved()->where('user_id', $user->id)->where('withdraw_wallet', 'bonus_wallet')->sum('amount');
         $data['rejectedWithdrawals']   = Withdrawal::rejected()->where('user_id', $user->id)->sum('amount');
         $data['initiatedWithdrawals']  = Withdrawal::initiated()->where('user_id', $user->id)->sum('amount');
         $data['requestedWithdrawals']  = Withdrawal::where('user_id', $user->id)->sum('amount');
@@ -59,9 +58,6 @@ class UserController extends Controller
         $data['interests']             = Transaction::where('remark', 'interest')->where('user_id', $user->id)->sum('amount');
         $data['depositWalletInvests']  = Invest::where('user_id', $user->id)->where('wallet_type', 'deposit_wallet')->where('status', Status::INVEST_RUNNING)->sum('amount');
         $data['interestWalletInvests'] = Invest::where('user_id', $user->id)->where('wallet_type', 'interest_wallet')->where('status', Status::INVEST_RUNNING)->sum('amount');
-        $data['bonusWalletInvests'] = $user->bonus_wallet;
-
-        $data['fractionalCapital'] = Transaction::where('remark', 'return_fractional_capital')->where('user_id', $user->id)->sum('amount');
 
         $data['isHoliday']      = HyipLab::isHoliDay(now()->toDateTimeString(), gs());
         $data['nextWorkingDay'] = now()->toDateString();
@@ -204,7 +200,7 @@ class UserController extends Controller
 
         $pageTitle  = 'User Data';
         $info       = json_decode(json_encode(getIpInfo()), true);
-        $mobileCode = @implode(',', $info['code']);
+        $mobileCode = @implode(',', $info['code'] ?? []);
         $countries  = json_decode(file_get_contents(resource_path('views/partials/country.json')));
 
         return view('Template::user.user_data', compact('pageTitle', 'user', 'countries', 'mobileCode'));
@@ -227,7 +223,7 @@ class UserController extends Controller
             'country_code' => 'required|in:' . $countryCodes,
             'country'      => 'required|in:' . $countries,
             'mobile_code'  => 'required|in:' . $mobileCodes,
-            'dni'  => 'required|string:' . $mobileCodes,
+            'username'     => 'required|unique:users|min:6',
             'mobile'       => ['required', 'regex:/^([0-9]*)$/', Rule::unique('users')->where('dial_code', $request->mobile_code)],
         ];
 
@@ -248,14 +244,13 @@ class UserController extends Controller
         if (!$user->email) {
             $user->firstname = $request->firstname;
             $user->lastname  = $request->lastname;
-            $user->username  = $request->username;
             $user->email = $request->email;
             $user->ev    = gs('ev') ? Status::NO : Status::YES;
         }
 
         $user->country_code = $request->country_code;
         $user->mobile       = $request->mobile;
-        $user->dni     = $request->dni;
+        $user->username     = $request->username;
 
         $user->address      = $request->address;
         $user->city         = $request->city;
@@ -319,11 +314,6 @@ class UserController extends Controller
         return view('Template::user.referrals', compact('pageTitle', 'user', 'maxLevel'));
     }
 
-    public function tokenGrafica()
-    {
-        $pageTitle    = 'Grafica Token';
-        return view('Template::user.token_grafica', compact('pageTitle'));
-    }
     public function promotionalBanners()
     {
         $promotionCount = PromotionTool::count();

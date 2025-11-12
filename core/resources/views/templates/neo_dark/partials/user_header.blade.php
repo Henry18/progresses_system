@@ -4,7 +4,7 @@
             <div class="header-top-content d-flex flex-wrap align-items-center justify-content-between">
                 <div class="header-top-left">
                     @if (gs('multi_language'))
-                        @include($activeTemplate . 'partials.language')
+                        @include('Template::partials.language')
                     @endif
                 </div>
                 <div class="header-top-right">

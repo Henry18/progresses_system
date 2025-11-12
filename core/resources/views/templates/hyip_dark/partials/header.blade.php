@@ -28,7 +28,7 @@
                             
                             @if (gs('multi_language'))
                                 <li class="nav-item d-xl-none">
-                                    @include($activeTemplate.'partials.language')
+                                    @include('Template::partials.language')
                                 </li>
                             @endif
 
@@ -37,7 +37,7 @@
                             </li>
 
                             @php
-                                $pages = App\Models\Page::where('tempname', $activeTemplate)->where('is_default', 0)->get();
+                                $pages = App\Models\Page::where('tempname', activeTemplate())->where('is_default', 0)->get();
                             @endphp
                             @foreach ($pages as $k => $data)
                                 <li class="nav-item">
@@ -79,7 +79,7 @@
                 <div class="header-right d-none d-xl-flex">
 
                     @if (gs('multi_language'))
-                        @include($activeTemplate.'partials.language')
+                        @include('Template::partials.language')
                     @endif
 
                     <div class="btn--groups">

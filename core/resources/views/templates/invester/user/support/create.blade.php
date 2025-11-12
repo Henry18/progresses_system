@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
     <div class="dashboard-inner">
         <div class="text-end mb-3 d-flex flex-wrap justify-content-between gap-1">

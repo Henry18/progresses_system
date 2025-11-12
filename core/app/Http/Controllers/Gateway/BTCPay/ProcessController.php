@@ -32,10 +32,7 @@ class ProcessController extends Controller
 
             $send['redirect']     = true;
             $send['redirect_url'] = $invoice['checkoutLink'];
-
-
-
-        } catch (\Throwable$e) {
+        } catch (\Throwable $e) {
             $send['error']     = true;
             $send['message'] = $e->getMessage();
         }
@@ -51,8 +48,8 @@ class ProcessController extends Controller
 
             try {
                 $postData = json_decode($rawPostData, false, 512, JSON_THROW_ON_ERROR);
-                $deposit = Deposit::where('btc_wallet', $postData->invoiceId)->where('status', 0)->first();
-            } catch (\Throwable$e) {
+                $deposit = Deposit::where('btc_wallet', $postData->invoiceId)->where('status', Status::PAYMENT_INITIATE)->first();
+            } catch (\Throwable $e) {
                 $adminNotification            = new AdminNotification();
                 $adminNotification->user_id   = 0;
                 $adminNotification->title     = 'Error decoding webhook payload: ' . $e->getMessage();
@@ -81,7 +78,6 @@ class ProcessController extends Controller
 
             $this->processPayment($deposit, $postData);
         }
-
     }
 
     public function processPayment($deposit, $webhookData)
@@ -106,7 +102,6 @@ class ProcessController extends Controller
                     $adminNotification->save();
                     return false;
                 }
-
             }
         }
     }
@@ -115,5 +110,4 @@ class ProcessController extends Controller
     {
         return Webhook::isIncomingWebhookRequestValid($requestData, $signature, $secretCode);
     }
-
 }
