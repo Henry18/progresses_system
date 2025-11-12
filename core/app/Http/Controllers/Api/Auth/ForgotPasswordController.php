@@ -13,10 +13,10 @@ use Illuminate\Validation\Rules\Password;
 class ForgotPasswordController extends Controller
 {
     public function sendResetCodeEmail(Request $request)
-    {   
+    {
         $validator = Validator::make($request->all(), [
             'value' => 'required',
-        ]); 
+        ]);
 
         if ($validator->fails()) {
             return responseError('validation_error', $validator->errors()->all());
@@ -96,13 +96,12 @@ class ForgotPasswordController extends Controller
         $user->password = bcrypt($request->password);
         $user->save();
 
-        $userIpInfo  = getIpInfo();
         $userBrowser = osBrowser();
         notify($user, 'PASS_RESET_DONE', [
             'operating_system' => @$userBrowser['os_platform'],
             'browser'          => @$userBrowser['browser'],
-            'ip'               => @$userIpInfo['ip'],
-            'time'             => @$userIpInfo['time'],
+            'ip' => getRealIp(),
+            'time' => date('Y-m-d h:i:s A')
         ], ['email']);
 
         $response[] = 'Password changed successfully';

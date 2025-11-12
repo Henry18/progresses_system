@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 @section('content')
     @php
         $loginContent = getContent('login.content', true);
@@ -15,7 +15,7 @@
                             <h2 class="section-title">{{ __(@$loginContent->data_values->heading_w) }} <span class="base--color">{{ __(@$loginContent->data_values->heading_c) }}</span></h2>
                             <p>{{ __(@$loginContent->data_values->sub_heading) }}</p>
 
-                            @include($activeTemplate.'partials.social_login')
+                            @include('Template::partials.social_login')
                             
                         </div> 
 

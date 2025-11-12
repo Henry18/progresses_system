@@ -2,7 +2,7 @@
     $registrationDisabled = getContent('register_disable.content', true);
 @endphp
 
-@extends($activeTemplate . 'layouts.app')
+@extends('Template::layouts.app')
 
 @section('panel')
     <div class="register-disable">

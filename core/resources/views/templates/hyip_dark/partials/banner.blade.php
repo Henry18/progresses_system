@@ -53,16 +53,16 @@
     </div>
     <div class="coins-wrapper">
         <div class="coins-wrapper__one">
-            <img src="{{ asset($activeTemplateTrue . 'images/thumbs/ban-4.png') }}" alt="">
+            <img src="{{ asset(activeTemplate(true) . 'images/thumbs/ban-4.png') }}" alt="">
         </div>
         <div class="coins-wrapper__two">
-            <img src="{{ asset($activeTemplateTrue . 'images/thumbs/ban-4.png') }}" alt="">
+            <img src="{{ asset(activeTemplate(true) . 'images/thumbs/ban-4.png') }}" alt="">
         </div>
         <div class="coins-wrapper__three">
-            <img src="{{ asset($activeTemplateTrue . 'images/thumbs/ban-5.png') }}" alt="">
+            <img src="{{ asset(activeTemplate(true) . 'images/thumbs/ban-5.png') }}" alt="">
         </div>
         <div class="coins-wrapper__four">
-            <img src="{{ asset($activeTemplateTrue . 'images/thumbs/ban-5.png') }}" alt="">
+            <img src="{{ asset(activeTemplate(true) . 'images/thumbs/ban-5.png') }}" alt="">
         </div>
     </div>
     <div class="banner-section__thumb-one">

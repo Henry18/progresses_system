@@ -18,7 +18,7 @@
                         <ul class="navbar-nav main-menu ms-auto">
                             <li> <a href="{{ route('home') }}">@lang('Home')</a></li>
                             @php
-                                $pages = App\Models\Page::where('tempname', $activeTemplate)
+                                $pages = App\Models\Page::where('tempname', activeTemplate())
                                     ->where('is_default', 0)
                                     ->get();
                             @endphp
@@ -38,7 +38,7 @@
                                     @endif
                                 </ul>
                                 @if (gs('multi_language'))
-                                    @include($activeTemplate.'partials.language')
+                                    @include('Template::partials.language')
                                 @endif
                             </div>
                         </div>

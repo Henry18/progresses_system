@@ -30,7 +30,7 @@
             </div>
         </div><!-- row end -->
         <div class="row gy-4 justify-content-center">
-            @include($activeTemplate . 'partials.plan', ['plans' => $plans])
+            @include('Template::partials.plan', ['plans' => $plans])
         </div>
     </div>
 </section>

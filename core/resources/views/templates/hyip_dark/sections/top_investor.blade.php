@@ -42,7 +42,7 @@
 </div>
 <div class="withdraw-deposit-section my-120">
     <div class="withdraw-deposit-section__shape">
-        <img src="{{ asset($activeTemplateTrue.'images/shapes/dw-1.png') }}" alt="">
+        <img src="{{ asset(activeTemplate(true).'images/shapes/dw-1.png') }}" alt="">
     </div>
     <div class="container">
         <div class="row gy-4 justify-content-between">
@@ -59,7 +59,7 @@
                                     <span class="time"> {{ showDateTime(@$latestDeposit->created_at, 'd F Y, h:ia') }}</span>
                                 </div>
                                 <div class="deposit-withdraw-item__thumb">
-                                    <img src="{{ asset($activeTemplateTrue.'images/thumbs/dp-4.png') }}" alt="">
+                                    <img src="{{ asset(activeTemplate(true).'images/thumbs/dp-4.png') }}" alt="">
                                 </div>
                                 <h6 class="deposit-withdraw-item__currency">
                                     {{ showAmount($latestDeposit->amount) }}
@@ -90,7 +90,7 @@
                                     <span class="time"> {{ showDateTime(@$latestWithdrawal->created_at, 'd F Y, h:ia') }}</span>
                                 </div>
                                 <div class="deposit-withdraw-item__thumb">
-                                    <img src="{{ asset($activeTemplateTrue.'images/thumbs/dp-4.png') }}" alt="">
+                                    <img src="{{ asset(activeTemplate(true).'images/thumbs/dp-4.png') }}" alt="">
                                 </div>
                                 <h6 class="deposit-withdraw-item__currency">
                                     {{ showAmount($latestWithdrawal->amount) }}

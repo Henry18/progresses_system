@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
     <section class="pb-150 pt-150">
         <div class="container">
@@ -10,7 +10,7 @@
                         </a>
                     </div>
                 </div>
-                @include($activeTemplate . 'partials.invest_history', ['invests' => $invests])
+                @include('Template::partials.invest_history', ['invests' => $invests])
 
                 @if ($invests->hasPages())
                     <div class="col-12">

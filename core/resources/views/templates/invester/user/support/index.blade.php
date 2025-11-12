@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
     <div class="dashboard-inner">
         <div class="row">
@@ -30,13 +30,7 @@
                                                     @php echo $support->statusBadge; @endphp
                                                 </td>
                                                 <td>
-                                                    @if ($support->priority == 1)
-                                                        <span class="badge badge--dark">@lang('Low')</span>
-                                                    @elseif($support->priority == 2)
-                                                        <span class="badge badge--success">@lang('Medium')</span>
-                                                    @elseif($support->priority == 3)
-                                                        <span class="badge badge--primary">@lang('High')</span>
-                                                    @endif
+                                                    @php echo $item->priorityBadge; @endphp
                                                 </td>
                                                 <td> {{ diffForHumans($support->last_reply) }} </td>
                                                 <td>

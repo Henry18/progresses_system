@@ -8,19 +8,19 @@
                     <input type="hidden" name="form_generator[is_required][]" value="{{ $formData->is_required }}">
                     <input type="hidden" name="form_generator[extensions][]" value="{{ $formData->extensions }}">
                     <input type="hidden" name="form_generator[options][]" value="{{ implode(',', $formData->options) }}">
-                    <input type="hidden" name="form_generator[form_width][]" value="{{ @$formData->width }}">
+                    <input type="hidden" name="form_generator[form_width][]" value="{{ isset($formData->width) ? $formData->width : '' }}">
                     <input type="hidden" name="form_generator[form_label][]" class="form-control" value="{{ $formData->name }}">
-                    <input type="hidden" name="form_generator[instruction][]" class="form-control" value="{{ @$formData->instruction }}">
+                    <input type="hidden" name="form_generator[instruction][]" class="form-control" value="{{ isset($formData->instruction) ? $formData->instruction : '' }}">
                     <input type="hidden" name="form_generator[form_type][]" class="form-control" value="{{ $formData->type }}">
                     @php
                         $jsonData = json_encode([
                             'type' => $formData->type,
                             'is_required' => $formData->is_required,
-                            'instruction' => @$formData->instruction,
+                            'instruction' => isset($formData->instruction) ? $formData->instruction : '',
                             'label' => $formData->name,
                             'extensions' => explode(',', $formData->extensions) ?? 'null',
                             'options' => $formData->options,
-                            'width' => @$formData->width,
+                            'width' => isset($formData->width) ? $formData->width : '',
                             'old_id' => '',
                         ]);
                     @endphp
@@ -32,7 +32,7 @@
                             </div>
                             <div>
                                 <p class="title">@lang('Name')</p>
-                                <p class="value">{{ __(@$formData->name) }}</p>
+                                <p class="value">{{ __(isset($formData->name) ? $formData->name : '') }}</p>
                             </div>
                         </div>
                         <div class="form-field__item">
@@ -42,13 +42,13 @@
                         <div class="form-field__item">
                             <p class="title">@lang('Width')</p>
                             <p class="value">
-                                @if (@$formData->width == '12')
+                                @if ((isset($formData->width) ? $formData->width : '') == '12')
                                     @lang('100%')
-                                @elseif(@$formData->width == '6')
+                                @elseif((isset($formData->width) ? $formData->width : '') == '6')
                                     @lang('50%')
-                                @elseif(@$formData->width == '4')
+                                @elseif((isset($formData->width) ? $formData->width : '') == '4')
                                     @lang('33%')
-                                @elseif(@$formData->width == '3')
+                                @elseif((isset($formData->width) ? $formData->width : '') == '3')
                                     @lang('25%')
                                 @else
                                     -
@@ -108,14 +108,14 @@
             text-align: right;
         }
 
-        .submitRequired{
+        .submitRequired {
             cursor: unset;
         }
-        .form-field__wrapper{
+
+        .form-field__wrapper {
             overflow-x: auto;
             margin-bottom: 10px;
         }
-
     </style>
 @endpush
 @push('script-lib')

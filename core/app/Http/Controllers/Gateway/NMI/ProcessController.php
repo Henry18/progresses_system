@@ -55,8 +55,14 @@ class ProcessController extends Controller
 
     public function ipn()
     {
-        $tokenId = $_GET['token-id'];
-        $track = decrypt($_GET['trx']);
+        try {
+            $tokenId = $_GET['token-id'];
+            $track = isset($_GET['trx']) ? decrypt($_GET['trx']) : null;
+        } catch (\Exception $e) {
+            $notify[] = ['error', 'Something went wrong.'];
+            return back()->withNotify($notify);
+        }
+        
         if (!$track) {
             $track = Session::get('Track');
         }

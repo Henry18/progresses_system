@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 @section('content')
     @php
         $plans = App\Models\Plan::with('timeSetting')
@@ -22,7 +22,7 @@
     <section class="plan-section pt-120 pb-120 bg--light">
         <div class="container">
             <div class="row gy-4 justify-content-center">
-                @include($activeTemplate . 'partials.plan', ['plans' => $plans])
+                @include('Template::partials.plan', ['plans' => $plans])
             </div>
 
             @php

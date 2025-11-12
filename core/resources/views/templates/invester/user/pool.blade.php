@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 
 @section('content')
     <div class="dashboard-fluid-inner">
@@ -11,7 +11,7 @@
                     </div>
                     <div class="pool-body">
                         <div class="row justify-content-center">
-                            @include($activeTemplate . 'partials.pool', ['pools' => $pools])
+                            @include('Template::partials.pool', ['pools' => $pools])
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-@extends($activeTemplate.'layouts.frontend')
+@extends('Template::layouts.frontend')
 
 @section('content')
     <section class="my-120">
@@ -13,7 +13,7 @@
                                     <p class="verification-text mb-3">@lang('A 6 digit verification code sent to your email address') :  {{ showEmailAddress($email) }}</p>
                                     <input type="hidden" name="email" value="{{ $email }}">
 
-                                    @include($activeTemplate.'partials.verification_code')
+                                    @include('Template::partials.verification_code')
 
                                     <div class="form-group">
                                         <button type="submit" class="btn btn--base w-100 btn--lg">@lang('Submit')</button>

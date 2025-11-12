@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 
 @section('content')
     <section class="pb-60 pt-60">
@@ -11,7 +11,7 @@
                         </a>
                     </div>
                 </div>
-                @include($activeTemplate.'partials.invest_history',['invests'=>$invests])
+                @include('Template::partials.invest_history',['invests'=>$invests])
                 @if ($invests->hasPages())
                     <div class="custom--pagination mt-4">
                         {{ paginateLinks($invests) }}

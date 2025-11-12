@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
     @php
         $kyc = getContent('kyc.content', true);
@@ -217,7 +217,7 @@
 @endsection
 
 @push('script')
-    <script src="{{ asset($activeTemplateTrue . '/js/lib/apexcharts.min.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . '/js/lib/apexcharts.min.js') }}"></script>
 
     <script>
         // apex-line chart

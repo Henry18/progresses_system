@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 
 @section('content')
     <div class="cmn-section">
@@ -9,7 +9,7 @@
                         <form action="{{ route('user.verify.mobile') }}" method="POST" class="submit-form">
                             @csrf
                             <p class="verification-text">@lang('A 6 digit verification code sent to your mobile number') : +{{ showMobileNumber(auth()->user()->mobileNumber) }}</p>
-                            @include($activeTemplate . 'partials.verification_code')
+                            @include('Template::partials.verification_code')
                             <div class="mb-3">
                                 <button type="submit" class="btn btn--base w-100">@lang('Submit')</button>
                             </div>

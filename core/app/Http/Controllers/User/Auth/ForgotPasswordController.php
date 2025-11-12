@@ -42,14 +42,13 @@ class ForgotPasswordController extends Controller
         $password->created_at = \Carbon\Carbon::now();
         $password->save();
 
-        $userIpInfo      = getIpInfo();
         $userBrowserInfo = osBrowser();
         notify($user, 'PASS_RESET_CODE', [
             'code'             => $code,
             'operating_system' => @$userBrowserInfo['os_platform'],
             'browser'          => @$userBrowserInfo['browser'],
-            'ip'               => @$userIpInfo['ip'],
-            'time'             => @$userIpInfo['time'],
+            'ip' => getRealIp(),
+            'time' => date('Y-m-d h:i:s A')
         ], ['email']);
 
         $email = $user->email;
@@ -94,5 +93,4 @@ class ForgotPasswordController extends Controller
         session()->flash('fpass_email', $request->email);
         return to_route('user.password.reset', $code)->withNotify($notify);
     }
-
 }

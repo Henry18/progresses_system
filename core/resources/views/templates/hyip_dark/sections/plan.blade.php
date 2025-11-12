@@ -27,7 +27,7 @@
             <p class="section-heading__desc">{{ __(@$planCaption->data_values->subheading) }}</p>
         </div>
         <div class="row gy-5 justify-content-center">
-            @include($activeTemplate . 'partials.plan', ['plans' => $plans])
+            @include('Template::partials.plan', ['plans' => $plans])
         </div>
     </div>
 </section>

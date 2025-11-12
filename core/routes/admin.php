@@ -225,7 +225,7 @@ Route::middleware('admin')->group(function () {
     Route::controller('ReportController')->prefix('report')->name('report.')->group(function(){
         Route::get('transaction/{user_id?}', 'transaction')->name('transaction');
         Route::get('login/history', 'loginHistory')->name('login.history');
-        Route::get('login/ipHistory/{ip}', 'loginIpHistory')->name('login.ipHistory');
+        Route::get('login/ip-history/{ip}', 'loginIpHistory')->name('login.ip.history');
         Route::get('notification/history', 'notificationHistory')->name('notification.history');
         Route::get('email/detail/{id}', 'emailDetails')->name('email.details');
         Route::get('invest/history', 'investHistory')->name('invest.history');
@@ -410,6 +410,7 @@ Route::middleware('admin')->group(function () {
             Route::get('frontend-slug-check/{key}/{id?}', 'frontendElementSlugCheck')->name('sections.element.slug.check');
             Route::get('frontend-element-seo/{key}/{id}', 'frontendSeo')->name('sections.element.seo');
             Route::post('frontend-element-seo/{key}/{id}', 'frontendSeoUpdate');
+            Route::post('update-seo', 'updateSeoContent')->name('seo.update');
             Route::post('remove/{id}', 'remove')->name('remove');
         });
 

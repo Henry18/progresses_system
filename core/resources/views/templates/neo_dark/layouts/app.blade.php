@@ -16,18 +16,18 @@
     <link rel="stylesheet" href="{{ asset('assets/global/css/select2.min.css') }}">
 
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/vendor/animate.css') }}">
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/vendor/nice-select.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/vendor/animate.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/vendor/nice-select.css') }}">
 
     <!-- slick slider css -->
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/vendor/slick.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/vendor/slick.css') }}">
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/main.css') }}">
     @stack('style-lib')
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">
     @stack('style')
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/color.php') }}?color=<?php echo gs('base_color'); ?>">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/color.php') }}?color=<?php echo gs('base_color'); ?>">
 </head>
 
 @php echo loadExtension('google-analytics') @endphp
@@ -74,10 +74,10 @@
     <script src="{{ asset('assets/global/js/select2.min.js') }}"></script>
 
     <!-- slick slider js -->
-    <script src="{{ asset($activeTemplateTrue . 'js/vendor/slick.min.js') }}"></script>
-    <script src="{{ asset($activeTemplateTrue . 'js/vendor/wow.min.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/vendor/slick.min.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/vendor/wow.min.js') }}"></script>
     <!-- dashboard custom js -->
-    <script src="{{ asset($activeTemplateTrue . 'js/main.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/main.js') }}"></script>
 
     @stack('script-lib')
 

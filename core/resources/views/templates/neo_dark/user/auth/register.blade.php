@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 @section('content')
     @php
         $policyPages = getContent('policy_pages.element', false, null, true);
@@ -17,7 +17,7 @@
                 <div class="col-xl-5 col-lg-6">
                     <div class="signin-form-area">
                         <h3 class="title text-capitalize text-shadow mb-30">{{ __($pageTitle) }}</h3>
-                        @include($activeTemplate.'partials.social_login')
+                        @include('Template::partials.social_login')
 
                         <form class="signin-form verify-gcaptcha" action="{{ route('user.register') }}" method="post">
                             @csrf

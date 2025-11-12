@@ -97,6 +97,6 @@ class ProcessController extends Controller
         }
 
         $notify[] = ['success', 'Unable to process'];
-        return redirect($deposit->failed_url)->withNotify($notify);
+        return redirect('user.deposit.index')->withNotify($notify);
     }
 }

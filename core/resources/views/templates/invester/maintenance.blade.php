@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.app')
+@extends('Template::layouts.app')
 @section('panel')
     <section class="maintenance-page flex-column justify-content-center">
         <div class="container">
@@ -38,12 +38,6 @@
             background: #fff;
             font-size: 26px;
             color: #e73d3e;
-        }
-        h3  {
-            color: #FFFFFF !important;
-        }
-        body {
-            background: #020202 !important;
         }
     </style>
 @endpush

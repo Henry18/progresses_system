@@ -1,4 +1,4 @@
-@extends($activeTemplate.'layouts.app')
+@extends('Template::layouts.app')
 @section('panel')
     <section class="account-section position-relative">
         <div class="container">
