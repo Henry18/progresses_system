@@ -486,8 +486,7 @@
       if (type == 1) {
         this.modal.find('.interest-type').text('%');
       } else {
-        this.modal.find('.interest-type').text('{{ gs('
-          cur_text ') }}');
+        this.modal.find('.interest-type').text('{{ gs('cur_text') }}');
       }
     }
 
