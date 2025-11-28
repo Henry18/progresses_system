@@ -47,7 +47,7 @@ class UserController extends Controller
 
         $data['submittedWithdrawals']  = Withdrawal::where('status', '!=', Status::PAYMENT_INITIATE)->where('user_id', $user->id)->sum('amount');
         $data['successfulWithdrawals'] = Withdrawal::approved()->where('user_id', $user->id)->sum('amount');
-        $data['successfulbonusWithdrawals'] = Withdrawal::approved()->where('user_id', $user->id)->where('withdraw_wallet', 'bonus_wallet')->sum('amount');
+        $data['successfulWithdrawalsBonus'] = Withdrawal::approved()->where('user_id', $user->id)->where('withdraw_wallet', 'bonus_wallet')->sum('amount');
         $data['rejectedWithdrawals']   = Withdrawal::rejected()->where('user_id', $user->id)->sum('amount');
         $data['initiatedWithdrawals']  = Withdrawal::initiated()->where('user_id', $user->id)->sum('amount');
         $data['requestedWithdrawals']  = Withdrawal::where('user_id', $user->id)->sum('amount');
@@ -62,6 +62,7 @@ class UserController extends Controller
         $data['bonusWalletInvests'] = $user->bonus_wallet;
 
         $data['fractionalCapital'] = Transaction::where('remark', 'return_fractional_capital')->where('user_id', $user->id)->sum('amount');
+
 
         $data['isHoliday']      = HyipLab::isHoliDay(now()->toDateTimeString(), gs());
         $data['nextWorkingDay'] = now()->toDateString();
@@ -227,7 +228,7 @@ class UserController extends Controller
             'country_code' => 'required|in:' . $countryCodes,
             'country'      => 'required|in:' . $countries,
             'mobile_code'  => 'required|in:' . $mobileCodes,
-            'dni'  => 'required|string:' . $mobileCodes,
+            'dni'          => 'required|string',
             'mobile'       => ['required', 'regex:/^([0-9]*)$/', Rule::unique('users')->where('dial_code', $request->mobile_code)],
         ];
 
@@ -324,6 +325,8 @@ class UserController extends Controller
         $pageTitle    = 'Grafica Token';
         return view('Template::user.token_grafica', compact('pageTitle'));
     }
+
+
     public function promotionalBanners()
     {
         $promotionCount = PromotionTool::count();

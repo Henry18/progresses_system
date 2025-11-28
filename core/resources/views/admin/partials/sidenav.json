@@ -264,7 +264,7 @@
                 "keyword": ["Login History", "Report", "Login report", "Login history", "Login activity"],
                 "title": "Login History",
                 "route_name": "admin.report.login.history",
-                "menu_active": ["admin.report.login.history", "admin.report.login.ipHistory"]
+                 "menu_active": ["admin.report.login.history", "admin.report.login.ip.history"]
             },
             {
                 "keyword": ["Notification History", "Report", "Notification report", "Notification history", "Notification activity","email log","email history","sms log","sms history","push notification log","push notification history"],

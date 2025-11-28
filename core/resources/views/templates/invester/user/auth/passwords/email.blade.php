@@ -1,4 +1,4 @@
-@extends($activeTemplate.'layouts.app')
+@extends('Template::layouts.app')
 @section('panel')
 
 <!-- Account Section -->

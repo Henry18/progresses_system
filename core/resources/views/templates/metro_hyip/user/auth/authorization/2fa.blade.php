@@ -5,7 +5,7 @@
         <div class="d-flex justify-content-center">
             <div class="verification-code-wrapper">
                 <div class="verification-area">
-                    <form action="{{route('user.go2fa.verify')}}" method="POST" class="submit-form">
+                    <form action="{{route('user.2fa.verify')}}" method="POST" class="submit-form">
                         @csrf
 
                         @include($activeTemplate.'partials.verification_code')

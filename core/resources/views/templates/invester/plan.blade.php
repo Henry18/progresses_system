@@ -1,4 +1,4 @@
-@extends("$activeTemplate.layouts.$layout")
+@extends("Template::layouts.$layout")
 
 @section('content')
     <div class="bg--light">
@@ -10,7 +10,7 @@
                     </div>
                 </div>
                 <div class="row justify-content-center gy-4">
-                    @include($activeTemplate.'partials.plan', ['plans' => $plans])
+                    @include('Template::partials.plan', ['plans' => $plans])
                 </div>
             </div>
         </div>

@@ -42,7 +42,7 @@
             <li class="social-login-list__item flex-grow-1">
                 <button class="w-100 social-login-btn metamaskLogin">
                     <span class="social-login-btn__icon">
-                        <img src="{{ asset($activeTemplateTrue . 'images/metamask.png') }}" alt="@lang('image')" class="others-login-image"> 
+                        <img src="{{ asset(activeTemplate(true) . 'images/metamask.png') }}" alt="@lang('image')" class="others-login-image"> 
                     </span>
                     @lang("$text with Metamask")
                 </button>

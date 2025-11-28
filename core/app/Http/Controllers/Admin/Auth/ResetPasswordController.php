@@ -44,13 +44,12 @@ class ResetPasswordController extends Controller
         $reset->status = Status::DISABLE;
         $reset->save();
 
-        $ipInfo  = getIpInfo();
         $browser = osBrowser();
         notify($admin, 'PASS_RESET_DONE', [
-            'operating_system' => $browser['os_platform'],
-            'browser'          => $browser['browser'],
-            'ip'               => $ipInfo['ip'],
-            'time'             => $ipInfo['time'],
+            'operating_system' => isset($browser['os_platform']) ? $browser['os_platform'] : '',
+            'browser' => isset($browser['browser']) ? $browser['browser'] : '',
+            'ip' => getRealIp(),
+            'time' => date('Y-m-d h:i:s A')
         ], ['email'], false);
 
         $notify[] = ['success', 'Password changed'];

@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 
 @php
     $contactContent = getContent('contact.content', true);
@@ -9,7 +9,7 @@
     <!-- ==================== contact Start Here ==================== -->
     <div class="contact-section my-60">
         <div class="contact-section__shape">
-            <img src="{{ asset($activeTemplateTrue. 'images/shapes/contact-s.png') }}" alt="">
+            <img src="{{ asset(activeTemplate(true). 'images/shapes/contact-s.png') }}" alt="">
         </div>
         <div class="container">
             <div class="row justify-content-center">
@@ -85,7 +85,7 @@
 
     @if(@$sections->secs != null)
         @foreach(json_decode($sections->secs) as $sec)
-            @include($activeTemplate.'sections.'.$sec)
+            @include('Template::sections.'.$sec)
         @endforeach
     @endif
 @endsection

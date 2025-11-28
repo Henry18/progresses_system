@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.app')
+@extends('Template::layouts.app')
 @section('panel')
     @php
         $authContent = getContent('authentication.content', true);
@@ -15,7 +15,7 @@
                             <h4 class="mb-2">{{ __(@$authContent->data_values->register_title) }}</h4>
                             <p>{{ __(@$authContent->data_values->register_subtitle) }}</p>
 
-                            @include($activeTemplate . 'partials.social_login')
+                            @include('Template::partials.social_login')
                         </div>
                         <div class="row">
                             @if (session()->get('reference') != null)

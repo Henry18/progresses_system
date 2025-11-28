@@ -15,23 +15,23 @@
     <!-- Fontasosome -->
     <link href="{{ asset('assets/global/css/all.min.css') }}" rel="stylesheet">
     <!-- Slick -->
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/slick.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/slick.css') }}">
     <!-- line awesome -->
     <link rel="stylesheet" href="{{ asset('assets/global/css/line-awesome.min.css') }}" />
     <!-- select2 css  -->
     <link rel="stylesheet" href="{{ asset('assets/global/css/select2.min.css') }}">
     <!-- Odometer -->
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/odometer.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/odometer.css') }}">
     <!-- Main css -->
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/main.css') }}">
 
     @stack('style-lib')
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">
 
     @stack('style')
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/color.php') }}?color=<?php echo gs('base_color'); ?>">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/color.php') }}?color=<?php echo gs('base_color'); ?>">
 </head>
 
 @php echo loadExtension('google-analytics') @endphp
@@ -82,14 +82,14 @@
     <!-- select2 js  -->
     <script src="{{ asset('assets/global/js/select2.min.js') }}"></script>
     <!-- Slick js -->
-    <script src="{{ asset($activeTemplateTrue . 'js/slick.min.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/slick.min.js') }}"></script>
     <!-- Odometer js -->
-    <script src="{{ asset($activeTemplateTrue . '/js/odometer.min.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . '/js/odometer.min.js') }}"></script>
     <!-- Viewport js -->
-    <script src="{{ asset($activeTemplateTrue . '/js/viewport.jquery.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . '/js/viewport.jquery.js') }}"></script>
 
     <!-- main js -->
-    <script src="{{ asset($activeTemplateTrue . '/js/main.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . '/js/main.js') }}"></script>
 
     @stack('script-lib')
 

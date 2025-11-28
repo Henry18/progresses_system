@@ -16,7 +16,7 @@
     @endif
 
     @if (gs('metamask_login'))
-        <button class="btn btn--base w-100 my-2 metamaskLogin"><img src="{{ asset($activeTemplateTrue . 'images/metamask.png') }}" alt="@lang('image')" class="others-login-image"> @lang("$text with Metamask")</button>
+        <button class="btn btn--base w-100 my-2 metamaskLogin"><img src="{{ asset(activeTemplate(true) . 'images/metamask.png') }}" alt="@lang('image')" class="others-login-image"> @lang("$text with Metamask")</button>
     @endif
 </div>
 

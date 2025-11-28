@@ -17,11 +17,11 @@ class ActiveTemplateMiddleware {
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next) {
-        $viewShare['general']            = gs();
         $viewShare['activeTemplate']     = activeTemplate();
         $viewShare['activeTemplateTrue'] = activeTemplate(true);
         view()->share($viewShare);
-
+        
+        $viewShare['general']            = gs();
         view()->composer(['Template::partials.header', 'Template::partials.footer'], function ($view) {
             $view->with([
                 'pages' => Page::where('is_default', Status::NO)->where('tempname', activeTemplate())->orderBy('id', 'DESC')->get(),

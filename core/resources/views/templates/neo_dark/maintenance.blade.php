@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.app')
+@extends('Template::layouts.app')
 @section('panel')
     <section class="maintenance-page flex-column justify-content-center">
         <div class="container">

@@ -1,15 +1,15 @@
-@extends($activeTemplate . 'layouts.app')
+@extends('Template::layouts.app')
 
 @section('panel')
     <div class="dashboard position-relative">
         <div class="dashboard__inner flex-wrap">
 
-            @include($activeTemplate . 'partials.user_sidebar')
+            @include('Template::partials.user_sidebar')
 
             <div class="dashboard__right">
 
-                @include($activeTemplate . 'partials.user_header')
-                @include($activeTemplate . 'partials.user_breadcrumb')
+                @include('Template::partials.user_header')
+                @include('Template::partials.user_breadcrumb')
 
                 <div class="container-fluid p-0">
                     <div class="dashboard-body">

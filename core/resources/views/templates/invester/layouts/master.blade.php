@@ -1,14 +1,14 @@
-@extends($activeTemplate.'layouts.app')
+@extends('Template::layouts.app')
 @section('panel')
 
 
 <div class="d-flex flex-wrap">
 
-    @include($activeTemplate.'partials.sidebar')
+    @include('Template::partials.sidebar')
 
     <div class="dashboard-wrapper">
 
-        @include($activeTemplate.'partials.topbar')
+        @include('Template::partials.topbar')
 
         <div class="@if(request()->routeIs('pool') || request()->routeIs('user.staking.index')) dashboard-container-fluid  @else dashboard-container @endif">
 

@@ -14,24 +14,19 @@ class ClientInfo{
 	    $ip = getRealIP();
 
 
-	    $xml = @simplexml_load_file("http://www.geoplugin.net/xml.gp?ip=" . $ip);
-
-
-	    $country = @$xml->geoplugin_countryName;
-	    $city = @$xml->geoplugin_city;
-	    $area = @$xml->geoplugin_areaCode;
-	    $code = @$xml->geoplugin_countryCode;
-	    $long = @$xml->geoplugin_longitude;
-	    $lat = @$xml->geoplugin_latitude;
-
-	    $data['country'] = $country ?? [];
-	    $data['city'] = $city ?? [];
-	    $data['area'] = $area ?? [];
-	    $data['code'] = $code ?? [];
-	    $data['long'] = $long ?? [];
-	    $data['lat'] = $lat ?? [];
-	    $data['ip'] = $ip;
-	    $data['time'] = date('Y-m-d h:i:s A');
+	    $response = json_decode(file_get_contents("http://ip-api.com/json/$ip"));
+		if($response && $response->status == 'success'){
+			$data['country'] = [$response->country  ?? ''];
+			$data['city'] = [$response->city  ?? ''];
+			$data['area'] = [$response->regionName  ?? ''];
+			$data['code'] = [$response->countryCode  ?? ''];
+			$data['long'] = [$response->lon  ?? ''];
+			$data['lat'] = [$response->lat  ?? ''];
+			$data['ip'] = $ip;
+			$data['time'] = date('Y-m-d h:i:s A');
+		}else{
+			$data = [];
+		}
 
 
 	    return $data;

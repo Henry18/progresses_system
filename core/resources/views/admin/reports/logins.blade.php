@@ -37,7 +37,7 @@
 
                                     <td>
                                         <span class="fw-bold">
-                                        <a href="{{route('admin.report.login.ipHistory',[$log->user_ip])}}">{{ $log->user_ip }}</a>
+                                        <a href="{{route('admin.report.login.ip.history',[$log->user_ip])}}">{{ $log->user_ip }}</a>
                                         </span>
                                     </td>
 
@@ -75,7 +75,7 @@
         <x-search-form placeholder="Search Username" dateSearch='yes' />
     @endif
 @endpush
-@if(request()->routeIs('admin.report.login.ipHistory'))
+@if(request()->routeIs('admin.report.login.ip.history'))
     @push('breadcrumb-plugins')
         <a href="https://www.ip2location.com/{{ $ip }}" target="_blank" class="btn btn-outline--primary">@lang('Lookup IP') {{ $ip }}</a>
     @endpush

@@ -62,7 +62,7 @@
         </div>
     </div>
 @empty
-    @include($activeTemplate . 'partials.empty')
+    @include('Template::partials.empty')
 @endforelse
 
 <div class="modal fade" id="investModal">

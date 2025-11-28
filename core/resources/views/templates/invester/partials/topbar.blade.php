@@ -10,7 +10,7 @@
             </span>
         @endif
         @if (gs('multi_language'))
-            @include($activeTemplate . 'partials.language')
+            @include('Template::partials.language')
         @endif
         <ul class="nav-header-link d-flex flex-wrap gap-2">
             <li>

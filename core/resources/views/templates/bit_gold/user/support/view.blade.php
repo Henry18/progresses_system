@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.' . $layout)
+@extends('Template::layouts.' . $layout)
 
 @section('content')
     <div class="cmn-section">

@@ -1,13 +1,13 @@
-@extends($activeTemplate.'layouts.app')
+@extends('Template::layouts.app')
 @section('panel')
 
 <main class="color-version-one">
-    @include($activeTemplate.'partials.header')
+    @include('Template::partials.header')
     @if(!request()->routeIs('home'))
-    @include($activeTemplate.'partials.breadcrumb')
+    @include('Template::partials.breadcrumb')
     @endif
     @yield('content')
-    @include($activeTemplate.'partials.footer')
+    @include('Template::partials.footer')
 </main>
 
 @endsection

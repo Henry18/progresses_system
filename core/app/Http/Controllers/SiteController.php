@@ -21,8 +21,8 @@ class SiteController extends Controller
 {
     public function index()
     {
-        $reference = @$_GET['reference'];
-        if ($reference) {
+        if (isset($_GET['reference'])) {
+            $reference = $_GET['reference'];
             session()->put('reference', $reference);
         }
 
@@ -101,7 +101,7 @@ class SiteController extends Controller
 
     public function policyPages($slug)
     {
-        $policy      = Frontend::where('slug', $slug)->where('tempname', activeTemplateName())->where('data_keys', 'policy_pages.element')->firstOrFail();
+        $policy = Frontend::where('tempname', activeTemplateName())->where('slug', $slug)->where('data_keys', 'policy_pages.element')->firstOrFail();
         $pageTitle   = $policy->data_values->title;
         $seoContents = $policy->seo_content;
         $seoImage    = @$seoContents->image ? frontendImage('policy_pages', $seoContents->image, getFileSize('seo'), true) : null;
@@ -138,7 +138,7 @@ class SiteController extends Controller
         }
 
         $blog        = Frontend::where('slug', $slug)->where('tempname', activeTemplateName())->where('data_keys', 'blog.element')->firstOrFail();
-    
+
         $blogs       = Frontend::where('id', '!=', $blog->id)->where('tempname', activeTemplateName())->where('data_keys', 'blog.element')->latest()->limit(5)->get();
         $pageTitle   = $blog->data_values->title;
         $seoContents = $blog->seo_content;
@@ -242,12 +242,29 @@ class SiteController extends Controller
                 $total .= '+Capital';
                 $totalMoney += $request->investAmount;
             }
-
-            $result['description'] = 'Return ' . showAmount($interestAmount) . ' Every ' . $timeName . ' For ' . $ret . ' ' . $timeName . '. Total ' . $total;
-            $result['totalMoney']  = $totalMoney;
-            $result['netProfit']   = showAmount($totalMoney - $request->investAmount);
+            if (activeTemplateName() == 'crypto_hyip') {
+                $result['planName']    = $plan->name;
+                $result['amount']      = showAmount($request->investAmount);
+                $result['interval']    = $timeName;
+                $result['netProfit']   = showAmount($interestAmount);
+                $result['capitalBack'] = $plan->capital_back ? 'Yes' : 'No';
+                $result['total']       = showAmount($totalMoney);
+            } else {
+                $result['description'] = 'Return ' . showAmount($interestAmount) . ' Every ' . $timeName . ' For ' . $ret . ' ' . $timeName . '. Total ' . $total;
+                $result['totalMoney']  = $totalMoney;
+                $result['netProfit']   = showAmount($totalMoney - $request->investAmount);
+            }
         } else {
-            $result['description'] = 'Return ' . showAmount($interestAmount) . ' Every ' . $timeName . ' For Lifetime';
+            if (activeTemplateName() == 'crypto_hyip') {
+                $result['planName']    = $plan->name;
+                $result['amount']      = showAmount($request->investAmount);
+                $result['interval']    = $timeName;
+                $result['netProfit']   = showAmount($interestAmount);
+                $result['capitalBack'] = '--';
+                $result['total']       = '--';
+            } else {
+                $result['description'] = 'Return ' . showAmount($interestAmount) . ' Every ' . $timeName . ' For Lifetime';
+            }
         }
 
         return response($result);
@@ -305,5 +322,4 @@ class SiteController extends Controller
         $maintenance = Frontend::where('data_keys', 'maintenance.data')->first();
         return view('Template::maintenance', compact('pageTitle', 'maintenance'));
     }
-
 }

@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.frontend')
+@extends('Template::layouts.frontend')
 
 @section('content')
     @php
@@ -17,7 +17,7 @@
                             </h2>
                             <p>{{ __(@$registerContent->data_values->sub_heading) }}</p>
 
-                            @include($activeTemplate . 'partials.social_login')
+                            @include('Template::partials.social_login')
 
                         </div>
                         <div class="account-card__body">

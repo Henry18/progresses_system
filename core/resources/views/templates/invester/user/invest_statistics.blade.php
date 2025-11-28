@@ -1,4 +1,4 @@
-@extends($activeTemplate.'layouts.master')
+@extends('Template::layouts.master')
 @section('content')
 <div class="dashboard-inner">
     <div class="mb-4">
@@ -54,7 +54,7 @@
             <h5 class="title mb-3">@lang('Active Investments') <span class="count text-base">({{ $activePlan }})</span></h5>
             <a href="{{ route('user.invest.log') }}" class="link-color">@lang('View All') <i class="las la-arrow-right"></i></a>
         </div>
-        @include($activeTemplate.'partials.invest_history',['invests'=>$invests])
+        @include('Template::partials.invest_history',['invests'=>$invests])
     </div>
 </div>
 

@@ -42,14 +42,13 @@ class ForgotPasswordController extends Controller
         $adminPasswordReset->created_at = Carbon::now();
         $adminPasswordReset->save();
 
-        $adminIpInfo  = getIpInfo();
         $adminBrowser = osBrowser();
         notify($admin, 'PASS_RESET_CODE', [
             'code'             => $code,
-            'operating_system' => $adminBrowser['os_platform'],
-            'browser'          => $adminBrowser['browser'],
-            'ip'               => $adminIpInfo['ip'],
-            'time'             => $adminIpInfo['time'],
+            'operating_system' => isset($adminBrowser['os_platform']) ? $adminBrowser['os_platform'] : '',
+            'browser' => isset($adminBrowser['browser']) ? $adminBrowser['browser'] : '',
+            'ip' => getRealIp(),
+            'time' => date('Y-m-d h:i:s A')
         ], ['email'], false);
 
         $email = $admin->email;

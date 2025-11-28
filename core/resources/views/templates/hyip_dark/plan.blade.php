@@ -1,4 +1,4 @@
-@extends($activeTemplate . 'layouts.' . $layout)
+@extends('Template::layouts.' . $layout)
 
 @section('content')
 
@@ -16,7 +16,7 @@
                     </div>
                 @endauth
 
-                @include($activeTemplate . 'partials.plan', ['plans' => $plans, 'layout' => $layout])
+                @include('Template::partials.plan', ['plans' => $plans, 'layout' => $layout])
             </div>
         </div>
     </section>
@@ -24,7 +24,7 @@
     @guest
         @if (@$sections->secs != null)
             @foreach (json_decode($sections->secs) as $sec)
-                @include($activeTemplate . 'sections.' . $sec)
+                @include('Template::sections.' . $sec)
             @endforeach
         @endif
     @endguest

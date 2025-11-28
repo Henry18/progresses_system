@@ -19,21 +19,21 @@
 
     <link rel="stylesheet" href="{{ asset('assets/global/css/select2.min.css') }}">
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/lib/animate.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/lib/animate.css') }}">
 
     <!-- Plugin Link -->
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/lib/slick.css') }}">
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/lib/magnific-popup.css') }}">
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/lib/apexcharts.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/lib/slick.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/lib/magnific-popup.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/lib/apexcharts.css') }}">
 
     <!-- Main css -->
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/main.css') }}">
 
     @stack('style-lib')
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/custom.css') }}">
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/color.php') }}?color=<?php echo gs('base_color'); ?>">
+    <link rel="stylesheet" href="{{ asset(activeTemplate(true) . 'css/color.php') }}?color=<?php echo gs('base_color'); ?>">
 
     @stack('style')
     <style>
@@ -80,14 +80,14 @@
     <script src="{{ asset('assets/global/js/select2.min.js') }}"></script>
 
     <!-- Pluglin Link -->
-    <script src="{{ asset($activeTemplateTrue . 'js/lib/slick.min.js') }}"></script>
-    <script src="{{ asset($activeTemplateTrue . 'js/lib/magnific-popup.min.js') }}"></script>
-    <script src="{{ asset($activeTemplateTrue . 'js/lib/apexcharts.min.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/lib/slick.min.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/lib/magnific-popup.min.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/lib/apexcharts.min.js') }}"></script>
 
     @stack('script-lib')
 
     <!-- Main js -->
-    <script src="{{ asset($activeTemplateTrue . 'js/main.js') }}"></script>
+    <script src="{{ asset(activeTemplate(true) . 'js/main.js') }}"></script>
 
 
     @php echo loadExtension('tawk-chat') @endphp
