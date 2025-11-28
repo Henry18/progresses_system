@@ -34,6 +34,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     ->name('admin.')
                     ->group(base_path('routes/admin.php'));
 
+                Route::middleware(['web'])
+                    ->namespace('Admin')
+                    ->prefix('demo-admin')
+                    ->name('demo-admin.')
+                    ->group(base_path('routes/admin.php'));
+
                 Route::middleware(['web', 'maintenance'])
                     ->namespace('Gateway')
                     ->prefix('ipn')

@@ -32,6 +32,7 @@ Route::middleware('admin')->group(function () {
         Route::get('chart/deposit-withdraw', 'depositAndWithdrawReport')->name('chart.deposit.withdraw');
         Route::get('chart/transaction', 'transactionReport')->name('chart.transaction');
         Route::get('profile', 'profile')->name('profile');
+        Route::get('profile', 'profile')->name('profile');
         Route::post('profile', 'profileUpdate')->name('profile.update');
         Route::get('password', 'password')->name('password');
         Route::post('password', 'passwordUpdate')->name('password.update');
@@ -429,5 +430,32 @@ Route::middleware('admin')->group(function () {
         });
 
     });
+});
+
+Route::middleware('demo-admin')->group(function () {
+    Route::controller('AdminController')->group(function(){
+        Route::get('dashboard', 'dashboard')->name('dashboard');
+        Route::get('chart/deposit-withdraw', 'depositAndWithdrawReport')->name('chart.deposit.withdraw');
+        Route::get('chart/transaction', 'transactionReport')->name('chart.transaction');
+        Route::get('profile', 'profile')->name('profile');
+        Route::get('profile', 'profile')->name('profile');
+        Route::post('profile', 'profileUpdate')->name('profile.update');
+        Route::get('password', 'password')->name('password');
+        Route::post('password', 'passwordUpdate')->name('password.update');
+
+        //Notification
+        Route::get('notifications','notifications')->name('notifications');
+        Route::get('notification/read/{id}','notificationRead')->name('notification.read');
+        Route::get('notifications/read-all','readAllNotification')->name('notifications.read.all');
+        Route::post('notifications/delete-all','deleteAllNotification')->name('notifications.delete.all');
+        Route::post('notifications/delete-single/{id}','deleteSingleNotification')->name('notifications.delete.single');
+
+        //Report Bugs
+        Route::get('request-report','requestReport')->name('request.report');
+        Route::post('request-report','reportSubmit');
+
+        Route::get('download-attachments/{file_hash}', 'downloadAttachment')->name('download.attachment');
+    });
+
 });
 
