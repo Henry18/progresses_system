@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::namespace('Auth')->group(function () {
+    print_r('admin');
+    die();
     Route::middleware('admin.guest')->group(function(){
         Route::controller('LoginController')->group(function () {
             Route::get('/', 'showLoginForm')->name('login');
