@@ -13,7 +13,7 @@
       <div class="plan-item__info">
         <h5 class="plan-item__time">
           @if ($data->lifetime == 0)
-          {{ __($data->repeat_time) }} Meses
+          {{ $data->repeat_time }} @lang('Months')
           @else
           @lang('Lifetime')
           @endif
@@ -37,7 +37,7 @@
         </li>
         <li class="plan-item__list-inner">
           @if ($data->lifetime == 0)
-          {{ __($data->repeat_time) }} Meses
+          {{ $data->repeat_time }} @lang('Months')
           @else
           @lang('Lifetime')
           @endif
