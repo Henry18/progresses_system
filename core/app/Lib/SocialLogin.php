@@ -87,7 +87,7 @@ class SocialLogin
 
             $tokenResult = $userData->createToken('auth_token')->plainTextToken;
             $this->loginLog($userData);
-            
+
             return [
                 'user'         => $userData,
                 'access_token' => $tokenResult,
@@ -137,7 +137,7 @@ class SocialLogin
         $newUser->provider_id = $user->id;
 
         $newUser->email = $user->email;
-
+        $newUser->username = explode('@', $user->email)[0];
         $newUser->password = Hash::make($password);
         $newUser->firstname = $firstName;
         $newUser->lastname = $lastName;
@@ -174,12 +174,12 @@ class SocialLogin
             $transaction->trx          =  getTrx();
             $transaction->wallet_type  = 'deposit_wallet';
             $transaction->remark       = 'registration_bonus';
-            $transaction->details      = 'You have got registration bonus';
+            $transaction->details      = __('tagyouhavegotregistrationbonus');
             $transaction->save();
         }
 
         $parentUser = User::find($user->ref_by);
-        
+
         if($parentUser){
             notify($parentUser, 'REFERRAL_JOIN', [
                 'ref_username' => $user->username

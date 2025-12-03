@@ -92,17 +92,22 @@ class CronController extends Controller
             foreach ($invests as $invest) {
                 $now  = $now;
                 $next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
+                //$next = HyipLab::nextWorkingMinute(1);
                 $user = $invest->user;
+                $interest = $invest->amount * ($invest->mon_interest_rate/100);
 
-                $invest->return_rec_time += 1;
-                $invest->paid += $invest->interest;
+                $invest->rec_total_days = $invest->rec_total_days - 1 < 0 ? 21 : $invest->rec_total_days - 1;
+                $invest->return_rec_time += $invest->rec_total_days == 0 ? 1 : 0;
+                //$invest->return_rec_time += 1;
+                //$invest->paid += $invest->interest;
+                $invest->paid += $interest;
                 $invest->should_pay -= $invest->period > 0 ? $invest->interest : 0;
                 $invest->next_time = $next;
                 $invest->last_time = $now;
                 $invest->net_interest += $invest->rem_compound_times ? 0 : $invest->interest;
 
                 // Add Return Amount to user's Interest Balance
-                $user->interest_wallet += $invest->interest;
+                $user->interest_wallet += $interest;
                 $user->save();
 
                 $trx = getTrx();
@@ -111,14 +116,14 @@ class CronController extends Controller
                 $transaction               = new Transaction();
                 $transaction->user_id      = $user->id;
                 $transaction->invest_id    = $invest->id;
-                $transaction->amount       = $invest->interest;
+                $transaction->amount       = $interest;
                 $transaction->charge       = 0;
                 $transaction->post_balance = $user->interest_wallet;
                 $transaction->trx_type     = '+';
                 $transaction->trx          = $trx;
                 $transaction->remark       = 'interest';
                 $transaction->wallet_type  = 'interest_wallet';
-                $transaction->details      = showAmount($invest->interest) . ' interest from ' . @$invest->plan->name;
+                $transaction->details      = showAmount($interest) . ' ' . @$invest->plan->name;
                 $transaction->save();
 
                 // Give Referral Commission if Enabled
@@ -132,7 +137,7 @@ class CronController extends Controller
                     $invest->status = 0; // Change Status so he do not get any more return
 
                     // Give the capital back if plan says the same and hold capital option is disabled
-                    if ($invest->capital_status == 1 && !$invest->hold_capital) {
+                    if ($invest->capital_status == 1 && !$invest->hold_capital && !$invest->fractional_capital) {
                         HyipLab::capitalReturn($invest);
                     }
                 }
@@ -157,11 +162,32 @@ class CronController extends Controller
                     $transaction->amount       = $interest;
                     $transaction->post_balance = $user->interest_wallet;
                     $transaction->charge       = 0;
-                    $transaction->trx_type     = '-';
-                    $transaction->details      = 'Invested Compound on ' . $invest->plan->name;
+                    $transaction->trx_type     = '+';
+                    $transaction->details      = '' . $invest->plan->name;
                     $transaction->trx          = $trx;
                     $transaction->wallet_type  = 'interest_wallet';
                     $transaction->remark       = 'invest_compound';
+                    $transaction->save();
+                }
+
+                if ($invest->rec_total_days == 0 && $invest->fractional_capital && (($invest->period - $invest->return_rec_time) <= $invest->period_return_capital)) {
+                    $newInvestAmount = $invest->amount - $invest->mon_return_amount;
+                    $invest->amount  = $newInvestAmount;
+
+                    $user->interest_wallet += $invest->mon_return_amount;
+                    $user->save();
+
+                    $transaction               = new Transaction();
+                    $transaction->user_id      = $user->id;
+                    $transaction->invest_id    = $invest->id;
+                    $transaction->amount       = $invest->mon_return_amount;
+                    $transaction->post_balance = $user->interest_wallet;
+                    $transaction->charge       = 0;
+                    $transaction->trx_type     = '+';
+                    $transaction->details      = __('tagretufraccapital') . ' ' . $invest->plan->name;
+                    $transaction->trx          = $trx;
+                    $transaction->wallet_type  = 'interest_wallet';
+                    $transaction->remark       = 'return_fractional_capital';
                     $transaction->save();
                 }
 
@@ -199,7 +225,7 @@ class CronController extends Controller
                 $rankings = UserRanking::active()->where('id', '>', $user->user_ranking_id)->where('minimum_invest', '<=', $userInvests)->where('min_referral_invest', '<=', $referralInvests)->where('min_referral', '<=', $referralCount)->get();
 
                 foreach ($rankings as $ranking) {
-                    $user->interest_wallet += $ranking->bonus;
+                    $user->bonus_wallet += $ranking->bonus;
                     $user->user_ranking_id = $ranking->id;
                     $user->save();
 
@@ -207,12 +233,12 @@ class CronController extends Controller
                     $transaction->user_id      = $user->id;
                     $transaction->amount       = $ranking->bonus;
                     $transaction->charge       = 0;
-                    $transaction->post_balance = $user->interest_wallet;
+                    $transaction->post_balance = $user->bonus_wallet;
                     $transaction->trx_type     = '+';
                     $transaction->trx          = getTrx();
                     $transaction->remark       = 'ranking_bonus';
-                    $transaction->wallet_type  = 'interest_wallet';
-                    $transaction->details      = showAmount($ranking->bonus) . ' ranking bonus for ' . @$ranking->name;
+                    $transaction->wallet_type  = 'bonus_wallet';
+                    $transaction->details      = showAmount($ranking->bonus) . __('tagrankingbonusfor') . @$ranking->name;
                     $transaction->save();
                 }
             }
@@ -282,17 +308,17 @@ class CronController extends Controller
                 $stakingInvest->status = Status::STAKING_COMPLETED;
                 $stakingInvest->save();
 
-                $transaction                    = new Transaction();
-                $transaction->user_id           = $user->id;
+                $transaction               = new Transaction();
+                $transaction->user_id      = $user->id;
                 $transaction->staking_invest_id = $stakingInvest->id;
-                $transaction->amount            = $stakingInvest->invest_amount + $stakingInvest->interest;
-                $transaction->post_balance      = $user->interest_wallet;
-                $transaction->charge            = 0;
-                $transaction->trx_type          = '+';
-                $transaction->details           = 'Staking invested return';
-                $transaction->trx               = getTrx();
-                $transaction->wallet_type       = 'interest_wallet';
-                $transaction->remark            = 'staking_invest_return';
+                $transaction->amount       = $stakingInvest->invest_amount + $stakingInvest->interest;
+                $transaction->post_balance = $user->interest_wallet;
+                $transaction->charge       = 0;
+                $transaction->trx_type     = '+';
+                $transaction->details      = __('tagstakinginvestedreturn');
+                $transaction->trx          = getTrx();
+                $transaction->wallet_type  = 'interest_wallet';
+                $transaction->remark       = 'staking_invest_return';
                 $transaction->save();
             }
 
