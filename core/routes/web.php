@@ -36,6 +36,7 @@ Route::controller('SiteController')->group(function () {
     Route::get('policy/{slug}', 'policyPages')->name('policy.pages');
 
     Route::get('plan', 'plan')->name('plan');
+    Route::get('plan/details/{id}/{slug?}', 'planDetails')->name('plan.details');
     Route::post('planCalculator', 'planCalculator')->name('planCalculator');
 
     Route::post('/subscribe', 'subscribe')->name('subscribe');

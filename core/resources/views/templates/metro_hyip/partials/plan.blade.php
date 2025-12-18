@@ -65,8 +65,8 @@
         </li>
         @endif
       </ul>
-      <a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#investModal" data-plan="{{ $data }}"
-        class="btn btn--base pill outline investModal">@lang('Invest Now')</a>
+      <a href="{{ route('plan.details', [$data->id, slug($data->name)]) }}"
+        class="btn btn--base pill outline">@lang('View Details')</a>
     </div>
   </div>
 </div>

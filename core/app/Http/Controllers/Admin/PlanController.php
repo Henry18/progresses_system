@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\Status;
 use App\Lib\HyipLab;
+use App\Lib\FileManager;
 use App\Models\Plan;
 use App\Models\Invest;
 use App\Models\TimeSetting;
@@ -38,7 +39,7 @@ class PlanController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validation($request);
+        $this->validation($request, $id);
         $plan = Plan::findOrFail($id);
         $this->saveData($plan, $request);
 
@@ -48,7 +49,35 @@ class PlanController extends Controller
 
     protected function saveData($plan, $request)
     {
+        // Manejar carga de imagen
+        if ($request->hasFile('image')) {
+            try {
+                $fileManager = new FileManager($request->image);
+                $fileManager->path = $fileManager->planImage()->path;
+                $fileManager->size = $fileManager->planImage()->size;
+                $fileManager->old = $plan->image ?? null;
+                $fileManager->upload();
+                $plan->image = $fileManager->filename;
+            } catch (\Exception $e) {
+                throw ValidationException::withMessages(['image' => 'Error uploading image: ' . $e->getMessage()]);
+            }
+        }
+
+        // Manejar carga de PDF (opcional)
+        if ($request->hasFile('pdf')) {
+            try {
+                $fileManager = new FileManager($request->pdf);
+                $fileManager->path = $fileManager->planFile()->path;
+                $fileManager->old = $plan->pdf ?? null;
+                $fileManager->upload();
+                $plan->pdf = $fileManager->filename;
+            } catch (\Exception $e) {
+                throw ValidationException::withMessages(['pdf' => 'Error uploading PDF: ' . $e->getMessage()]);
+            }
+        }
+
         $plan->name              = $request->name;
+        $plan->description       = $request->description;
         $plan->minimum           = $request->minimum ?? 0;
         $plan->maximum           = $request->maximum ?? 0;
         $plan->fixed_amount      = $request->amount ?? 0;
@@ -67,10 +96,15 @@ class PlanController extends Controller
         $plan->save();
     }
 
-    protected function validation($request)
+    protected function validation($request, $id = null)
     {
+        $imageRule = $id ? 'nullable' : 'required';
+
         $request->validate([
             'name'          => 'required',
+            'description'   => 'required|string',
+            'image'         => $imageRule . '|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'pdf'           => 'nullable|mimes:pdf|max:10240',
             'invest_type'   => 'required|in:1,2',
             'interest_type' => 'required|in:1,2',
             'interest'      => 'required|numeric|gt:0',
@@ -158,6 +192,19 @@ class PlanController extends Controller
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'interest_return';
         $transaction->save();
+    }
+
+    public function create()
+    {
+        $pageTitle = 'New Plan';
+        return view('admin.plan.create', compact('pageTitle'));
+    }
+
+    public function edit($id)
+    {
+        $pageTitle = 'Edit Plan';
+        $plan = Plan::findOrFail($id);
+        return view('admin.plan.edit', compact('pageTitle', 'plan'));
     }
 
 

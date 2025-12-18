@@ -73,6 +73,9 @@ Route::middleware('admin')->group(function () {
         Route::post('status/{id}', 'status')->name('status');
 
         Route::post('invest/cancel', 'cancelInvest')->name('invest.cancel');
+
+        Route::get('create', 'create')->name('create');
+        Route::get('edit/{id}', 'edit')->name('edit');
     });
 
     Route::controller('StakingPoolController')->group(function () {

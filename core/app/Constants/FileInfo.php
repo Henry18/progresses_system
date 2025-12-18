@@ -78,6 +78,13 @@ class FileInfo
             'path' => 'assets/images/user_rankings',
             'size' => '100x100'
         ];
+        $data['planImage'] = [
+            'path' => 'assets/plans/images',
+            'size' => '800x600'
+        ];
+        $data['planFile'] = [
+            'path' => 'assets/plans/files'
+        ];
         return $data;
 	}
 
