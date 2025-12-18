@@ -94,7 +94,9 @@ class CronController extends Controller
                 $next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
                 $next = HyipLab::nextWorkingMinute(15);
                 $user = $invest->user;
-                $interest = $invest->amount * ($invest->mon_interest_rate/100);
+
+                // Calculate interest (using distribution if configured)
+                $interest = $this->calculateInterest($invest);
 
                 $invest->rec_total_days = $invest->rec_total_days - 1 < 0 ? 21 : $invest->rec_total_days - 1;
                 $invest->return_rec_time += $invest->rec_total_days == 0 ? 1 : 0;
@@ -325,6 +327,79 @@ class CronController extends Controller
         } catch (\Throwable $th) {
             throw new \Exception($th->getMessage());
         }
+    }
+
+    /**
+     * Calculate interest based on distribution configuration
+     *
+     * @param Invest $invest
+     * @return float
+     */
+    protected function calculateInterest($invest)
+    {
+        $plan = $invest->plan;
+
+        // Check if plan has interest distribution configured
+        if (!$plan->interest_distribution || !isset($plan->interest_distribution['enabled']) || !$plan->interest_distribution['enabled']) {
+            // Use traditional calculation
+            return $invest->amount * ($invest->mon_interest_rate / 100);
+        }
+
+        // Get distribution configuration
+        $distribution = $plan->interest_distribution;
+        $segments = $distribution['segments'] ?? [];
+
+        if (empty($segments)) {
+            // Fallback to traditional calculation if no segments
+            return $invest->amount * ($invest->mon_interest_rate / 100);
+        }
+
+        // Determine current month (1-based index)
+        $currentMonth = $invest->return_rec_time + 1;
+
+        // Find which segment the current month belongs to
+        $currentSegment = $this->getCurrentSegment($currentMonth, $segments);
+
+        if (!$currentSegment) {
+            // Fallback if segment not found
+            return $invest->amount * ($invest->mon_interest_rate / 100);
+        }
+
+        // Calculate monthly interest rate for current segment
+        $segmentMonthlyRate = $currentSegment['percentage'] / $currentSegment['months'];
+
+        // Apply interest based on type (percentage or fixed)
+        if ($plan->interest_type == 1) {
+            // Percentage-based interest
+            $monthlyInterest = $invest->amount * ($segmentMonthlyRate / 100);
+        } else {
+            // Fixed interest
+            $monthlyInterest = $segmentMonthlyRate;
+        }
+
+        return $monthlyInterest;
+    }
+
+    /**
+     * Get the segment that corresponds to the current month
+     *
+     * @param int $currentMonth
+     * @param array $segments
+     * @return array|null
+     */
+    protected function getCurrentSegment($currentMonth, $segments)
+    {
+        $accumulatedMonths = 0;
+
+        foreach ($segments as $segment) {
+            $accumulatedMonths += $segment['months'];
+
+            if ($currentMonth <= $accumulatedMonths) {
+                return $segment;
+            }
+        }
+
+        return null;
     }
 
 }

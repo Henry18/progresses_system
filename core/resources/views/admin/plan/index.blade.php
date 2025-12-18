@@ -68,10 +68,8 @@
                   {{ $plan->days_to_init }}
                 </td>
                 <td>
-                  <button class="btn btn-sm btn-outline--primary modalShow me-2" data-type="edit" data-bs-toggle="modal"
-                    data-bs-target="#editModal" data-resource="{{ $plan }}"
-                    data-action="{{ route('admin.plan.update', $plan->id) }}"><i
-                      class="las la-pen"></i>@lang('Edit')</button>
+                  <a href="{{ route('admin.plan.edit', $plan->id) }}" class="btn btn-sm btn-outline--primary me-2"><i
+                      class="las la-pen"></i>@lang('Edit')</a>
                   @if ($plan->status)
                   <button class="btn btn-sm btn-outline--danger confirmationBtn"
                     data-question="@lang('Are you sure to disable this plan?')"
@@ -340,8 +338,9 @@
 @endsection
 
 @push('breadcrumb-plugins')
-<button class="btn btn-outline--primary btn-sm modalShow" data-type="add" data-bs-toggle="modal"
-  data-bs-target="#addModal"><i class="las la-plus"></i> @lang('Add New')</button>
+<!--button class="btn btn-outline--primary btn-sm modalShow" data-type="add" data-bs-toggle="modal"
+  data-bs-target="#addModal"><i class="las la-plus"></i> @lang('Add New')</button-->
+  <a class="btn btn-outline--primary" href="{{ route('admin.plan.create') }}"><i class="las la-plus"></i>@lang('Add New')</a>
 @endpush
 
 

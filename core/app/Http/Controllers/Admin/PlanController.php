@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\Status;
 use App\Lib\HyipLab;
+use App\Lib\FileManager;
 use App\Models\Plan;
 use App\Models\Invest;
 use App\Models\TimeSetting;
@@ -38,7 +39,7 @@ class PlanController extends Controller
 
     public function update(Request $request, $id)
     {
-        $this->validation($request);
+        $this->validation($request, $id);
         $plan = Plan::findOrFail($id);
         $this->saveData($plan, $request);
 
@@ -48,7 +49,35 @@ class PlanController extends Controller
 
     protected function saveData($plan, $request)
     {
+        // Manejar carga de imagen
+        if ($request->hasFile('image')) {
+            try {
+                $fileManager = new FileManager($request->image);
+                $fileManager->path = $fileManager->planImage()->path;
+                $fileManager->size = $fileManager->planImage()->size;
+                $fileManager->old = $plan->image ?? null;
+                $fileManager->upload();
+                $plan->image = $fileManager->filename;
+            } catch (\Exception $e) {
+                throw ValidationException::withMessages(['image' => 'Error uploading image: ' . $e->getMessage()]);
+            }
+        }
+
+        // Manejar carga de PDF (opcional)
+        if ($request->hasFile('pdf')) {
+            try {
+                $fileManager = new FileManager($request->pdf);
+                $fileManager->path = $fileManager->planFile()->path;
+                $fileManager->old = $plan->pdf ?? null;
+                $fileManager->upload();
+                $plan->pdf = $fileManager->filename;
+            } catch (\Exception $e) {
+                throw ValidationException::withMessages(['pdf' => 'Error uploading PDF: ' . $e->getMessage()]);
+            }
+        }
+
         $plan->name              = $request->name;
+        $plan->description       = $request->description;
         $plan->minimum           = $request->minimum ?? 0;
         $plan->maximum           = $request->maximum ?? 0;
         $plan->fixed_amount      = $request->amount ?? 0;
@@ -64,13 +93,27 @@ class PlanController extends Controller
         $plan->testing          = $request->testing ? Status::YES : Status::NO;
         $plan->days_to_init     = $request->days_to_init ?? 1;
         $plan->capital_months_return = $request->capital_months_return ?? 0;
+
+        // Manejar distribución de intereses
+        if ($request->has('distribution_enabled') && $request->distribution_enabled == 1) {
+            $distribution = $this->processInterestDistribution($request);
+            $plan->interest_distribution = $distribution;
+        } else {
+            $plan->interest_distribution = null;
+        }
+
         $plan->save();
     }
 
-    protected function validation($request)
+    protected function validation($request, $id = null)
     {
+        $imageRule = $id ? 'nullable' : 'required';
+
         $request->validate([
             'name'          => 'required',
+            'description'   => 'required|string',
+            'image'         => $imageRule . '|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'pdf'           => 'nullable|mimes:pdf|max:10240',
             'invest_type'   => 'required|in:1,2',
             'interest_type' => 'required|in:1,2',
             'interest'      => 'required|numeric|gt:0',
@@ -158,6 +201,93 @@ class PlanController extends Controller
         $transaction->wallet_type  = $wallet;
         $transaction->remark       = 'interest_return';
         $transaction->save();
+    }
+
+    public function create()
+    {
+        $pageTitle = 'New Plan';
+        return view('admin.plan.create', compact('pageTitle'));
+    }
+
+    public function edit($id)
+    {
+        $pageTitle = 'Edit Plan';
+        $plan = Plan::findOrFail($id);
+        return view('admin.plan.edit', compact('pageTitle', 'plan'));
+    }
+
+    /**
+     * Procesar distribución de intereses desde el request
+     */
+    protected function processInterestDistribution($request)
+    {
+        $segments = [];
+        $segmentMonths = $request->input('segment_months', []);
+        $segmentPercentages = $request->input('segment_percentage', []);
+        $segmentDescriptions = $request->input('segment_description', []);
+
+        foreach ($segmentMonths as $index => $months) {
+            if (!empty($months) && isset($segmentPercentages[$index])) {
+                $segments[] = [
+                    'segment' => $index + 1,
+                    'months' => (int) $months,
+                    'percentage' => (float) $segmentPercentages[$index],
+                    'description' => $segmentDescriptions[$index] ?? "Segmento " . ($index + 1)
+                ];
+            }
+        }
+
+        // Validar distribución
+        $this->validateDistribution($segments, $request->repeat_time, $request->interest);
+
+        return [
+            'enabled' => true,
+            'segments' => $segments
+        ];
+    }
+
+    /**
+     * Validar que la distribución de intereses sea correcta
+     */
+    protected function validateDistribution($segments, $totalMonths, $totalInterest)
+    {
+        if (empty($segments)) {
+            throw ValidationException::withMessages([
+                'distribution' => 'Debe configurar al menos un segmento de distribución'
+            ]);
+        }
+
+        // Validar que los meses sumen correctamente
+        $totalSegmentMonths = array_sum(array_column($segments, 'months'));
+        if ($totalSegmentMonths != $totalMonths) {
+            throw ValidationException::withMessages([
+                'distribution' => "Los segmentos ({$totalSegmentMonths} meses) no coinciden con la duración total del plan ({$totalMonths} meses)"
+            ]);
+        }
+
+        // Validar que los porcentajes sumen correctamente
+        $totalSegmentPercentage = array_sum(array_column($segments, 'percentage'));
+        $tolerance = 0.01; // Tolerancia para decimales
+
+        if (abs($totalSegmentPercentage - $totalInterest) > $tolerance) {
+            throw ValidationException::withMessages([
+                'distribution' => "La suma de porcentajes de los segmentos ({$totalSegmentPercentage}%) no coincide con el interés total del plan ({$totalInterest}%)"
+            ]);
+        }
+
+        // Validar que no haya meses negativos o cero
+        foreach ($segments as $segment) {
+            if ($segment['months'] <= 0) {
+                throw ValidationException::withMessages([
+                    'distribution' => "Cada segmento debe tener al menos 1 mes"
+                ]);
+            }
+            if ($segment['percentage'] < 0) {
+                throw ValidationException::withMessages([
+                    'distribution' => "Los porcentajes no pueden ser negativos"
+                ]);
+            }
+        }
     }
 
 

@@ -313,6 +313,26 @@ class SiteController extends Controller
         imagedestroy($image);
     }
 
+    public function planDetails($id, $slug = null)
+    {
+        $plan = Plan::with('timeSetting')->whereHas('timeSetting', function ($time) {
+            $time->where('status', Status::ENABLE);
+        })->where('status', Status::ENABLE)->findOrFail($id);
+
+        $pageTitle = $plan->name;
+        $layout = 'frontend';
+        $gatewayCurrency = null;
+
+        if (auth()->check()) {
+            $layout = 'master';
+            $gatewayCurrency = GatewayCurrency::whereHas('method', function ($gate) {
+                $gate->where('status', Status::ENABLE);
+            })->with('method')->orderby('name')->get();
+        }
+
+        return view('Template::plan_details', compact('pageTitle', 'plan', 'layout', 'gatewayCurrency'));
+    }
+
     public function maintenance()
     {
         $pageTitle = 'Maintenance Mode';

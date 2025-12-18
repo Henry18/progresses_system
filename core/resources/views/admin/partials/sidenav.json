@@ -42,6 +42,21 @@
         "route_name": "admin.invest.report.dashboard",
         "menu_active": "admin.invest.report.dashboard"
     },
+    "manage_plans": {
+        "keyword": [
+            "Plans",
+            "Investment Plans",
+            "Plan Management",
+            "Plans Overview",
+            "Manage Plans",
+            "Plan Configuration",
+            "Investment Packages"
+        ],
+        "title": "Plans",
+        "icon": "fas fa-funnel-dollar",
+        "route_name": "admin.plan.index",
+        "menu_active": "admin.plan*"
+    },
     "deposits": {
         "title": "Deposits",
         "icon": "las la-file-invoice-dollar",
