@@ -29,7 +29,12 @@ class Plan extends Model
         'testing',
         'days_to_init',
         'capital_months_return',
+        'interest_distribution',
         'status'
+    ];
+
+    protected $casts = [
+        'interest_distribution' => 'array'
     ];
 
     public function invests()

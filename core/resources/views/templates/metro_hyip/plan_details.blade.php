@@ -214,6 +214,123 @@
                                         </div>
                                         @endif
                                     </div>
+
+                                    {{-- Interest Distribution Section --}}
+                                    @if($plan->interest_distribution && isset($plan->interest_distribution['enabled']) && $plan->interest_distribution['enabled'] && isset($plan->interest_distribution['segments']))
+                                    <hr class="my-4">
+                                    <div class="distribution-visualization">
+                                        <h5 class="mb-3">
+                                            <i class="las la-chart-area"></i> @lang('Interest Distribution Timeline')
+                                        </h5>
+                                        <p class="text-muted mb-4">
+                                            @lang('This plan distributes returns across different periods based on the project\'s expected performance.')
+                                        </p>
+
+                                        {{-- Visual Progress Bar --}}
+                                        <div class="distribution-progress mb-4">
+                                            <div class="progress" style="height: 40px;">
+                                                @php
+                                                    $totalMonths = $plan->repeat_time;
+                                                    $accumulatedMonths = 0;
+                                                    $colors = ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6f42c1'];
+                                                @endphp
+                                                @foreach($plan->interest_distribution['segments'] as $index => $segment)
+                                                    @php
+                                                        $widthPercentage = ($segment['months'] / $totalMonths) * 100;
+                                                        $color = $colors[$index % count($colors)];
+                                                    @endphp
+                                                    <div class="progress-bar" role="progressbar"
+                                                         style="width: {{ $widthPercentage }}%; background-color: {{ $color }};"
+                                                         data-bs-toggle="tooltip"
+                                                         title="{{ $segment['description'] }}: {{ $segment['percentage'] }}%">
+                                                        <strong>{{ $segment['percentage'] }}%</strong>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-2 small text-muted">
+                                                <span>@lang('Month') 1</span>
+                                                <span>@lang('Month') {{ $totalMonths }}</span>
+                                            </div>
+                                        </div>
+
+                                        {{-- Segments Detail Cards --}}
+                                        <div class="row gy-3">
+                                            @foreach($plan->interest_distribution['segments'] as $index => $segment)
+                                            @php
+                                                $monthlyRate = $segment['months'] > 0 ? ($segment['percentage'] / $segment['months']) : 0;
+                                                $startMonth = array_sum(array_column(array_slice($plan->interest_distribution['segments'], 0, $index), 'months')) + 1;
+                                                $endMonth = $startMonth + $segment['months'] - 1;
+                                            @endphp
+                                            <div class="col-md-6 col-lg-4">
+                                                <div class="card border-0 shadow-sm h-100">
+                                                    <div class="card-body">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="segment-icon me-3">
+                                                                <i class="las la-calendar-check" style="font-size: 32px; color: {{ $colors[$index % count($colors)] }};"></i>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="mb-0">@lang('Segment') {{ $segment['segment'] }}</h6>
+                                                                <small class="text-muted">{{ $segment['description'] }}</small>
+                                                            </div>
+                                                        </div>
+                                                        <ul class="list-unstyled mb-0">
+                                                            <li class="mb-2">
+                                                                <i class="las la-clock text-primary"></i>
+                                                                <strong>@lang('Period'):</strong> @lang('Months') {{ $startMonth }}-{{ $endMonth }}
+                                                            </li>
+                                                            <li class="mb-2">
+                                                                <i class="las la-hourglass-half text-info"></i>
+                                                                <strong>@lang('Duration'):</strong> {{ $segment['months'] }} @lang('months')
+                                                            </li>
+                                                            <li class="mb-2">
+                                                                <i class="las la-percentage text-success"></i>
+                                                                <strong>@lang('Total Interest'):</strong> {{ $segment['percentage'] }}%
+                                                            </li>
+                                                            <li class="mb-0">
+                                                                <i class="las la-calculator text-warning"></i>
+                                                                <strong>@lang('Monthly Rate'):</strong> {{ number_format($monthlyRate, 4) }}%
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+
+                                        {{-- Investment Example Calculator --}}
+                                        <div class="card bg-light border-0 mt-4">
+                                            <div class="card-body">
+                                                <h6 class="mb-3">
+                                                    <i class="las la-lightbulb"></i> @lang('Example Calculation')
+                                                </h6>
+                                                <p class="mb-2">
+                                                    @lang('For an investment of') <strong>{{ showAmount(100) }}</strong>:
+                                                </p>
+                                                <ul class="mb-0">
+                                                    @foreach($plan->interest_distribution['segments'] as $segment)
+                                                    @php
+                                                        $earnings = 100 * ($segment['percentage'] / 100);
+                                                    @endphp
+                                                    <li>
+                                                        {{ $segment['description'] }}: <strong>{{ showAmount($earnings) }}</strong>
+                                                        <small class="text-muted">({{ $segment['percentage'] }}%)</small>
+                                                    </li>
+                                                    @endforeach
+                                                </ul>
+                                                @php
+                                                    $totalEarnings = 100 * ($plan->interest / 100);
+                                                @endphp
+                                                <hr class="my-2">
+                                                <p class="mb-0">
+                                                    <strong>@lang('Total Expected Profit'):</strong> {{ showAmount($totalEarnings) }}
+                                                    @if($plan->capital_back == 1)
+                                                        + <span class="badge badge--success">@lang('Capital Return')</span>
+                                                    @endif
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>

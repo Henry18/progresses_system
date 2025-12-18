@@ -93,6 +93,15 @@ class PlanController extends Controller
         $plan->testing          = $request->testing ? Status::YES : Status::NO;
         $plan->days_to_init     = $request->days_to_init ?? 1;
         $plan->capital_months_return = $request->capital_months_return ?? 0;
+
+        // Manejar distribución de intereses
+        if ($request->has('distribution_enabled') && $request->distribution_enabled == 1) {
+            $distribution = $this->processInterestDistribution($request);
+            $plan->interest_distribution = $distribution;
+        } else {
+            $plan->interest_distribution = null;
+        }
+
         $plan->save();
     }
 
@@ -205,6 +214,80 @@ class PlanController extends Controller
         $pageTitle = 'Edit Plan';
         $plan = Plan::findOrFail($id);
         return view('admin.plan.edit', compact('pageTitle', 'plan'));
+    }
+
+    /**
+     * Procesar distribución de intereses desde el request
+     */
+    protected function processInterestDistribution($request)
+    {
+        $segments = [];
+        $segmentMonths = $request->input('segment_months', []);
+        $segmentPercentages = $request->input('segment_percentage', []);
+        $segmentDescriptions = $request->input('segment_description', []);
+
+        foreach ($segmentMonths as $index => $months) {
+            if (!empty($months) && isset($segmentPercentages[$index])) {
+                $segments[] = [
+                    'segment' => $index + 1,
+                    'months' => (int) $months,
+                    'percentage' => (float) $segmentPercentages[$index],
+                    'description' => $segmentDescriptions[$index] ?? "Segmento " . ($index + 1)
+                ];
+            }
+        }
+
+        // Validar distribución
+        $this->validateDistribution($segments, $request->repeat_time, $request->interest);
+
+        return [
+            'enabled' => true,
+            'segments' => $segments
+        ];
+    }
+
+    /**
+     * Validar que la distribución de intereses sea correcta
+     */
+    protected function validateDistribution($segments, $totalMonths, $totalInterest)
+    {
+        if (empty($segments)) {
+            throw ValidationException::withMessages([
+                'distribution' => 'Debe configurar al menos un segmento de distribución'
+            ]);
+        }
+
+        // Validar que los meses sumen correctamente
+        $totalSegmentMonths = array_sum(array_column($segments, 'months'));
+        if ($totalSegmentMonths != $totalMonths) {
+            throw ValidationException::withMessages([
+                'distribution' => "Los segmentos ({$totalSegmentMonths} meses) no coinciden con la duración total del plan ({$totalMonths} meses)"
+            ]);
+        }
+
+        // Validar que los porcentajes sumen correctamente
+        $totalSegmentPercentage = array_sum(array_column($segments, 'percentage'));
+        $tolerance = 0.01; // Tolerancia para decimales
+
+        if (abs($totalSegmentPercentage - $totalInterest) > $tolerance) {
+            throw ValidationException::withMessages([
+                'distribution' => "La suma de porcentajes de los segmentos ({$totalSegmentPercentage}%) no coincide con el interés total del plan ({$totalInterest}%)"
+            ]);
+        }
+
+        // Validar que no haya meses negativos o cero
+        foreach ($segments as $segment) {
+            if ($segment['months'] <= 0) {
+                throw ValidationException::withMessages([
+                    'distribution' => "Cada segmento debe tener al menos 1 mes"
+                ]);
+            }
+            if ($segment['percentage'] < 0) {
+                throw ValidationException::withMessages([
+                    'distribution' => "Los porcentajes no pueden ser negativos"
+                ]);
+            }
+        }
     }
 
 

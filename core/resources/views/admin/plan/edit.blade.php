@@ -101,8 +101,7 @@
                                 <div class="form-group">
                                     <label>@lang('Return type')</label>
                                     <select name="return_type" class="form-control" id="return_type" required>
-                                        <option value="0" {{ old('return_type', $plan->lifetime == 0 ? 0 : 1) == 0 ? 'selected' : '' }}>@lang('Repeat')</option>
-                                        <option value="1" {{ old('return_type', $plan->lifetime == 0 ? 0 : 1) == 1 ? 'selected' : '' }}>@lang('Lifetime')</option>
+                                        <option value="0" selected>@lang('Repeat')</option>
                                     </select>
                                 </div>
                             </div>
@@ -113,14 +112,6 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label for="">@lang('Compound Interest') <i class="las la-info-circle"
-                                        title="@lang('Provide investors with the choice to reinvest their earnings, allowing for compounding growth over time.')"></i></label>
-                                    <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger"
-                                        data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="compound_interest" {{ old('compound_interest', $plan->compound_interest) ? 'checked' : '' }}>
-                                </div>
-                            </div>
                             <div class="col-md-6 col-lg-4 holdCapitalGroup" style="display: none;">
                                 <div class="form-group">
                                     <label for="">@lang('Hold Capital') <i class="las la-info-circle"
@@ -141,6 +132,66 @@
                                     <label for="">@lang('Featured')</label>
                                     <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger"
                                         data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="featured" {{ old('featured', $plan->featured) ? 'checked' : '' }}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Interest Distribution Section -->
+                        <div class="row mt-4 distribution-section" style="display: none;">
+                            <div class="col-md-12">
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5>@lang('Interest Distribution Configuration')</h5>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="distribution_enabled" name="distribution_enabled" value="1" {{ old('distribution_enabled', $plan->interest_distribution ? 1 : 0) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="distribution_enabled">
+                                            @lang('Enable Distribution')
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="distribution-config" style="display: none;">
+                                    <div class="alert alert-info">
+                                        <i class="las la-info-circle"></i>
+                                        @lang('Configure how interest will be distributed across different time periods. The sum of all segments must equal the total months and total interest percentage.')
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <div class="card bg-light">
+                                                <div class="card-body">
+                                                    <small class="text-muted">@lang('Total Plan Duration')</small>
+                                                    <h4 class="mb-0"><span id="total_months_display">{{ $plan->repeat_time }}</span> @lang('months')</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card bg-light">
+                                                <div class="card-body">
+                                                    <small class="text-muted">@lang('Total Interest')</small>
+                                                    <h4 class="mb-0"><span id="total_interest_display">{{ $plan->interest }}</span>%</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="segments-container"></div>
+
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="add-segment">
+                                        <i class="las la-plus"></i> @lang('Add Segment')
+                                    </button>
+
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <div class="alert alert-warning mb-0">
+                                                <small><strong>@lang('Segments Total'):</strong> <span id="segments_months_total">0</span> @lang('months')</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="alert alert-warning mb-0">
+                                                <small><strong>@lang('Percentage Total'):</strong> <span id="segments_percentage_total">0</span>%</small>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -283,6 +334,162 @@
                     }
                 }
             }
+
+            // =============== Interest Distribution Management ===============
+            let segmentCounter = 0;
+
+            // Show distribution section only for repeat-type plans
+            $('[name=return_type]').on('change', function() {
+                if ($(this).val() == '0') {
+                    $('.distribution-section').show();
+                } else {
+                    $('.distribution-section').hide();
+                    $('#distribution_enabled').prop('checked', false).trigger('change');
+                }
+            });
+
+            // Toggle distribution config
+            $('#distribution_enabled').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('.distribution-config').slideDown();
+                    updateTotalDisplays();
+                } else {
+                    $('.distribution-config').slideUp();
+                    $('#segments-container').empty();
+                    segmentCounter = 0;
+                }
+            });
+
+            // Update total displays when repeat_time or interest changes
+            $('[name=repeat_time], [name=interest]').on('input', function() {
+                updateTotalDisplays();
+                calculateTotals();
+            });
+
+            function updateTotalDisplays() {
+                let months = $('[name=repeat_time]').val() || 0;
+                let interest = $('[name=interest]').val() || 0;
+                $('#total_months_display').text(months);
+                $('#total_interest_display').text(interest);
+            }
+
+            // Add new segment
+            $('#add-segment').on('click', function() {
+                segmentCounter++;
+                addSegmentHTML(segmentCounter, {});
+            });
+
+            function addSegmentHTML(index, data) {
+                let html = `
+                    <div class="segment-item card mb-3" data-segment="${index}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">@lang('Segment') ${index}</h6>
+                                <button type="button" class="btn btn-sm btn-danger remove-segment">
+                                    <i class="las la-times"></i>
+                                </button>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>@lang('Duration (months)')</label>
+                                        <input type="number" class="form-control segment-months" name="segment_months[]" min="1" value="${data.months || ''}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>@lang('Interest (%)')</label>
+                                        <input type="number" step="0.01" class="form-control segment-percentage" name="segment_percentage[]" min="0" value="${data.percentage || ''}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>@lang('Description')</label>
+                                        <input type="text" class="form-control" name="segment_description[]" value="${data.description || ''}" placeholder="@lang('e.g., Initial period')">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="segment-info small text-muted mt-2">
+                                <i class="las la-calculator"></i> @lang('Monthly rate'): <span class="monthly-rate">0</span>%
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $('#segments-container').append(html);
+
+                // Update monthly rate for this segment
+                if (data.months && data.percentage) {
+                    let monthlyRate = (data.percentage / data.months).toFixed(4);
+                    $(`[data-segment="${index}"] .monthly-rate`).text(monthlyRate);
+                }
+
+                calculateTotals();
+            }
+
+            // Remove segment
+            $(document).on('click', '.remove-segment', function() {
+                $(this).closest('.segment-item').remove();
+                calculateTotals();
+            });
+
+            // Calculate totals when segment values change
+            $(document).on('input', '.segment-months, .segment-percentage', function() {
+                calculateTotals();
+                updateMonthlyRate($(this).closest('.segment-item'));
+            });
+
+            function updateMonthlyRate($segment) {
+                let months = $segment.find('.segment-months').val() || 0;
+                let percentage = $segment.find('.segment-percentage').val() || 0;
+                let monthlyRate = months > 0 ? (percentage / months).toFixed(4) : 0;
+                $segment.find('.monthly-rate').text(monthlyRate);
+            }
+
+            function calculateTotals() {
+                let totalMonths = 0;
+                let totalPercentage = 0;
+
+                $('.segment-item').each(function() {
+                    let months = parseFloat($(this).find('.segment-months').val()) || 0;
+                    let percentage = parseFloat($(this).find('.segment-percentage').val()) || 0;
+                    totalMonths += months;
+                    totalPercentage += percentage;
+                });
+
+                $('#segments_months_total').text(totalMonths);
+                $('#segments_percentage_total').text(totalPercentage.toFixed(2));
+
+                // Validate totals
+                let planMonths = parseFloat($('[name=repeat_time]').val()) || 0;
+                let planInterest = parseFloat($('[name=interest]').val()) || 0;
+
+                if (totalMonths == planMonths) {
+                    $('#segments_months_total').parent().removeClass('alert-warning').addClass('alert-success');
+                } else {
+                    $('#segments_months_total').parent().removeClass('alert-success').addClass('alert-warning');
+                }
+
+                if (Math.abs(totalPercentage - planInterest) < 0.01) {
+                    $('#segments_percentage_total').parent().removeClass('alert-warning').addClass('alert-success');
+                } else {
+                    $('#segments_percentage_total').parent().removeClass('alert-success').addClass('alert-warning');
+                }
+            }
+
+            // Load existing distribution if any
+            $(document).ready(function() {
+                @if($plan->interest_distribution && isset($plan->interest_distribution['segments']))
+                    let distribution = @json($plan->interest_distribution);
+                    if (distribution.enabled && distribution.segments) {
+                        $('#distribution_enabled').prop('checked', true).trigger('change');
+
+                        distribution.segments.forEach(function(segment, index) {
+                            segmentCounter++;
+                            addSegmentHTML(segmentCounter, segment);
+                        });
+                    }
+                @endif
+            });
         })(jQuery);
     </script>
 @endpush
