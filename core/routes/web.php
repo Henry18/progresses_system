@@ -22,6 +22,12 @@ Route::controller('TicketController')->prefix('ticket')->name('ticket.')->group(
 
 Route::get('app/deposit/confirm/{hash}', 'Gateway\PaymentController@appDepositConfirm')->name('deposit.app.confirm');
 
+// Project Routes (MUST be before SiteController catch-all)
+Route::controller('ProjectController')->prefix('projects')->name('projects.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/{id}', 'show')->name('show');
+});
+
 Route::controller('SiteController')->group(function () {
     Route::get('/contact', 'contact')->name('contact');
     Route::post('/contact', 'contactSubmit');

@@ -42,6 +42,18 @@ class Invest extends Model
         return $this->hasOne(Plan::class, 'id', 'plan_id')->withDefault();
     }
 
+    public function project()
+    {
+        return $this->hasOneThrough(
+            Project::class,
+            Plan::class,
+            'id', // Foreign key on plans table
+            'id', // Foreign key on projects table
+            'plan_id', // Local key on invests table
+            'project_id' // Local key on plans table
+        );
+    }
+
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id')->withDefault();

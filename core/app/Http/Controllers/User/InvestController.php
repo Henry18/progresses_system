@@ -127,7 +127,7 @@ class InvestController extends Controller
     public function statistics()
     {
         $pageTitle  = 'Invest Statistics';
-        $invests    = Invest::where('user_id', auth()->id())->with('plan.timeSetting')->limit(10)->orderBy('id', 'desc')->get();
+        $invests    = Invest::where('user_id', auth()->id())->with(['plan.timeSetting', 'plan.project'])->limit(10)->orderBy('id', 'desc')->get();
         $activePlan = Invest::where('user_id', auth()->id())->where('status', Status::INVEST_RUNNING)->count();
 
         $investChart = Invest::where('user_id', auth()->id())->with('plan')->groupBy('plan_id')->select('plan_id')->selectRaw("SUM(amount) as investAmount")->orderBy('investAmount', 'desc')->get();
@@ -137,7 +137,7 @@ class InvestController extends Controller
     public function log()
     {
         $pageTitle = 'Invest Logs';
-        $invests   = Invest::where('user_id', auth()->id())->orderBy('id', 'desc')->with('plan.timeSetting')->paginate(getPaginate());
+        $invests   = Invest::where('user_id', auth()->id())->orderBy('id', 'desc')->with(['plan.timeSetting', 'plan.project'])->paginate(getPaginate());
         return view(activeTemplate() . 'user.invests', compact('pageTitle', 'invests'));
     }
 
@@ -371,6 +371,68 @@ class InvestController extends Controller
 
         $notify[] = ['success', 'Pool investment added successfully'];
         return back()->withNotify($notify);
+    }
+
+    /**
+     * Display projects list in user dashboard
+     */
+    public function projects()
+    {
+        $pageTitle = 'Investment Projects';
+
+        // Get active projects with their active plans
+        $projects = \App\Models\Project::where('status', 1)
+            ->where('testing', 0)
+            ->with(['activePlans' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->withCount(['activePlans' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->orderBy('featured', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
+
+        $featuredProjects = \App\Models\Project::where('status', 1)
+            ->where('testing', 0)
+            ->where('featured', 1)
+            ->with(['activePlans' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->withCount(['activePlans' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->limit(6)
+            ->get();
+
+        return view(activeTemplate() . 'user.projects.index', compact('pageTitle', 'projects', 'featuredProjects'));
+    }
+
+    /**
+     * Display project details with plans in user dashboard
+     */
+    public function projectDetails($id)
+    {
+        $project = \App\Models\Project::where('status', 1)
+            ->where('testing', 0)
+            ->with(['activePlans.timeSetting' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->findOrFail($id);
+
+        $pageTitle = $project->name;
+
+        // Get other projects for suggestions
+        $otherProjects = \App\Models\Project::where('status', 1)
+            ->where('testing', 0)
+            ->where('id', '!=', $id)
+            ->withCount(['activePlans' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->limit(3)
+            ->get();
+
+        return view(activeTemplate() . 'user.projects.show', compact('pageTitle', 'project', 'otherProjects'));
     }
 
 }

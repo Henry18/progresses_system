@@ -1,43 +1,59 @@
 @extends('admin.layouts.app')
 
 @section('panel')
+    @if($project)
+    <div class="row mb-3">
+        <div class="col-lg-12">
+            <div class="alert alert-info d-flex align-items-center">
+                <i class="las la-info-circle fs-3 me-3"></i>
+                <div>
+                    <strong>@lang('Creating plan for project'):</strong> {{ $project->name }}
+                    <br>
+                    <small>@lang('This plan will be associated with the selected project')</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="alert alert-warning d-flex align-items-center">
+                <i class="las la-exclamation-triangle fs-3 me-3"></i>
+                <div>
+                    <strong>@lang('Investment Limits'):</strong>
+                    <br>
+                    <small>
+                        @lang('Minimum'): <strong>{{ showAmount($project->minimum_investment) }}</strong>
+                        &nbsp;|&nbsp;
+                        @lang('Maximum'): <strong>{{ showAmount($project->maximum_investment) }}</strong>
+                    </small>
+                    <br>
+                    <small class="text-muted">@lang('Plan investment amounts must be within these limits')</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <form action="{{ route('admin.plan.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    @if($projectId)
+                        <input type="hidden" name="project_id" value="{{ $projectId }}">
+                    @endif
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>@lang('Name')</label>
+                                    <label>@lang('Plan Name')</label>
                                     <input type="text" class="form-control" name="name" value="{{ old('name') }}" required />
+                                    <small class="text-muted">@lang('e.g., "6 Months", "Annual Premium", "Quarterly Returns"')</small>
                                 </div>
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>@lang('Description')</label>
-                                    <textarea class="form-control" name="description" rows="4" required>{{ old('description') }}</textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>@lang('Plan Image')</label>
-                                    <input type="file" class="form-control" name="image" accept="image/*" required />
-                                    <small class="text-muted">@lang('Supported formats: JPG, PNG, GIF. Max size: 2MB')</small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>@lang('Plan PDF') <span class="text-muted">@lang('(Optional)')</span></label>
-                                    <input type="file" class="form-control" name="pdf" accept=".pdf" />
-                                    <small class="text-muted">@lang('Project explanation/documentation. Max size: 10MB')</small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label>@lang('Days to init')</label>
-                                    <input type="number" class="form-control" name="days_to_init" min="1" value="{{ old('days_to_init', 1) }}" required>
+                                    <label>@lang('Plan Description')</label>
+                                    <textarea class="form-control" name="description" rows="3">{{ old('description') }}</textarea>
+                                    <small class="text-muted">@lang('Brief description of the plan benefits and features')</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -110,20 +126,6 @@
                             </div>
                             <div class="col-md-6 col-lg-6">
                                 <div class="form-group">
-                                    <label for="">@lang('Testing')</label>
-                                    <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger"
-                                        data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="testing" {{ old('testing') ? 'checked' : '' }}>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
-                                    <label for="">@lang('Featured')</label>
-                                    <input type="checkbox" data-width="100%" data-onstyle="-success" data-offstyle="-danger"
-                                        data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="featured" {{ old('featured') ? 'checked' : '' }}>
-                                </div>
-                            </div>
-                            <div class="col-md-6 col-lg-6">
-                                <div class="form-group">
                                     <label for="">@lang('Interest Distribution') <i class="las la-info-circle"
                                         title="@lang('Configure how interest will be distributed across different time periods')"></i></label>
                                     <input type="checkbox" data-width="100%" data-onstyle="-warning" data-offstyle="-secondary"
@@ -192,13 +194,29 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-back route="{{ route('admin.plan.index') }}" />
+    @if($project)
+        <a href="{{ route('admin.project.show', $project->id) }}" class="btn btn-sm btn-outline--info">
+            <i class="las la-arrow-left"></i> @lang('Back to Project')
+        </a>
+    @else
+        <x-back route="{{ route('admin.plan.index') }}" />
+    @endif
 @endpush
 
 @push('script')
     <script>
         (function($) {
             "use strict";
+
+            // Límites del proyecto (si existe)
+            @if($project)
+            const projectLimits = {
+                minimum: {{ $project->minimum_investment }},
+                maximum: {{ $project->maximum_investment }}
+            };
+            @else
+            const projectLimits = null;
+            @endif
 
             // Handle invest type change
             $('[name=invest_type]').on('change', function() {
@@ -231,6 +249,7 @@
                                     <input type="number" step="any" class="form-control" name="minimum" value="{{ old('minimum') }}" required>
                                     <span class="input-group-text">{{ gs('cur_text') }}</span>
                                 </div>
+                                <small class="text-muted amount-validation-message"></small>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -240,6 +259,7 @@
                                     <input type="number" step="any" class="form-control" name="maximum" value="{{ old('maximum') }}" required>
                                     <span class="input-group-text">{{ gs('cur_text') }}</span>
                                 </div>
+                                <small class="text-muted amount-validation-message"></small>
                             </div>
                         </div>
                     `;
@@ -252,11 +272,77 @@
                                     <input type="number" step="any" class="form-control" name="amount" value="{{ old('amount') }}" required>
                                     <span class="input-group-text">{{ gs('cur_text') }}</span>
                                 </div>
+                                <small class="text-muted amount-validation-message"></small>
                             </div>
                         </div>
                     `;
                 }
                 $('.amount-fields').html(html);
+
+                // Agregar validación en tiempo real si hay límites de proyecto
+                if (projectLimits) {
+                    attachAmountValidation();
+                }
+            }
+
+            // Función para validar montos en tiempo real
+            function attachAmountValidation() {
+                $(document).on('input', '[name=minimum], [name=maximum], [name=amount]', function() {
+                    validateAmounts();
+                });
+            }
+
+            function validateAmounts() {
+                if (!projectLimits) return true;
+
+                let isValid = true;
+                const minimum = parseFloat($('[name=minimum]').val()) || 0;
+                const maximum = parseFloat($('[name=maximum]').val()) || 0;
+                const amount = parseFloat($('[name=amount]').val()) || 0;
+
+                // Validar mínimo
+                if ($('[name=minimum]').length && minimum > 0) {
+                    if (minimum < projectLimits.minimum) {
+                        $('[name=minimum]').addClass('is-invalid').removeClass('is-valid');
+                        $('[name=minimum]').closest('.form-group').find('.amount-validation-message')
+                            .html('<span class="text-danger"><i class="las la-exclamation-circle"></i> Must be at least {{ gs("cur_sym") }}' + projectLimits.minimum + '</span>');
+                        isValid = false;
+                    } else {
+                        $('[name=minimum]').removeClass('is-invalid').addClass('is-valid');
+                        $('[name=minimum]').closest('.form-group').find('.amount-validation-message')
+                            .html('<span class="text-success"><i class="las la-check-circle"></i> Valid</span>');
+                    }
+                }
+
+                // Validar máximo
+                if ($('[name=maximum]').length && maximum > 0) {
+                    if (maximum > projectLimits.maximum) {
+                        $('[name=maximum]').addClass('is-invalid').removeClass('is-valid');
+                        $('[name=maximum]').closest('.form-group').find('.amount-validation-message')
+                            .html('<span class="text-danger"><i class="las la-exclamation-circle"></i> Cannot exceed {{ gs("cur_sym") }}' + projectLimits.maximum + '</span>');
+                        isValid = false;
+                    } else if (maximum >= projectLimits.minimum) {
+                        $('[name=maximum]').removeClass('is-invalid').addClass('is-valid');
+                        $('[name=maximum]').closest('.form-group').find('.amount-validation-message')
+                            .html('<span class="text-success"><i class="las la-check-circle"></i> Valid</span>');
+                    }
+                }
+
+                // Validar monto fijo
+                if ($('[name=amount]').length && amount > 0) {
+                    if (amount < projectLimits.minimum || amount > projectLimits.maximum) {
+                        $('[name=amount]').addClass('is-invalid').removeClass('is-valid');
+                        $('[name=amount]').closest('.form-group').find('.amount-validation-message')
+                            .html('<span class="text-danger"><i class="las la-exclamation-circle"></i> Must be between {{ gs("cur_sym") }}' + projectLimits.minimum + ' and {{ gs("cur_sym") }}' + projectLimits.maximum + '</span>');
+                        isValid = false;
+                    } else {
+                        $('[name=amount]').removeClass('is-invalid').addClass('is-valid');
+                        $('[name=amount]').closest('.form-group').find('.amount-validation-message')
+                            .html('<span class="text-success"><i class="las la-check-circle"></i> Valid</span>');
+                    }
+                }
+
+                return isValid;
             }
 
             function getInterestType(type) {
@@ -288,11 +374,11 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-6 capital-months-group" style="display: none;">
                             <div class="form-group">
-                                <label class="required">@lang('Months back capital') <i class="las la-info-circle" title="@lang('Time that must pass before starting to repay the capital.')"></i></label>
+                                <label>@lang('Months back capital') <i class="las la-info-circle" title="@lang('Time that must pass before starting to repay the capital.')"></i></label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" name="capital_months_return" min="1" value="{{ old('capital_months_return') }}" required>
+                                    <input type="number" class="form-control" name="capital_months_return" min="1" value="{{ old('capital_months_return') }}">
                                 </div>
                             </div>
                         </div>
@@ -308,10 +394,14 @@
                     $('[name=compound_interest]').closest('.col-md-6').removeClass('col-lg-6').addClass('col-lg-4');
                     $('[name=featured]').closest('.col-md-6').removeClass('col-lg-6').addClass('col-lg-4');
                     $('.holdCapitalGroup').show();
+                    $('.capital-months-group').show();
+                    $('[name=capital_months_return]').prop('required', true);
                 } else {
                     $('[name=compound_interest]').closest('.col-md-6').removeClass('col-lg-4').addClass('col-lg-6');
                     $('[name=featured]').closest('.col-md-6').removeClass('col-lg-4').addClass('col-lg-6');
                     $('.holdCapitalGroup').hide();
+                    $('.capital-months-group').hide();
+                    $('[name=capital_months_return]').prop('required', false).val('');
                     if ($('[name=hold_capital]').data('bs.toggle')) {
                         $('[name=hold_capital]').bootstrapToggle('off');
                     }
@@ -321,17 +411,9 @@
             // =============== Interest Distribution Management ===============
             let segmentCounter = 0;
 
-            // Show distribution section only for repeat-type plans
-            $('[name=return_type]').on('change', function() {
-                if ($(this).val() == '0') {
-                    $('.distribution-section').show();
-                } else {
-                    $('.distribution-section').hide();
-                    $('#distribution_enabled').prop('checked', false).trigger('change');
-                }
-            });
+            // Distribution section is always visible now
 
-            // Toggle distribution config
+            // Toggle distribution config (with bootstrap-toggle compatibility)
             $('#distribution_enabled').on('change', function() {
                 if ($(this).is(':checked')) {
                     $('.distribution-config').slideDown();

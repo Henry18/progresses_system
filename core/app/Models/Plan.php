@@ -10,6 +10,7 @@ class Plan extends Model
     use GlobalStatus;
 
     protected $fillable = [
+        'project_id',
         'name',
         'description',
         'image',
@@ -36,6 +37,14 @@ class Plan extends Model
     protected $casts = [
         'interest_distribution' => 'array'
     ];
+
+    /**
+     * Get the project that owns the plan.
+     */
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
 
     public function invests()
     {

@@ -35,7 +35,15 @@
             <tbody>
                 @forelse($invests as $invest)
                     <tr>
-                        <td>{{ __($invest->plan->name) }} <br> {{ showAmount($invest->amount) }} </td>
+                        <td>
+                            @if($invest->plan->project)
+                                <small class="text-muted">
+                                    <i class="las la-project-diagram"></i> {{ __($invest->plan->project->name) }}
+                                </small>
+                                <br>
+                            @endif
+                            <strong>{{ __($invest->plan->name) }}</strong> <br> {{ showAmount($invest->amount) }}
+                        </td>
                         <td>
                             {{ showAmount($invest->amount*($invest->mon_interest_rate/100)) }} @lang('every') @lang('Day')
                             <br>

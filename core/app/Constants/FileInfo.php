@@ -85,6 +85,13 @@ class FileInfo
         $data['planFile'] = [
             'path' => 'assets/plans/files'
         ];
+        $data['projectImage'] = [
+            'path' => 'assets/projects/images',
+            'size' => '800x600'
+        ];
+        $data['projectFile'] = [
+            'path' => 'assets/projects/files'
+        ];
         return $data;
 	}
 

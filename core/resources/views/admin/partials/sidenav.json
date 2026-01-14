@@ -42,20 +42,20 @@
         "route_name": "admin.invest.report.dashboard",
         "menu_active": "admin.invest.report.dashboard"
     },
-    "manage_plans": {
+    "manage_projects": {
         "keyword": [
-            "Plans",
-            "Investment Plans",
-            "Plan Management",
-            "Plans Overview",
-            "Manage Plans",
-            "Plan Configuration",
-            "Investment Packages"
+            "Projects",
+            "Investment Projects",
+            "Project Management",
+            "Projects Overview",
+            "Manage Projects",
+            "Project Configuration",
+            "Investment Opportunities"
         ],
-        "title": "Plans",
-        "icon": "fas fa-funnel-dollar",
-        "route_name": "admin.plan.index",
-        "menu_active": "admin.plan*"
+        "title": "Projects",
+        "icon": "las la-project-diagram",
+        "route_name": "admin.project.index",
+        "menu_active": "admin.project*"
     },
     "deposits": {
         "title": "Deposits",
@@ -229,7 +229,7 @@
             }
         ]
     },
-   
+
     "support_ticket": {
         "title": "Support Ticket",
         "icon": "la la-ticket",
@@ -346,7 +346,7 @@
                 "menu_active": "admin.pool.statistics"
             }
         ]
-    },   
+    },
     "subscriber": {
         "keyword": ["subscriber", "subscribers", "Subscription management", "Subscriber list", "Subscriber activity"],
         "title": "Subscribers",

@@ -34,6 +34,12 @@ class PlanController extends Controller
         RequiredConfig::configured('plan_setting');
 
         $notify[] = ['success', 'Plan added successfully'];
+
+        // Redirect to project details if created from project
+        if ($request->project_id) {
+            return redirect()->route('admin.project.show', $request->project_id)->withNotify($notify);
+        }
+
         return back()->withNotify($notify);
     }
 
@@ -49,37 +55,30 @@ class PlanController extends Controller
 
     protected function saveData($plan, $request)
     {
-        // Manejar carga de imagen
-        if ($request->hasFile('image')) {
-            try {
-                $fileManager = new FileManager($request->image);
-                $fileManager->path = $fileManager->planImage()->path;
-                $fileManager->size = $fileManager->planImage()->size;
-                $fileManager->old = $plan->image ?? null;
-                $fileManager->upload();
-                $plan->image = $fileManager->filename;
-            } catch (\Exception $e) {
-                throw ValidationException::withMessages(['image' => 'Error uploading image: ' . $e->getMessage()]);
-            }
-        }
+        // Vincular al proyecto si viene project_id
+        if ($request->has('project_id') && $request->project_id) {
+            $project = \App\Models\Project::findOrFail($request->project_id);
+            $plan->project_id = $request->project_id;
 
-        // Manejar carga de PDF (opcional)
-        if ($request->hasFile('pdf')) {
-            try {
-                $fileManager = new FileManager($request->pdf);
-                $fileManager->path = $fileManager->planFile()->path;
-                $fileManager->old = $plan->pdf ?? null;
-                $fileManager->upload();
-                $plan->pdf = $fileManager->filename;
-            } catch (\Exception $e) {
-                throw ValidationException::withMessages(['pdf' => 'Error uploading PDF: ' . $e->getMessage()]);
+            // Heredar configuraciones del proyecto si no se proporcionan
+            if (!$request->has('minimum') || $request->minimum == 0) {
+                $plan->minimum = $project->minimum_investment;
+            } else {
+                $plan->minimum = $request->minimum;
             }
+
+            if (!$request->has('maximum') || $request->maximum == 0) {
+                $plan->maximum = $project->maximum_investment;
+            } else {
+                $plan->maximum = $request->maximum;
+            }
+        } else {
+            $plan->minimum           = $request->minimum ?? 0;
+            $plan->maximum           = $request->maximum ?? 0;
         }
 
         $plan->name              = $request->name;
         $plan->description       = $request->description;
-        $plan->minimum           = $request->minimum ?? 0;
-        $plan->maximum           = $request->maximum ?? 0;
         $plan->fixed_amount      = $request->amount ?? 0;
         $plan->interest          = $request->interest;
         $plan->interest_type     = $request->interest_type == 1 ? 1 : 0;
@@ -87,11 +86,7 @@ class PlanController extends Controller
         $plan->capital_back      = $request->capital_back ?? 0;
         $plan->lifetime          = $request->return_type == 1 ? 1 : 0;
         $plan->repeat_time       = $request->repeat_time ?? 0;
-        $plan->compound_interest = $request->compound_interest ? Status::YES : Status::NO;
         $plan->hold_capital      = $request->hold_capital ? Status::YES : Status::NO;
-        $plan->featured          = $request->featured ? Status::YES : Status::NO;
-        $plan->testing          = $request->testing ? Status::YES : Status::NO;
-        $plan->days_to_init     = $request->days_to_init ?? 1;
         $plan->capital_months_return = $request->capital_months_return ?? 0;
 
         // Manejar distribución de intereses
@@ -107,13 +102,9 @@ class PlanController extends Controller
 
     protected function validation($request, $id = null)
     {
-        $imageRule = $id ? 'nullable' : 'required';
-
         $request->validate([
-            'name'          => 'required',
-            'description'   => 'required|string',
-            'image'         => $imageRule . '|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'pdf'           => 'nullable|mimes:pdf|max:10240',
+            'name'          => 'required|string|max:255',
+            'description'   => 'nullable|string|max:1000',
             'invest_type'   => 'required|in:1,2',
             'interest_type' => 'required|in:1,2',
             'interest'      => 'required|numeric|gt:0',
@@ -126,14 +117,36 @@ class PlanController extends Controller
             'capital_back'  => 'nullable|required_if:return_type,2|in:1,0',
         ]);
 
-        if ($request->compound_interest && ((!$request->capital_back && !$request->return_type) || $request->interest_type == 2)) {
-            throw ValidationException::withMessages(['error' => 'For compound interest, a lifetime plan or capital return and a percentage-based interest rate are required.']);
-        }
-
         if ($request->hold_capital && !$request->capital_back) {
             throw ValidationException::withMessages(['error' => 'When hold capital is enabled, capital back is required.']);
         }
 
+        // Validar que los montos del plan estén dentro del rango del proyecto
+        if ($request->has('project_id') && $request->project_id) {
+            $project = \App\Models\Project::findOrFail($request->project_id);
+
+            if ($request->invest_type == 1) {
+                // Inversión por rango
+                if ($request->minimum < $project->minimum_investment) {
+                    throw ValidationException::withMessages([
+                        'minimum' => "The minimum investment cannot be less than the project's minimum (" . showAmount($project->minimum_investment) . ")"
+                    ]);
+                }
+
+                if ($request->maximum > $project->maximum_investment) {
+                    throw ValidationException::withMessages([
+                        'maximum' => "The maximum investment cannot exceed the project's maximum (" . showAmount($project->maximum_investment) . ")"
+                    ]);
+                }
+            } else {
+                // Inversión fija
+                if ($request->amount < $project->minimum_investment || $request->amount > $project->maximum_investment) {
+                    throw ValidationException::withMessages([
+                        'amount' => "The fixed amount must be between " . showAmount($project->minimum_investment) . " and " . showAmount($project->maximum_investment)
+                    ]);
+                }
+            }
+        }
     }
 
     public function status($id)
@@ -203,16 +216,23 @@ class PlanController extends Controller
         $transaction->save();
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $pageTitle = 'New Plan';
-        return view('admin.plan.create', compact('pageTitle'));
+        $projectId = $request->project_id;
+        $project = null;
+
+        if ($projectId) {
+            $project = \App\Models\Project::findOrFail($projectId);
+        }
+
+        return view('admin.plan.create', compact('pageTitle', 'projectId', 'project'));
     }
 
     public function edit($id)
     {
         $pageTitle = 'Edit Plan';
-        $plan = Plan::findOrFail($id);
+        $plan = Plan::with('project')->findOrFail($id);
         return view('admin.plan.edit', compact('pageTitle', 'plan'));
     }
 

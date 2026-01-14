@@ -10,14 +10,17 @@
                     <li class="nav-item">
                         <a class="nav-link {{ menuActive('home') }}" href="{{ route('home') }}">@lang('Home')</a>
                     </li>
-                    <!--@php
+                    @php
                         $pages = App\Models\Page::where('tempname', $activeTemplate)->where('is_default', 0)->get();
                     @endphp
                     @foreach ($pages as $data)
                         <li class="nav-item"><a href="{{ route('pages', [$data->slug]) }}" class="nav-link {{ menuActive('pages', [$data->slug]) }}">{{ __($data->name) }}</a></li>
                     @endforeach
                     <li class="nav-item">
-                        <a class="nav-link {{ menuActive('plan') }}" href="{{ route('plan') }}"> @lang('Plan') </a>
+                        <a class="nav-link {{ menuActive('projects*') }}" href="{{ route('projects.index') }}"> @lang('Projects') </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ menuActive('plan') }}" href="{{ route('plan') }}"> @lang('Plans') </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ menuActive('blogs') }}" href="{{ route('blogs') }}">@lang('Blog')</a>
@@ -25,7 +28,6 @@
                     <li class="nav-item">
                         <a class="nav-link {{ menuActive('contact') }}" href="{{ route('contact') }}">@lang('Contact')</a>
                     </li>
-                     languages -->
                     @if (gs('multi_language'))
                         @include($activeTemplate . 'partials.language')
                     @endif

@@ -110,6 +110,12 @@ Route::middleware('auth', 'delete.status')->name('user.')->group(function () {
                     Route::post('schedule/status/{id}', 'scheduleInvestStatus')->name('schedule.status');
                 });
 
+                // Project routes for dashboard
+                Route::name('projects.')->prefix('projects')->group(function () {
+                    Route::get('/', 'projects')->name('index');
+                    Route::get('/{id}', 'projectDetails')->name('show');
+                });
+
                 Route::name('staking.')->prefix('staking')->group(function () {
                     Route::get('/', 'staking')->name('index');
                     Route::post('save', 'saveStaking')->name('save');
