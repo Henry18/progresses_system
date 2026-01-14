@@ -36,9 +36,15 @@
             </a>
         </li>
         <li class="sidebar-menu-list__item {{ menuActive(['plan', 'user.invest.statistics', 'user.invest.log', 'user.invest.details']) }} ">
-            <a href="{{ route('plan') }}" class="sidebar-menu-list__link ">
+            <a href="{{ route('user.invest.statistics') }}" class="sidebar-menu-list__link ">
                 <span class="icon"><i class="fas fa-funnel-dollar"></i></span>
                 <span class="text">@lang('Investment')</span>
+            </a>
+        </li>
+        <li class="sidebar-menu-list__item {{ menuActive(['user.projects.*']) }} ">
+            <a href="{{ route('user.projects.index') }}" class="sidebar-menu-list__link ">
+                <span class="icon"><i class="fas fa-project-diagram"></i></span>
+                <span class="text">@lang('Projects')</span>
             </a>
         </li>
         @if (gs('schedule_invest'))

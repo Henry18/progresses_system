@@ -66,6 +66,19 @@ Route::middleware('admin')->group(function () {
     });
 
     // Plan Controller
+    // Projects Management
+    Route::controller('ProjectController')->name('project.')->prefix('project')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('create', 'create')->name('create');
+        Route::post('store', 'store')->name('store');
+        Route::get('show/{id}', 'show')->name('show');
+        Route::get('edit/{id}', 'edit')->name('edit');
+        Route::post('update/{id}', 'update')->name('update');
+        Route::post('status/{id}', 'status')->name('status');
+        Route::post('delete/{id}', 'delete')->name('delete');
+    });
+
+    // Plans Management (legacy - still accessible)
     Route::controller('PlanController')->name('plan.')->prefix('plan')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::post('store', 'store')->name('store');

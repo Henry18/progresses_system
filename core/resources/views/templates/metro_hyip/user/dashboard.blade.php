@@ -578,7 +578,71 @@
     </div>
   </div>
 </div>
-@endif @endsection @push('script')
+@endif
+
+{{-- Featured Projects Section --}}
+@if(isset($featuredProjects) && $featuredProjects->count() > 0)
+<div class="row mt-5">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4>@lang('Featured Investment Projects')</h4>
+      <a href="{{ route('projects.index') }}" class="btn btn--sm btn--base">
+        @lang('View All Projects') <i class="las la-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+
+  @foreach($featuredProjects as $project)
+  <div class="col-lg-4 col-md-6 mb-3">
+    <div class="card custom--card h-100">
+      <div class="card-header bg--base p-0">
+        <img src="{{ getImage(getFilePath('projectImage') . '/' . $project->image, getFileSize('projectImage')) }}"
+             alt="{{ __($project->name) }}"
+             class="w-100"
+             style="height: 150px; object-fit: cover;">
+        <span class="badge badge--success position-absolute top-0 end-0 m-2">
+          <i class="las la-star"></i> @lang('Featured')
+        </span>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title mb-2">{{ __($project->name) }}</h5>
+        <p class="card-text text-muted small mb-3">{{ __(strLimit($project->description, 80)) }}</p>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <div class="bg--section p-2 rounded text-center">
+              <small class="d-block text-muted">@lang('Min')</small>
+              <strong>{{ showAmount($project->minimum_investment) }}</strong>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="bg--section p-2 rounded text-center">
+              <small class="d-block text-muted">@lang('Max')</small>
+              <strong>{{ showAmount($project->maximum_investment) }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="badge badge--primary">
+            {{ $project->active_plans_count }} @lang('Plans')
+          </span>
+          <small class="text-muted">
+            {{ $project->days_to_init }} @lang('days to start')
+          </small>
+        </div>
+
+        <a href="{{ route('projects.show', $project->id) }}" class="btn btn--base w-100 btn--sm">
+          @lang('View Details') <i class="las la-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  @endforeach
+</div>
+@endif
+
+@endsection @push('script')
 <script>
 'use strict';
 (function($) {

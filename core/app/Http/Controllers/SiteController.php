@@ -30,7 +30,18 @@ class SiteController extends Controller
         $sections    = Page::where('tempname', activeTemplate())->where('slug', '/')->first();
         $seoContents = @$sections->seo_content;
         $seoImage    = @$seoContents->image ? getImage(getFilePath('seo') . '/' . @$seoContents->image, getFileSize('seo')) : null;
-        return view('Template::home', compact('pageTitle', 'sections', 'seoContents', 'seoImage'));
+
+        // Load featured projects for homepage
+        $featuredProjects = \App\Models\Project::where('status', 1)
+            ->where('testing', 0)
+            ->where('featured', 1)
+            ->withCount(['activePlans' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->limit(3)
+            ->get();
+
+        return view('Template::home', compact('pageTitle', 'sections', 'seoContents', 'seoImage', 'featuredProjects'));
     }
 
     public function pages($slug)
@@ -315,7 +326,7 @@ class SiteController extends Controller
 
     public function planDetails($id, $slug = null)
     {
-        $plan = Plan::with('timeSetting')->whereHas('timeSetting', function ($time) {
+        $plan = Plan::with(['timeSetting', 'project'])->whereHas('timeSetting', function ($time) {
             $time->where('status', Status::ENABLE);
         })->where('status', Status::ENABLE)->findOrFail($id);
 

@@ -63,6 +63,15 @@ class UserController extends Controller
 
         $data['fractionalCapital'] = Transaction::where('remark', 'return_fractional_capital')->where('user_id', $user->id)->sum('amount');
 
+        // Featured projects for dashboard
+        $data['featuredProjects'] = \App\Models\Project::where('status', 1)
+            ->where('testing', 0)
+            ->where('featured', 1)
+            ->withCount(['activePlans' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->limit(6)
+            ->get();
 
         $data['isHoliday']      = HyipLab::isHoliDay(now()->toDateTimeString(), gs());
         $data['nextWorkingDay'] = now()->toDateString();
