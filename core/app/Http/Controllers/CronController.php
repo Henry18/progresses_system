@@ -87,51 +87,111 @@ class CronController extends Controller
                 exit;
             }
 
+            // Log total pending investments for monitoring
+            $totalPending = Invest::where('status', Status::INVEST_RUNNING)
+                ->where('next_time', '<=', $now)
+                ->count();
+            \Log::info("Cron Interest: $totalPending pending investments");
+
             $invests = Invest::with('plan.timeSetting', 'user')->where('status', Status::INVEST_RUNNING)->where('next_time', '<=', $now)->orderBy('last_time')->take(100)->get();
 
+            \Log::info("Cron Interest: Processing " . $invests->count() . " investments");
+
             foreach ($invests as $invest) {
-                $now  = $now;
-                $next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
-                $next = HyipLab::nextWorkingMinute(15);
                 $user = $invest->user;
+
+                // Determine next payment time and calculation mode
+                // TEST MODE: For quick testing with 15-minute cycles
+                // PRODUCTION MODE: Real business days calculation
+                $useTestMode = env('CRON_TEST_MODE', false);
+
+                if ($useTestMode) {
+                    // TEST MODE: Next payment in 15 minutes
+                    $next = HyipLab::nextWorkingMinute(15);
+
+                    // Calculate payment cycles (15-minute intervals = 1 "month" in test mode)
+                    $lastPayment = $invest->last_time ?: $invest->created_at;
+                    $minutesPassed = Carbon::parse($lastPayment)->diffInMinutes($now);
+                    $monthsCompleted = floor($minutesPassed / 15);
+                    $newRecTotalDays = 21; // Reset for next cycle
+
+                    \Log::info("TEST MODE - Invest #{$invest->id}: {$minutesPassed} minutes passed, {$monthsCompleted} cycles completed");
+                } else {
+                    // PRODUCTION MODE: Next payment based on plan configuration
+                    $next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
+
+                    // Calculate real business days passed
+                    $lastPayment = $invest->last_time ?: $invest->created_at;
+                    $businessDaysPassed = $this->calculateBusinessDays($lastPayment, $now);
+
+                    // Determine complete months (21 business days = 1 month)
+                    $monthsCompleted = floor($businessDaysPassed / 21);
+
+                    // Calculate remaining days for next month
+                    $remainingDays = $businessDaysPassed % 21;
+                    $newRecTotalDays = 21 - $remainingDays;
+
+                    \Log::info("PRODUCTION MODE - Invest #{$invest->id}: {$businessDaysPassed} business days passed, {$monthsCompleted} months completed");
+                }
+
+                // Skip if no complete months/cycles have passed
+                if ($monthsCompleted == 0) {
+                    // Update next_time and continue
+                    $invest->next_time = $next;
+                    $invest->save();
+                    continue;
+                }
 
                 // Calculate interest (using distribution if configured)
                 $interest = $this->calculateInterest($invest);
 
-                $invest->rec_total_days = $invest->rec_total_days - 1 < 0 ? 21 : $invest->rec_total_days - 1;
-                $invest->return_rec_time += $invest->rec_total_days == 0 ? 1 : 0;
-                //$invest->return_rec_time += 1;
-                //$invest->paid += $invest->interest;
-                $invest->paid += $interest;
-                $invest->should_pay -= $invest->period > 0 ? $invest->interest : 0;
+                // Update investment counters
+                $invest->return_rec_time += $monthsCompleted;
+                $invest->rec_total_days = $newRecTotalDays;
+                $invest->paid += $interest * $monthsCompleted;
+                $invest->should_pay -= $invest->period > 0 ? $invest->interest * $monthsCompleted : 0;
                 $invest->next_time = $next;
                 $invest->last_time = $now;
-                $invest->net_interest += $invest->rem_compound_times ? 0 : $invest->interest;
+                $invest->net_interest += $invest->rem_compound_times ? 0 : ($interest * $monthsCompleted);
 
-                // Add Return Amount to user's Interest Balance
-                $user->interest_wallet += $interest;
+                // Add Return Amount to user's wallet (for all completed months)
+                // If plan has restricted_withdrawal, credit to special_wallet, otherwise to interest_wallet
+                $totalInterestPayment = $interest * $monthsCompleted;
+                $plan = $invest->plan;
+                $useSpecialWallet = $plan && $plan->restricted_withdrawal;
+
+                if ($useSpecialWallet) {
+                    $user->special_wallet += $totalInterestPayment;
+                    $walletType = 'special_wallet';
+                    $postBalance = $user->special_wallet;
+                } else {
+                    $user->interest_wallet += $totalInterestPayment;
+                    $walletType = 'interest_wallet';
+                    $postBalance = $user->interest_wallet;
+                }
                 $user->save();
 
                 $trx = getTrx();
 
                 // Create The Transaction for Interest Back
+                $monthsText = $monthsCompleted > 1 ? " ({$monthsCompleted} months)" : "";
                 $transaction               = new Transaction();
                 $transaction->user_id      = $user->id;
                 $transaction->invest_id    = $invest->id;
-                $transaction->amount       = $interest;
+                $transaction->amount       = $totalInterestPayment;
                 $transaction->charge       = 0;
-                $transaction->post_balance = $user->interest_wallet;
+                $transaction->post_balance = $postBalance;
                 $transaction->trx_type     = '+';
                 $transaction->trx          = $trx;
-                $transaction->remark       = 'interest';
-                $transaction->wallet_type  = 'interest_wallet';
-                $transaction->details      = showAmount($interest) . ' ' . @$invest->plan->name;
+                $transaction->remark       = $useSpecialWallet ? 'interest_special' : 'interest';
+                $transaction->wallet_type  = $walletType;
+                $transaction->details      = showAmount($totalInterestPayment) . $monthsText . ' - ' . @$invest->plan->name;
                 $transaction->save();
 
-                // Give Referral Commission if Enabled
+                // Give Referral Commission if Enabled (for all completed months)
                 if ($general->invest_return_commission == 1) {
                     $commissionType = 'invest_return_commission';
-                    HyipLab::levelCommission($user, $invest->interest, $commissionType, $trx, $general);
+                    HyipLab::levelCommission($user, $totalInterestPayment, $commissionType, $trx, $general);
                 }
 
                 // Complete the investment if user get full amount as plan
@@ -172,23 +232,34 @@ class CronController extends Controller
                     $transaction->save();
                 }
 
-                if ($invest->rec_total_days == 0 && $invest->fractional_capital && (($invest->period - $invest->return_rec_time) <= $invest->period_return_capital)) {
-                    $newInvestAmount = $invest->amount - $invest->mon_return_amount;
-                    $invest->amount  = $newInvestAmount;
+                // Handle fractional capital return (for all completed months)
+                // Capital return uses the same wallet as interest (special_wallet if restricted)
+                if ($invest->fractional_capital && (($invest->period - $invest->return_rec_time) <= $invest->period_return_capital)) {
+                    // Calculate total capital to return for all completed months
+                    $totalCapitalReturn = $invest->mon_return_amount * $monthsCompleted;
+                    $newInvestAmount = $invest->amount - $totalCapitalReturn;
+                    $invest->amount  = max(0, $newInvestAmount); // Ensure it doesn't go below 0
 
-                    $user->interest_wallet += $invest->mon_return_amount;
+                    if ($useSpecialWallet) {
+                        $user->special_wallet += $totalCapitalReturn;
+                        $capitalPostBalance = $user->special_wallet;
+                    } else {
+                        $user->interest_wallet += $totalCapitalReturn;
+                        $capitalPostBalance = $user->interest_wallet;
+                    }
                     $user->save();
 
+                    $monthsCapitalText = $monthsCompleted > 1 ? " ({$monthsCompleted} months)" : "";
                     $transaction               = new Transaction();
                     $transaction->user_id      = $user->id;
                     $transaction->invest_id    = $invest->id;
-                    $transaction->amount       = $invest->mon_return_amount;
-                    $transaction->post_balance = $user->interest_wallet;
+                    $transaction->amount       = $totalCapitalReturn;
+                    $transaction->post_balance = $capitalPostBalance;
                     $transaction->charge       = 0;
                     $transaction->trx_type     = '+';
-                    $transaction->details      = __('tagretufraccapital') . ' ' . $invest->plan->name;
+                    $transaction->details      = __('tagretufraccapital') . $monthsCapitalText . ' - ' . $invest->plan->name;
                     $transaction->trx          = $trx;
-                    $transaction->wallet_type  = 'interest_wallet';
+                    $transaction->wallet_type  = $walletType;
                     $transaction->remark       = 'return_fractional_capital';
                     $transaction->save();
                 }
@@ -197,9 +268,9 @@ class CronController extends Controller
 
                 notify($user, 'INTEREST', [
                     'trx'          => $invest->trx,
-                    'amount'       => showAmount($invest->interest, currencyFormat: false),
+                    'amount'       => showAmount($totalInterestPayment, currencyFormat: false),
                     'plan_name'    => @$invest->plan->name,
-                    'post_balance' => showAmount($user->interest_wallet, currencyFormat: false),
+                    'post_balance' => showAmount($useSpecialWallet ? $user->special_wallet : $user->interest_wallet, currencyFormat: false),
                 ]);
             }
         } catch (\Throwable $th) {
@@ -400,6 +471,39 @@ class CronController extends Controller
         }
 
         return null;
+    }
+
+    /**
+     * Calculate business days between two dates (excluding weekends and holidays)
+     *
+     * @param string|Carbon $startDate
+     * @param string|Carbon $endDate
+     * @return int
+     */
+    protected function calculateBusinessDays($startDate, $endDate)
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        $days = 0;
+        $general = gs();
+        $offDays = (array) $general->off_day;
+
+        while ($start->lt($end)) {
+            $dayName = strtolower($start->format('D'));
+
+            // Skip if it's an off day
+            if (!array_key_exists($dayName, $offDays)) {
+                // Check if it's not a holiday
+                $isHoliday = Holiday::where('date', $start->format('Y-m-d'))->exists();
+                if (!$isHoliday) {
+                    $days++;
+                }
+            }
+
+            $start->addDay();
+        }
+
+        return $days;
     }
 
 }

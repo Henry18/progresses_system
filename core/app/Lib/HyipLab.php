@@ -122,6 +122,15 @@ class HyipLab
         $invest->rem_compound_times = $compoundTimes ?? 0;
         $invest->hold_capital       = $plan->hold_capital;
         $invest->fractional_capital = $fractional_capital;
+        $invest->terms_accepted     = 1;
+        $invest->terms_accepted_at  = now();
+
+        // Save project terms acceptance if project has PDF
+        if ($plan->project && $plan->project->pdf) {
+            $invest->project_terms_accepted = 1;
+            $invest->project_terms_accepted_at = now();
+        }
+
         $invest->save();
 
         if ($this->setting->invest_commission == 1) {

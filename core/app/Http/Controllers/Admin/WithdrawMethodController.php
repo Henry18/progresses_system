@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Lib\FormProcessor;
 use App\Lib\RequiredConfig;
 use App\Models\WithdrawMethod;
+use App\Models\WithdrawalPeriod;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 
@@ -32,6 +33,9 @@ class WithdrawMethodController extends Controller
             'currency' => 'required',
             'fixed_charge' => 'required|numeric|gte:0',
             'percent_charge' => 'required|numeric|between:0,100',
+            'percent_charge_bonus' => 'required|numeric|between:0,100',
+            'percent_charge_special' => 'required|numeric|between:0,100',
+            'percent_charge_special_out' => 'required|numeric|between:0,100',
             'min_limit' => 'required|numeric|gt:fixed_charge',
             'max_limit' => 'required|numeric|gt:min_limit',
             'image' => ['required', 'image', new FileTypeValidate(['jpg', 'jpeg', 'png'])],
@@ -66,12 +70,30 @@ class WithdrawMethodController extends Controller
         $method->max_limit = $request->max_limit;
         $method->fixed_charge = $request->fixed_charge;
         $method->percent_charge = $request->percent_charge;
+        $method->fixed_charge_bonus = $request->fixed_charge_bonus;
+        $method->percent_charge_bonus = $request->percent_charge_bonus;
+        $method->fixed_charge_special = $request->fixed_charge_special;
+        $method->percent_charge_special = $request->percent_charge_special;
+        $method->fixed_charge_special_out = $request->fixed_charge_special_out;
+        $method->percent_charge_special_out = $request->percent_charge_special_out;
         $method->currency = $request->currency;
         $method->description = $request->instruction;
         $method->save();
 
+        // Save withdrawal periods
+        if ($request->has('withdrawal_periods')) {
+            foreach ($request->withdrawal_periods as $period) {
+                WithdrawalPeriod::create([
+                    'withdraw_method_id' => $method->id,
+                    'start_date' => $period['start_date'],
+                    'end_date' => $period['end_date'],
+                    'status' => 1
+                ]);
+            }
+        }
+
         RequiredConfig::configured('withdrawal_method');
-        
+
         $notify[] = ['success', 'Withdrawal method added successfully'];
         return to_route('admin.withdraw.method.index')->withNotify($notify);
     }
@@ -80,7 +102,7 @@ class WithdrawMethodController extends Controller
     public function edit($id)
     {
         $pageTitle = 'Update Withdrawal Method';
-        $method = WithdrawMethod::with('form')->findOrFail($id);
+        $method = WithdrawMethod::with(['form', 'withdrawalPeriods'])->findOrFail($id);
         $form = $method->form;
         return view('admin.withdraw.edit', compact('pageTitle', 'method','form'));
     }
@@ -95,6 +117,9 @@ class WithdrawMethodController extends Controller
             'min_limit'      => 'required|numeric|gt:fixed_charge',
             'max_limit'      => 'required|numeric|gt:min_limit',
             'percent_charge' => 'required|numeric|between:0,100',
+            'percent_charge_bonus' => 'required|numeric|between:0,100',
+            'percent_charge_special' => 'required|numeric|between:0,100',
+            'percent_charge_special_out' => 'required|numeric|between:0,100',
             'currency'       => 'required',
             'instruction'    => 'required'
         ];
@@ -125,10 +150,45 @@ class WithdrawMethodController extends Controller
         $method->max_limit      = $request->max_limit;
         $method->fixed_charge   = $request->fixed_charge;
         $method->percent_charge = $request->percent_charge;
+        $method->fixed_charge_bonus   = $request->fixed_charge_bonus;
+        $method->percent_charge_bonus = $request->percent_charge_bonus;
+        $method->fixed_charge_special = $request->fixed_charge_special;
+        $method->percent_charge_special = $request->percent_charge_special;
+        $method->fixed_charge_special_out = $request->fixed_charge_special_out;
+        $method->percent_charge_special_out = $request->percent_charge_special_out;
         $method->description    = $request->instruction;
         $method->currency       = $request->currency;
         $method->save();
 
+        // Delete periods marked for deletion
+        if ($request->has('delete_periods')) {
+            WithdrawalPeriod::whereIn('id', $request->delete_periods)
+                ->where('withdraw_method_id', $method->id)
+                ->delete();
+        }
+
+        // Update or create withdrawal periods
+        if ($request->has('withdrawal_periods')) {
+            foreach ($request->withdrawal_periods as $period) {
+                if (!empty($period['id'])) {
+                    // Update existing period
+                    WithdrawalPeriod::where('id', $period['id'])
+                        ->where('withdraw_method_id', $method->id)
+                        ->update([
+                            'start_date' => $period['start_date'],
+                            'end_date' => $period['end_date']
+                        ]);
+                } else {
+                    // Create new period
+                    WithdrawalPeriod::create([
+                        'withdraw_method_id' => $method->id,
+                        'start_date' => $period['start_date'],
+                        'end_date' => $period['end_date'],
+                        'status' => 1
+                    ]);
+                }
+            }
+        }
 
         $notify[] = ['success', 'Withdrawal method updated successfully'];
         return back()->withNotify($notify);

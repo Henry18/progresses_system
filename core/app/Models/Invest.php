@@ -14,6 +14,13 @@ class Invest extends Model
 
     protected $appends = ['diffDatePercent', 'diffInSeconds', 'isShowDiffInSeconds', 'isEligibleCapitalBack'];
 
+    protected $casts = [
+        'terms_accepted' => 'boolean',
+        'terms_accepted_at' => 'datetime',
+        'project_terms_accepted' => 'boolean',
+        'project_terms_accepted_at' => 'datetime',
+    ];
+
     public function getDiffDatePercentAttribute(){
 
         if ($this->last_time) {

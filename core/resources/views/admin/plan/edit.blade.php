@@ -121,7 +121,15 @@
                                         data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="hold_capital" {{ old('hold_capital', $plan->hold_capital) ? 'checked' : '' }}>
                                 </div>
                             </div>
-                            <div class="col-md-6 col-lg-6">
+                            <div class="col-md-6 col-lg-4">
+                                <div class="form-group">
+                                    <label for="">@lang('Restricted Withdrawal') <i class="las la-info-circle"
+                                        title="@lang('When enabled, interest earnings will be credited to the special wallet which has restricted withdrawal periods.')"></i></label>
+                                    <input type="checkbox" data-width="100%" data-onstyle="-info" data-offstyle="-secondary"
+                                        data-bs-toggle="toggle" data-on="@lang('Yes')" data-off="@lang('No')" name="restricted_withdrawal" {{ old('restricted_withdrawal', $plan->restricted_withdrawal) ? 'checked' : '' }}>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
                                 <div class="form-group">
                                     <label for="">@lang('Interest Distribution') <i class="las la-info-circle"
                                         title="@lang('Configure how interest will be distributed across different time periods')"></i></label>

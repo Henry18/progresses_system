@@ -5,7 +5,7 @@
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="text-end">
-                    <a href="{{ route('plan') }}" class="btn btn--base">
+                    <a href="{{ route('user.projects.index') }}" class="btn btn--base">
                         @lang('Investment Plan')
                     </a>
                 </div>

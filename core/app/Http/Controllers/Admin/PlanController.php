@@ -87,6 +87,7 @@ class PlanController extends Controller
         $plan->lifetime          = $request->return_type == 1 ? 1 : 0;
         $plan->repeat_time       = $request->repeat_time ?? 0;
         $plan->hold_capital      = $request->hold_capital ? Status::YES : Status::NO;
+        $plan->restricted_withdrawal = $request->restricted_withdrawal ? Status::YES : Status::NO;
         $plan->capital_months_return = $request->capital_months_return ?? 0;
 
         // Manejar distribución de intereses
