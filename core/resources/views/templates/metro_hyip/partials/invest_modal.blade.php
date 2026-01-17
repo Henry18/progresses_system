@@ -84,6 +84,29 @@
                                         </div>
                                     </div>
                                 @endif
+
+                                @if (auth()->check())
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="termsAccepted" name="terms_accepted" value="1" required>
+                                                <label class="form-check-label" for="termsAccepted">
+                                                    @lang('I have read and accept the') <a href="{{ route('policy.pages', 'terms-and-service') }}" target="_blank" class="text--base">@lang('Terms and Conditions')</a>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 projectTermsContainer" style="display: none;">
+                                        <div class="form-group">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="projectTermsAccepted" name="project_terms_accepted" value="1">
+                                                <label class="form-check-label" for="projectTermsAccepted">
+                                                    @lang('I have read and accept the project conditions') <a href="#" id="projectPdfLink" target="_blank" class="text--base">@lang('Project Conditions')</a>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
 
                             @if (gs('schedule_invest'))
@@ -112,11 +135,12 @@
                             @endif
 
                         </div>
+
                     @endif
                     <div class="modal-footer">
                         @if (auth()->check())
                             <button type="button" class="btn btn--danger btn--sm pill" data-bs-dismiss="modal">@lang('No')</button>
-                            <button type="submit" class="btn btn--base btn--sm pill">@lang('Yes')</button>
+                            <button type="submit" class="btn btn--base btn--sm pill" id="investSubmitBtn">@lang('Yes')</button>
                         @else
                             <a href="{{ route('user.login') }}" class="btn btn--base pill w-100 text-center">@lang('At first sign in your account')</a>
                         @endif
@@ -140,6 +164,16 @@
                     plan = $(this).data('plan');
                     modal.find('.planName').text(plan.name)
                     modal.find('[name=plan_id]').val(plan.id);
+
+                    $('.projectTermsContainer').show();
+                    $('#projectTermsAccepted').prop('required', true);
+
+                    if (plan.project && plan.project.pdf) {
+                        var pdfUrl = '{{ asset('') }}' + 'assets/projects/' + plan.project.pdf;
+                        $('#projectPdfLink').attr('href', pdfUrl);
+                    } else {
+                        $('#projectPdfLink').hide();
+                    }
 
                     let fixedAmount = parseFloat(plan.fixed_amount).toFixed(2);
                     let minimumAmount = parseFloat(plan.minimum).toFixed(2);
@@ -275,6 +309,34 @@
                     $('.modal-dialog').removeClass('modal-lg');
                     $('.modal-dialog').find('.col-md-6').addClass('col-md-12');
                 @endif
+
+                // Function to validate all required checkboxes
+                function validateTermsCheckboxes() {
+                    var termsChecked = $('#termsAccepted').is(':checked');
+                    var projectTermsRequired = $('#projectTermsAccepted').prop('required');
+                    var projectTermsChecked = $('#projectTermsAccepted').is(':checked');
+
+                    // Enable submit button only if:
+                    // 1. General terms are checked AND
+                    // 2. Project terms are checked (if required)
+                    if (termsChecked && (!projectTermsRequired || projectTermsChecked)) {
+                        $('#investSubmitBtn').prop('disabled', false);
+                    } else {
+                        $('#investSubmitBtn').prop('disabled', true);
+                    }
+                }
+
+                // Terms and conditions checkbox handlers
+                $('#termsAccepted, #projectTermsAccepted').on('change', function() {
+                    validateTermsCheckboxes();
+                });
+
+                // Reset checkboxes when modal opens
+                $('#investModal').on('show.bs.modal', function() {
+                    $('#termsAccepted').prop('checked', false);
+                    $('#projectTermsAccepted').prop('checked', false);
+                    $('#investSubmitBtn').prop('disabled', true);
+                });
 
             })(jQuery);
         </script>

@@ -90,6 +90,7 @@ class ManageUsersController extends Controller {
         $pageTitle = __('User Detail').' - ' . $user->username;
 
         $totalDeposit     = Deposit::where('user_id', $user->id)->successful()->sum('amount');
+        //$totalSpecial
         $totalWithdrawals = Withdrawal::where('user_id', $user->id)->approved()->sum('amount');
         $totalTransaction = Transaction::where('user_id', $user->id)->count();
         $pendingTicket    = SupportTicket::where('user_id', $user->id)->whereIN('status', [Status::TICKET_OPEN, Status::TICKET_REPLY])->count();
@@ -196,7 +197,7 @@ class ManageUsersController extends Controller {
         $request->validate([
             'amount'      => 'required|numeric|gt:0',
             'act'         => 'required|in:add,sub',
-            'wallet_type' => 'required|in:deposit_wallet,interest_wallet,bonus_wallet',
+            'wallet_type' => 'required|in:deposit_wallet,interest_wallet,bonus_wallet,special_wallet',
             'remark'      => 'required|string|max:255',
         ]);
 

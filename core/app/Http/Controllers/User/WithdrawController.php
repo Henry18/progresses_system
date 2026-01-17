@@ -10,6 +10,7 @@ use App\Models\AdminNotification;
 use App\Models\Transaction;
 use App\Models\Withdrawal;
 use App\Models\WithdrawMethod;
+use App\Models\WithdrawalPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,7 @@ class WithdrawController extends Controller
     public function withdrawMoney()
     {
         $pageTitle      = 'Withdraw Money';
-        $withdrawMethod = WithdrawMethod::active()->get();
+        $withdrawMethod = WithdrawMethod::with('activeWithdrawalPeriods')->active()->get();
         $isHoliday      = HyipLab::isHoliDay(now()->toDateTimeString(), gs());
         $nextWorkingDay = now()->toDateString();
 
@@ -42,10 +43,16 @@ class WithdrawController extends Controller
         $request->validate([
             'method_code' => 'required',
             'amount'      => 'required|numeric',
+            'terms_accepted' => 'required|accepted',
+        ], [
+            'terms_accepted.required' => 'You must accept the terms and conditions to proceed',
+            'terms_accepted.accepted' => 'You must accept the terms and conditions to proceed',
         ]);
+
         $method = WithdrawMethod::where('id', $request->method_code)->active()->firstOrFail();
         $user   = auth()->user();
         $wallet = $request->type;
+
         if ($request->amount < $method->min_limit) {
             $notify[] = ['error', 'Your requested amount is smaller than minimum amount'];
             return back()->withNotify($notify)->withInput($request->all());
@@ -59,10 +66,25 @@ class WithdrawController extends Controller
             $notify[] = ['error', 'Insufficient balance for withdrawal'];
             return back()->withNotify($notify)->withInput($request->all());
         }
-        $charge      = $method->fixed_charge + ($request->amount * $method->percent_charge / 100);
-        if($wallet== 'bonus_wallet' ){
-            $charge      = $method->fixed_charge_bonus + ($request->amount * $method->percent_charge_bonus / 100);
+
+        // Determine charge based on wallet type and withdrawal period
+        $isWithinPeriod = $method->isWithinWithdrawalPeriod();
+
+        if ($wallet == 'special_wallet') {
+            // Special wallet uses special charges based on period
+            if ($isWithinPeriod) {
+                $charge = $method->fixed_charge_special + ($request->amount * $method->percent_charge_special / 100);
+            } else {
+                // Out of period - apply penalty charges
+                $charge = $method->fixed_charge_special_out + ($request->amount * $method->percent_charge_special_out / 100);
+            }
+        } elseif ($wallet == 'bonus_wallet') {
+            $charge = $method->fixed_charge_bonus + ($request->amount * $method->percent_charge_bonus / 100);
+        } else {
+            // interest_wallet - standard charges
+            $charge = $method->fixed_charge + ($request->amount * $method->percent_charge / 100);
         }
+
         $afterCharge = $request->amount - $charge;
 
         if ($afterCharge <= 0) {
@@ -73,7 +95,7 @@ class WithdrawController extends Controller
         $finalAmount = $afterCharge * $method->rate;
 
         $withdraw               = new Withdrawal();
-        $withdraw->method_id    = $method->id; // wallet method ID
+        $withdraw->method_id    = $method->id;
         $withdraw->user_id      = $user->id;
         $withdraw->amount       = $request->amount;
         $withdraw->currency     = $method->currency;
@@ -83,7 +105,9 @@ class WithdrawController extends Controller
         $withdraw->withdraw_wallet = $wallet;
         $withdraw->after_charge = $afterCharge;
         $withdraw->trx          = getTrx();
+        $withdraw->is_within_period = $isWithinPeriod ? 1 : 0;
         $withdraw->save();
+
         session()->put('wtrx', $withdraw->trx);
         return to_route('user.withdraw.preview');
     }

@@ -5,15 +5,20 @@
         <div class="col-12">
             <div class="row gy-4">
 
-                <div class="col-xxl-4 col-sm-6">
+                <div class="col-xxl-3 col-sm-6">
                     <x-widget style="7" link="{{ route('admin.report.transaction', $user->id) }}" title="Deposit Wallet" icon="las la-money-bill-wave-alt" value="{{ showAmount($user->deposit_wallet) }}" bg="indigo" type="2" />
                 </div>
 
-                <div class="col-xxl-4 col-sm-6">
+                <div class="col-xxl-3 col-sm-6">
                     <x-widget style="7" link="{{ route('admin.report.transaction', $user->id) }}" title="Interest Wallet" icon="las la-money-bill-wave-alt" value="{{ showAmount($user->interest_wallet) }}" bg="indigo" type="2" />
                 </div>
 
-                <div class="col-xxl-4 col-sm-6">
+
+                <div class="col-xxl-3 col-sm-6">
+                    <x-widget style="7" link="{{ route('admin.report.transaction', $user->id) }}" title="Special Wallet" icon="las la-money-bill-wave-alt" value="{{ showAmount($user->special_wallet) }}" bg="indigo" type="2" />
+                </div>
+
+                <div class="col-xxl-3 col-sm-6">
                     <x-widget style="7" link="{{ route('admin.deposit.list', $user->id) }}" title="Deposits" icon="las la-wallet" value="{{ showAmount($totalDeposit) }}" bg="8" type="2" />
                 </div>
 
@@ -230,6 +235,7 @@
                                 <option value="deposit_wallet">@lang('Deposit Wallet')</option>
                                 <option value="interest_wallet">@lang('Interest Wallet')</option>
                                 <option value="bonus_wallet">@lang('Bonus Wallet')</option>
+                                <option value="special_wallet">@lang('Special Wallet')</option>
                             </select>
                         </div>
                         <div class="form-group">

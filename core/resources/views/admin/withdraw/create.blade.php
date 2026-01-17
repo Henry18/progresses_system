@@ -70,7 +70,7 @@
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="card border border--primary">
-                                            <h5 class="card-header bg--primary">@lang('Charge')</h5>
+                                            <h5 class="card-header bg--primary">@lang('Interest Charge')</h5>
                                             <div class="card-body">
                                                 <div class="form-group">
                                                     <label>@lang('Fixed Charge')</label>
@@ -89,6 +89,80 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="col-lg-6">
+                                        <div class="card border border--primary">
+                                            <h5 class="card-header bg--primary">@lang('Bonus Charge')</h5>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label>@lang('Fixed Charge')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="fixed_charge_bonus" value="{{ old('fixed_charge_bonus') }}" required />
+                                                        <div class="input-group-text"> {{ __(gs('cur_text')) }} </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@lang('Percent Charge')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="percent_charge_bonus" value="{{ old('percent_charge_bonus') }}" required>
+                                                        <div class="input-group-text">%</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <div class="card border border--primary">
+                                            <h5 class="card-header bg--primary d-flex justify-content-between align-items-center">
+                                                @lang('Special Charge')
+                                                <button type="button" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#withdrawalPeriodsModal">
+                                                    <i class="las la-calendar-alt"></i> @lang('Withdrawal Periods')
+                                                </button>
+                                            </h5>
+                                            <div class="card-body">
+                                                <div class="form-group">
+                                                    <label>@lang('Fixed Charge')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="fixed_charge_special" value="{{ old('fixed_charge_special') }}" required />
+                                                        <div class="input-group-text"> {{ __(gs('cur_text')) }} </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@lang('Percent Charge')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="percent_charge_special" value="{{ old('percent_charge_special') }}" required>
+                                                        <div class="input-group-text">%</div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@lang('Fixed Charge out of time')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="fixed_charge_special_out" value="{{ old('fixed_charge_special_out') }}" required />
+                                                        <div class="input-group-text"> {{ __(gs('cur_text')) }} </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label>@lang('Percent Charge out of time')</label>
+                                                    <div class="input-group">
+                                                        <input type="number" step="any" class="form-control" name="percent_charge_special_out" value="{{ old('percent_charge_special_out') }}" required>
+                                                        <div class="input-group-text">%</div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Withdrawal Periods List Preview -->
+                                                <div class="withdrawal-periods-summary mt-3">
+                                                    <label>@lang('Configured Withdrawal Periods'):</label>
+                                                    <div id="contentsPeriodsList">
+                                                        <!-- Hidden inputs for periods will be added here by JS -->
+                                                    </div>
+                                                    <div id="periodsListPreview" class="small text-muted">
+                                                        @lang('No periods configured yet')
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
 
                                     <div class="col-lg-12">
                                         <div class="card border border--primary my-2">
@@ -129,6 +203,59 @@
     </div>
 
     <x-form-generator-modal />
+
+    <!-- Withdrawal Periods Modal -->
+    <div class="modal fade" id="withdrawalPeriodsModal" tabindex="-1" aria-labelledby="withdrawalPeriodsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg--primary">
+                    <h5 class="modal-title text-white" id="withdrawalPeriodsModalLabel">@lang('Withdrawal Periods')</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>@lang('Start Date')</label>
+                                <input type="date" class="form-control" id="periodStartDate">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>@lang('End Date')</label>
+                                <input type="date" class="form-control" id="periodEndDate">
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn--primary w-100" id="addPeriodBtn">
+                                <i class="las la-plus"></i> @lang('Add')
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>@lang('Start Date')</th>
+                                    <th>@lang('End Date')</th>
+                                    <th>@lang('Action')</th>
+                                </tr>
+                            </thead>
+                            <tbody id="periodsTableBody">
+                                <tr id="noPeriodsRow">
+                                    <td colspan="3" class="text-center text-muted">@lang('No periods added yet')</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('Close')</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('breadcrumb-plugins')
@@ -139,13 +266,175 @@
     <script>
         (function($) {
             "use strict";
+
+            // Currency symbol update
             $('input[name=currency]').on('input', function() {
                 $('.currency_symbol').text($(this).val());
+            });
+
+            // User data fields
+            $('.addUserData').on('click', function() {
+                var html = `
+                    <div class="col-md-12 user-data">
+                        <div class="form-group">
+                            <div class="input-group mb-md-0 mb-4">
+                                <div class="col-md-4">
+                                    <input name="field_name[]" class="form-control" type="text" required>
+                                </div>
+                                <div class="col-md-3 mt-md-0 mt-2">
+                                    <select name="type[]" class="form-control" required>
+                                        <option value="text" > @lang('Input Text') </option>
+                                        <option value="textarea" > @lang('Textarea') </option>
+                                        <option value="file"> @lang('File') </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 mt-md-0 mt-2">
+                                    <select name="validation[]"
+                                            class="form-control" required>
+                                        <option value="required"> @lang('Required') </option>
+                                        <option value="nullable">  @lang('Optional') </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2 mt-md-0 mt-2 text-end">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn--danger btn-lg removeBtn w-100" type="button">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+
+                $('.addedField').append(html);
+            });
+
+            $(document).on('click', '.removeBtn', function() {
+                $(this).closest('.user-data').remove();
             });
 
             @if (old('currency'))
                 $('input[name=currency]').trigger('input');
             @endif
+
+            // ============================================
+            // Withdrawal Periods Management
+            // ============================================
+            var withdrawalPeriods = [];
+            var periodIndex = 0;
+
+            // Add period button click
+            $('#addPeriodBtn').on('click', function() {
+                var startDate = $('#periodStartDate').val();
+                var endDate = $('#periodEndDate').val();
+
+                // Validation
+                if (!startDate || !endDate) {
+                    notify('error', 'Please select both start and end dates');
+                    return;
+                }
+
+                if (new Date(startDate) > new Date(endDate)) {
+                    notify('error', 'Start date cannot be after end date');
+                    return;
+                }
+
+                // Check for overlapping periods
+                var overlap = withdrawalPeriods.some(function(period) {
+                    return (new Date(startDate) <= new Date(period.endDate) && new Date(endDate) >= new Date(period.startDate));
+                });
+
+                if (overlap) {
+                    notify('error', 'This period overlaps with an existing period');
+                    return;
+                }
+
+                // Add period to array
+                var period = {
+                    id: periodIndex++,
+                    startDate: startDate,
+                    endDate: endDate
+                };
+                withdrawalPeriods.push(period);
+
+                // Update table and preview
+                updatePeriodsTable();
+                updatePeriodsPreview();
+
+                // Clear inputs
+                $('#periodStartDate').val('');
+                $('#periodEndDate').val('');
+
+                notify('success', 'Period added successfully');
+            });
+
+            // Remove period
+            $(document).on('click', '.removePeriodBtn', function() {
+                var periodId = $(this).data('period-id');
+                withdrawalPeriods = withdrawalPeriods.filter(function(p) {
+                    return p.id !== periodId;
+                });
+
+                updatePeriodsTable();
+                updatePeriodsPreview();
+            });
+
+            // Update periods table in modal
+            function updatePeriodsTable() {
+                var tbody = $('#periodsTableBody');
+                var tcont = $('#contentsPeriodsList');
+                tbody.empty();
+                tcont.empty(); // Clear hidden inputs to avoid duplicates
+
+                if (withdrawalPeriods.length === 0) {
+                    tbody.append('<tr id="noPeriodsRow"><td colspan="3" class="text-center text-muted">@lang('No periods added yet')</td></tr>');
+                } else {
+                    withdrawalPeriods.forEach(function(period, index) {
+                        var row = `
+                            <tr>
+                                <td>
+                                    ${formatDate(period.startDate)}
+                                </td>
+                                <td>
+                                    ${formatDate(period.endDate)}
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn--danger btn-sm removePeriodBtn" data-period-id="${period.id}">
+                                        <i class="las la-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                        var cont = `<input type="hidden" name="withdrawal_periods[${index}][start_date]" value="${period.startDate}">
+                                    <input type="hidden" name="withdrawal_periods[${index}][end_date]" value="${period.endDate}">`;
+                        tcont.append(cont);
+                        tbody.append(row);
+                    });
+                }
+            }
+
+            // Update periods preview in card
+            function updatePeriodsPreview() {
+                var preview = $('#periodsListPreview');
+
+                if (withdrawalPeriods.length === 0) {
+                    preview.html('<span class="text-muted">@lang('No periods configured yet')</span>');
+                } else {
+                    var html = '<ul class="list-unstyled mb-0">';
+                    withdrawalPeriods.forEach(function(period) {
+                        html += `<li><i class="las la-calendar-check text-success"></i> ${formatDate(period.startDate)} - ${formatDate(period.endDate)}</li>`;
+                    });
+                    html += '</ul>';
+                    preview.html(html);
+                }
+            }
+
+            // Format date for display
+            function formatDate(dateStr) {
+                var date = new Date(dateStr);
+                return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+
         })(jQuery);
     </script>
 @endpush

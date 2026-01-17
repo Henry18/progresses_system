@@ -47,6 +47,7 @@
                         <select name="type" id="type" class="form-control wallet_type">
                             <option value="interest_wallet" selected>Billetera de Intereses</option>
                             <option value="bonus_wallet">Billetera de Bonos</option>
+                            <option value="special_wallet">Billetera Especial</option>
                         </select>
                             <div class="row justify-content-center gy-sm-4 gy-3">
                                 <div class="col-lg-6">
@@ -137,7 +138,20 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        <button type="submit" class="btn btn--base w-100" disabled>
+                                        <!-- Period Warning for Special Wallet -->
+                                        <div class="deposit-info period-warning d-none pt-2">
+                                            <div class="alert alert-warning mb-2 p-2">
+                                                <small>
+                                                    <i class="las la-exclamation-triangle"></i>
+                                                    <span class="period-warning-text"></span>
+                                                </small>
+                                            </div>
+                                        </div>
+
+                                        <!-- Terms and Conditions Hidden Input -->
+                                        <input type="hidden" name="terms_accepted" id="terms_accepted_input" value="">
+
+                                        <button type="button" class="btn btn--base w-100 open-terms-modal" disabled>
                                             @lang('Confirm Withdraw')
                                         </button>
                                         <div class="info-text pt-3">
@@ -148,6 +162,66 @@
                             </div>
                         </div>
                     </form>
+
+                    <!-- Terms and Conditions Modal -->
+                    <div class="modal fade" id="withdrawTermsModal" tabindex="-1" aria-labelledby="withdrawTermsModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content" style="background-color: #1a1754; border: 1px solid #5a48e0;">
+                                <div class="modal-header" style="border-bottom: 1px solid #5a48e0;">
+                                    <h5 class="modal-title text-white" id="withdrawTermsModalLabel">
+                                        <i class="las la-file-contract"></i> @lang('Withdrawal Terms & Conditions')
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-white">
+                                    <!-- Standard Disclaimer -->
+                                    <div class="terms-section mb-4">
+                                        <h6 class="text-warning"><i class="las la-exclamation-circle"></i> @lang('Important Notice')</h6>
+                                        <div class="terms-content p-3" style="background: rgba(90, 72, 224, 0.1); border-radius: 8px; max-height: 200px; overflow-y: auto;">
+                                            <p>@lang('By proceeding with this withdrawal, you acknowledge and agree to the following terms:')</p>
+                                            <ul>
+                                                <li>@lang('Withdrawal requests are processed within 24-48 business hours.')</li>
+                                                <li>@lang('Processing fees are non-refundable once the withdrawal is initiated.')</li>
+                                                <li>@lang('You are responsible for providing accurate payment details.')</li>
+                                                <li>@lang('The platform is not responsible for delays caused by third-party payment processors.')</li>
+                                                <li>@lang('Withdrawals may be subject to verification for security purposes.')</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <!-- Special Wallet Warning (shown only for special_wallet) -->
+                                    <div class="special-wallet-warning d-none mb-4">
+                                        <h6 class="text-danger"><i class="las la-calendar-times"></i> @lang('Special Wallet Notice')</h6>
+                                        <div class="p-3" style="background: rgba(220, 53, 69, 0.1); border-radius: 8px; border: 1px solid rgba(220, 53, 69, 0.3);">
+                                            <p class="mb-2 special-period-status"></p>
+
+                                            <!-- Allowed Periods List -->
+                                            <div class="allowed-periods-section d-none mt-3">
+                                                <p class="mb-2 text-info"><i class="las la-calendar-check"></i> @lang('Allowed withdrawal periods for this method:')</p>
+                                                <ul class="allowed-periods-list mb-2" style="list-style: none; padding-left: 0;"></ul>
+                                            </div>
+
+                                            <p class="mb-0 text-warning special-charge-info"></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Terms Checkbox -->
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" id="termsCheckbox" style="width: 20px; height: 20px;">
+                                        <label class="form-check-label ms-2" for="termsCheckbox" style="cursor: pointer;">
+                                            @lang('I have read and accept the terms and conditions for this withdrawal')
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="modal-footer" style="border-top: 1px solid #5a48e0;">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@lang('Cancel')</button>
+                                    <button type="button" class="btn btn--base confirm-withdraw-btn" disabled>
+                                        <i class="las la-check-circle"></i> @lang('Accept & Withdraw')
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 @endif
             </div>
         </div>
@@ -163,12 +237,26 @@
         (function($) {
 
             var amount = parseFloat($('.amount').val() || 0);
-            var walletType = ''
+            var walletType = '';
             var gateway, minAmount, maxAmount;
             let percentCharge = 0;
             let fixedCharge = 0;
             let totalPercentCharge = 0;
 
+            // Withdrawal periods data from server
+            var withdrawalPeriods = @json($withdrawMethod->mapWithKeys(function($method) {
+                return [$method->id => [
+                    'isWithinPeriod' => $method->isWithinWithdrawalPeriod(),
+                    'periods' => $method->activeWithdrawalPeriods->map(function($p) {
+                        return [
+                            'start' => $p->start_date->format('M d'),
+                            'end' => $p->end_date->format('M d')
+                        ];
+                    })
+                ]];
+            }));
+
+            var isWithinPeriod = false;
 
             $('.amount').on('input', function(e) {
                 walletType = $('.wallet_type').val();
@@ -178,9 +266,9 @@
                 }
                 calculation();
             });
+
             $('.wallet_type').on('change', function(e) {
                 walletType = $(this).val();
-
                 amount = parseFloat($('.amount').val() || 0);
                 if (!amount) {
                     amount = 0;
@@ -200,6 +288,13 @@
                 minAmount = gatewayElement.data('min-amount');
                 maxAmount = gatewayElement.data('max-amount');
 
+                // Get period status for this method
+                if (withdrawalPeriods[methodCode]) {
+                    isWithinPeriod = withdrawalPeriods[methodCode].isWithinPeriod;
+                } else {
+                    isWithinPeriod = false;
+                }
+
                 calculation();
             }
 
@@ -216,15 +311,37 @@
 
             function calculation() {
                 if (!gateway) return;
+                walletType = $('.wallet_type').val();
                 $(".gateway-limit").text(minAmount + " - " + maxAmount);
 
+                // Determine charges based on wallet type and period
+                if (walletType == 'special_wallet') {
+                    if (isWithinPeriod) {
+                        percentCharge = parseFloat(gateway.percent_charge_special || 0);
+                        fixedCharge = parseFloat(gateway.fixed_charge_special || 0);
+                        $(".period-warning").addClass('d-none');
+                    } else {
+                        percentCharge = parseFloat(gateway.percent_charge_special_out || 0);
+                        fixedCharge = parseFloat(gateway.fixed_charge_special_out || 0);
+                        $(".period-warning").removeClass('d-none');
+                        $(".period-warning-text").text("@lang('You are withdrawing outside the allowed period. Higher charges apply.')");
+                    }
+                } else if (walletType == 'bonus_wallet') {
+                    percentCharge = parseFloat(gateway.percent_charge_bonus || 0);
+                    fixedCharge = parseFloat(gateway.fixed_charge_bonus || 0);
+                    $(".period-warning").addClass('d-none');
+                } else {
+                    percentCharge = parseFloat(gateway.percent_charge || 0);
+                    fixedCharge = parseFloat(gateway.fixed_charge || 0);
+                    $(".period-warning").addClass('d-none');
+                }
+
                 if (amount) {
-                    percentCharge = walletType == 'interest_wallet' ? parseFloat(gateway.percent_charge) : parseFloat(gateway.percent_charge_bonus);
-                    fixedCharge = walletType == 'interest_wallet' ? parseFloat(gateway.fixed_charge) : parseFloat(gateway.fixed_charge_bonus);
                     totalPercentCharge = parseFloat(amount / 100 * percentCharge);
-                    let processingFeeInfo =
-                    `${parseFloat(percentCharge).toFixed(2)}% with ${parseFloat(fixedCharge).toFixed(2)} {{ __(gs('cur_text')) }} {{__('charge for processing fees')}}`
-                $(".proccessing-fee-info").attr("data-bs-original-title", processingFeeInfo);
+                    let processingFeeInfo = `${parseFloat(percentCharge).toFixed(2)}% + {{ __(gs('cur_text')) }}${parseFloat(fixedCharge).toFixed(2)} @lang('charge for processing fees')`;
+                    $(".proccessing-fee-info").attr("data-bs-original-title", processingFeeInfo);
+                } else {
+                    totalPercentCharge = 0;
                 }
 
                 let totalCharge = parseFloat(totalPercentCharge + fixedCharge);
@@ -236,9 +353,9 @@
                 $(".gateway-currency").text(gateway.currency);
 
                 if (amount < Number(gateway.min_limit) || amount > Number(gateway.max_limit)) {
-                    $(".withdraw-form button[type=submit]").attr('disabled', true);
+                    $(".open-terms-modal").attr('disabled', true);
                 } else {
-                    $(".withdraw-form button[type=submit]").removeAttr('disabled');
+                    $(".open-terms-modal").removeAttr('disabled');
                 }
 
                 if (gateway.currency != "{{ gs('cur_text') }}") {
@@ -254,11 +371,71 @@
                 }
             }
 
+            // Open terms modal
+            $('.open-terms-modal').on('click', function() {
+                walletType = $('.wallet_type').val();
+                let methodCode = $('.gateway-input:checked').val();
+
+                // Update modal content based on wallet type
+                if (walletType == 'special_wallet') {
+                    $('.special-wallet-warning').removeClass('d-none');
+
+                    // Get periods for this method
+                    let methodPeriods = withdrawalPeriods[methodCode] ? withdrawalPeriods[methodCode].periods : [];
+
+                    if (isWithinPeriod) {
+                        $('.special-period-status').html('<i class="las la-check-circle text-success"></i> @lang("You are within an allowed withdrawal period.")');
+                        $('.special-charge-info').text('@lang("Standard special wallet charges will apply.")');
+                        $('.allowed-periods-section').addClass('d-none');
+                    } else {
+                        $('.special-period-status').html('<i class="las la-times-circle text-danger"></i> @lang("You are outside the allowed withdrawal periods.")');
+                        $('.special-charge-info').text('@lang("Penalty charges will be applied to this withdrawal: ") ' + percentCharge.toFixed(2) + '% + {{ __(gs("cur_text")) }}' + fixedCharge.toFixed(2));
+
+                        // Show allowed periods
+                        if (methodPeriods.length > 0) {
+                            $('.allowed-periods-section').removeClass('d-none');
+                            let periodsHtml = '';
+                            methodPeriods.forEach(function(period) {
+                                periodsHtml += `<li class="mb-1"><i class="las la-calendar text-success"></i> ${period.start} - ${period.end}</li>`;
+                            });
+                            $('.allowed-periods-list').html(periodsHtml);
+                        } else {
+                            $('.allowed-periods-section').addClass('d-none');
+                        }
+                    }
+                } else {
+                    $('.special-wallet-warning').addClass('d-none');
+                }
+
+                // Reset checkbox
+                $('#termsCheckbox').prop('checked', false);
+                $('.confirm-withdraw-btn').attr('disabled', true);
+
+                // Show modal
+                var modal = new bootstrap.Modal(document.getElementById('withdrawTermsModal'));
+                modal.show();
+            });
+
+            // Enable/disable confirm button based on checkbox
+            $('#termsCheckbox').on('change', function() {
+                if ($(this).is(':checked')) {
+                    $('.confirm-withdraw-btn').removeAttr('disabled');
+                } else {
+                    $('.confirm-withdraw-btn').attr('disabled', true);
+                }
+            });
+
+            // Confirm withdrawal
+            $('.confirm-withdraw-btn').on('click', function() {
+                $('#terms_accepted_input').val('1');
+                $('#withdrawTermsModal').modal('hide');
+                $('.withdraw-form').submit();
+            });
+
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl)
             });
-
 
             $('.gateway-input').change();
         })(jQuery);

@@ -23,12 +23,11 @@ class InvestController extends Controller
 {
     public function invest(Request $request)
     {
-        $this->validation($request);
-
-        $plan = Plan::with('timeSetting')->whereHas('timeSetting', function ($time) {
+        $plan = Plan::with(['timeSetting', 'project'])->whereHas('timeSetting', function ($time) {
             $time->where('status', Status::ENABLE);
         })->where('status', Status::ENABLE)->findOrFail($request->plan_id);
 
+        $this->validation($request, $plan);
         $this->planInfoValidation($plan, $request);
 
         if ($request->invest_time == 'schedule' && gs('schedule_invest')) {
@@ -74,14 +73,29 @@ class InvestController extends Controller
         return back()->withNotify($notify);
     }
 
-    private function validation($request)
+    private function validation($request, $plan = null)
     {
         $validationRule = [
             'amount'            => 'required|min:0',
             'plan_id'           => 'required',
             'wallet_type'       => 'required',
             'compound_interest' => 'nullable|numeric|min:0',
+            'terms_accepted'    => 'required|accepted',
         ];
+
+        $validationMessages = [
+            'wallet_type.in'       => 'For schedule invest pay via must be deposit wallet or interest wallet',
+            'wallet_type.required' => 'Pay via field is required',
+            'terms_accepted.required' => 'You must accept the terms and conditions to proceed',
+            'terms_accepted.accepted' => 'You must accept the terms and conditions to proceed',
+        ];
+
+        // Validate project terms if the project has a PDF
+        if ($plan && $plan->project && $plan->project->pdf) {
+            $validationRule['project_terms_accepted'] = 'required|accepted';
+            $validationMessages['project_terms_accepted.required'] = 'You must accept the project conditions to proceed';
+            $validationMessages['project_terms_accepted.accepted'] = 'You must accept the project conditions to proceed';
+        }
 
         $general = gs();
 
@@ -95,10 +109,7 @@ class InvestController extends Controller
             $validationRule['hours']          = 'required|integer|min:1';
         }
 
-        $request->validate($validationRule, [
-            'wallet_type.in'       => 'For schedule invest pay via must be deposit wallet or interest wallet',
-            'wallet_type.required' => 'Pay via field is required',
-        ]);
+        $request->validate($validationRule, $validationMessages);
     }
 
     private function planInfoValidation($plan, $request)
