@@ -156,9 +156,8 @@
                                                 <!-- Withdrawal Periods List Preview -->
                                                 <div class="withdrawal-periods-summary mt-3">
                                                     <label>@lang('Configured Withdrawal Periods'):</label>
-                                                    <div class="table-responsive">
-                                                            <div id="contentsPeriodsList">
-                                                            </div>
+                                                    <div id="contentsPeriodsList">
+                                                    </div>
                                                     <div id="periodsListPreview" class="small text-muted">
                                                         @if($method->withdrawalPeriods->count() > 0)
                                                             <ul class="list-unstyled mb-0">
