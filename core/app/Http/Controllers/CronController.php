@@ -99,178 +99,197 @@ class CronController extends Controller
 
             foreach ($invests as $invest) {
                 $user = $invest->user;
+                $plan = $invest->plan;
 
-                // Determine next payment time and calculation mode
-                // TEST MODE: For quick testing with 15-minute cycles
-                // PRODUCTION MODE: Real business days calculation
+                // Determine mode and calculate next payment time
+                // TEST MODE: 15-minute cycles simulate 1 business day each
+                // PRODUCTION MODE: Daily payments (cron runs every business day)
                 $useTestMode = env('CRON_TEST_MODE', false);
 
                 if ($useTestMode) {
-                    // TEST MODE: Next payment in 15 minutes
+                    // TEST MODE: Next payment in 15 minutes (simulates next business day)
                     $next = HyipLab::nextWorkingMinute(15);
-
-                    // Calculate payment cycles (15-minute intervals = 1 "month" in test mode)
-                    $lastPayment = $invest->last_time ?: $invest->created_at;
-                    $minutesPassed = Carbon::parse($lastPayment)->diffInMinutes($now);
-                    $monthsCompleted = floor($minutesPassed / 15);
-                    $newRecTotalDays = 21; // Reset for next cycle
-
-                    \Log::info("TEST MODE - Invest #{$invest->id}: {$minutesPassed} minutes passed, {$monthsCompleted} cycles completed");
+                    \Log::info("TEST MODE - Invest #{$invest->id}: Processing daily payment (day {$invest->return_rec_time})");
                 } else {
-                    // PRODUCTION MODE: Next payment based on plan configuration
-                    $next = HyipLab::nextWorkingDay($invest->plan?->timeSetting->time);
-
-                    // Calculate real business days passed
-                    $lastPayment = $invest->last_time ?: $invest->created_at;
-                    $businessDaysPassed = $this->calculateBusinessDays($lastPayment, $now);
-
-                    // Determine complete months (21 business days = 1 month)
-                    $monthsCompleted = floor($businessDaysPassed / 21);
-
-                    // Calculate remaining days for next month
-                    $remainingDays = $businessDaysPassed % 21;
-                    $newRecTotalDays = 21 - $remainingDays;
-
-                    \Log::info("PRODUCTION MODE - Invest #{$invest->id}: {$businessDaysPassed} business days passed, {$monthsCompleted} months completed");
+                    // PRODUCTION MODE: Next payment in 24 hours (next business day)
+                    $next = HyipLab::nextWorkingDay(24);
+                    \Log::info("PRODUCTION MODE - Invest #{$invest->id}: Processing daily payment (day {$invest->return_rec_time})");
                 }
 
-                // Skip if no complete months/cycles have passed
-                if ($monthsCompleted == 0) {
-                    // Update next_time and continue
-                    $invest->next_time = $next;
-                    $invest->save();
-                    continue;
-                }
+                // Calculate DAILY interest payment
+                // mon_interest_rate = interest_rate / 21 (already stored)
+                // So daily interest = amount * (mon_interest_rate / 100)
+                $dailyInterest = $this->calculateDailyInterest($invest);
 
-                // Calculate interest (using distribution if configured)
-                $interest = $this->calculateInterest($invest);
-
-                // Update investment counters
-                $invest->return_rec_time += $monthsCompleted;
-                $invest->rec_total_days = $newRecTotalDays;
-                $invest->paid += $interest * $monthsCompleted;
-                $invest->should_pay -= $invest->period > 0 ? $invest->interest * $monthsCompleted : 0;
-                $invest->next_time = $next;
-                $invest->last_time = $now;
-                $invest->net_interest += $invest->rem_compound_times ? 0 : ($interest * $monthsCompleted);
-
-                // Add Return Amount to user's wallet (for all completed months)
-                // If plan has restricted_withdrawal, credit to special_wallet, otherwise to interest_wallet
-                $totalInterestPayment = $interest * $monthsCompleted;
-                $plan = $invest->plan;
+                // Determine wallet type based on plan settings
                 $useSpecialWallet = $plan && $plan->restricted_withdrawal;
+                $walletType = $useSpecialWallet ? 'special_wallet' : 'interest_wallet';
 
+                // Add daily interest to user's wallet
                 if ($useSpecialWallet) {
-                    $user->special_wallet += $totalInterestPayment;
-                    $walletType = 'special_wallet';
+                    $user->special_wallet += $dailyInterest;
                     $postBalance = $user->special_wallet;
                 } else {
-                    $user->interest_wallet += $totalInterestPayment;
-                    $walletType = 'interest_wallet';
+                    $user->interest_wallet += $dailyInterest;
                     $postBalance = $user->interest_wallet;
                 }
                 $user->save();
 
+                // Update investment tracking
+                $invest->return_rec_time += 1; // Increment days counter
+                $invest->paid += $dailyInterest;
+                $invest->net_interest += $invest->rem_compound_times ? 0 : $dailyInterest;
+                $invest->next_time = $next;
+                $invest->last_time = $now;
+
+                // Update rec_total_days (days remaining in current month)
+                $daysInCurrentMonth = $invest->return_rec_time % 21;
+                $invest->rec_total_days = $daysInCurrentMonth == 0 ? 21 : (21 - $daysInCurrentMonth);
+
                 $trx = getTrx();
 
-                // Create The Transaction for Interest Back
-                $monthsText = $monthsCompleted > 1 ? " ({$monthsCompleted} months)" : "";
+                // Calculate current month and day for logging
+                $currentMonth = floor(($invest->return_rec_time - 1) / 21) + 1;
+                $dayInMonth = (($invest->return_rec_time - 1) % 21) + 1;
+
+                // Create transaction for daily interest
                 $transaction               = new Transaction();
                 $transaction->user_id      = $user->id;
                 $transaction->invest_id    = $invest->id;
-                $transaction->amount       = $totalInterestPayment;
+                $transaction->amount       = $dailyInterest;
                 $transaction->charge       = 0;
                 $transaction->post_balance = $postBalance;
                 $transaction->trx_type     = '+';
                 $transaction->trx          = $trx;
                 $transaction->remark       = $useSpecialWallet ? 'interest_special' : 'interest';
                 $transaction->wallet_type  = $walletType;
-                $transaction->details      = showAmount($totalInterestPayment) . $monthsText . ' - ' . @$invest->plan->name;
+                $transaction->details      = showAmount($dailyInterest) . ' - M' . $currentMonth . ' D' . $dayInMonth . ' - ' . @$invest->plan->name;
                 $transaction->save();
 
-                // Give Referral Commission if Enabled (for all completed months)
+                \Log::info("Invest #{$invest->id}: Month {$currentMonth}, Day {$dayInMonth}/21, Daily Interest: {$dailyInterest}");
+
+                // Give Referral Commission if Enabled
                 if ($general->invest_return_commission == 1) {
                     $commissionType = 'invest_return_commission';
-                    HyipLab::levelCommission($user, $totalInterestPayment, $commissionType, $trx, $general);
+                    HyipLab::levelCommission($user, $dailyInterest, $commissionType, $trx, $general);
                 }
 
-                // Complete the investment if user get full amount as plan
-                if ($invest->return_rec_time >= $invest->period && $invest->period != -1) {
-                    $invest->status = 0; // Change Status so he do not get any more return
+                // Calculate total days for complete plan (period months * 21 days)
+                $totalPlanDays = $invest->period * 21;
 
-                    // Give the capital back if plan says the same and hold capital option is disabled
+                // Check if investment is complete
+                if ($invest->return_rec_time >= $totalPlanDays && $invest->period != -1) {
+                    $invest->status = 0; // Complete the investment
+
+                    \Log::info("Invest #{$invest->id}: COMPLETED after {$invest->return_rec_time} days");
+
+                    // Return capital if configured (and not fractional)
                     if ($invest->capital_status == 1 && !$invest->hold_capital && !$invest->fractional_capital) {
-                        HyipLab::capitalReturn($invest);
+                        // Return the INITIAL invested amount (not current amount which may have changed)
+                        $capitalToReturn = $invest->initial_amount;
+
+                        if ($useSpecialWallet) {
+                            $user->special_wallet += $capitalToReturn;
+                            $capitalPostBalance = $user->special_wallet;
+                        } else {
+                            $user->interest_wallet += $capitalToReturn;
+                            $capitalPostBalance = $user->interest_wallet;
+                        }
+                        $user->save();
+
+                        $invest->capital_back = 1;
+
+                        $capitalTrx               = new Transaction();
+                        $capitalTrx->user_id      = $user->id;
+                        $capitalTrx->invest_id    = $invest->id;
+                        $capitalTrx->amount       = $capitalToReturn;
+                        $capitalTrx->charge       = 0;
+                        $capitalTrx->post_balance = $capitalPostBalance;
+                        $capitalTrx->trx_type     = '+';
+                        $capitalTrx->trx          = getTrx();
+                        $capitalTrx->wallet_type  = $walletType;
+                        $capitalTrx->remark       = 'capital_return';
+                        $capitalTrx->details      = 'Capital Return - ' . showAmount($capitalToReturn) . ' - ' . @$invest->plan->name;
+                        $capitalTrx->save();
+
+                        \Log::info("Invest #{$invest->id}: Capital returned: {$capitalToReturn}");
                     }
                 }
 
-                if ($invest->rem_compound_times) {
-                    $interest        = $invest->interest;
-                    $newInvestAmount = $invest->amount + $interest;
+                // Handle compound interest (at end of each month = every 21 days)
+                if ($invest->rem_compound_times && ($invest->return_rec_time % 21 == 0)) {
+                    $monthlyInterest = $invest->interest; // Monthly interest amount
+                    $newInvestAmount = $invest->amount + $monthlyInterest;
                     $newInterest     = $invest->interest * $newInvestAmount / $invest->amount;
-                    $newShouldPay    = $invest->should_pay == -1 ? -1 : ($invest->period - $invest->return_rec_time) * $newInterest;
 
-                    $user->interest_wallet -= $invest->interest;
+                    $user->interest_wallet -= $monthlyInterest;
                     $user->save();
 
                     $invest->amount     = $newInvestAmount;
                     $invest->interest   = $newInterest;
-                    $invest->should_pay = $newShouldPay;
                     $invest->rem_compound_times -= 1;
 
-                    $transaction               = new Transaction();
-                    $transaction->user_id      = $user->id;
-                    $transaction->invest_id    = $invest->id;
-                    $transaction->amount       = $interest;
-                    $transaction->post_balance = $user->interest_wallet;
-                    $transaction->charge       = 0;
-                    $transaction->trx_type     = '+';
-                    $transaction->details      = '' . $invest->plan->name;
-                    $transaction->trx          = $trx;
-                    $transaction->wallet_type  = 'interest_wallet';
-                    $transaction->remark       = 'invest_compound';
-                    $transaction->save();
+                    $compoundTrx               = new Transaction();
+                    $compoundTrx->user_id      = $user->id;
+                    $compoundTrx->invest_id    = $invest->id;
+                    $compoundTrx->amount       = $monthlyInterest;
+                    $compoundTrx->post_balance = $user->interest_wallet;
+                    $compoundTrx->charge       = 0;
+                    $compoundTrx->trx_type     = '-';
+                    $compoundTrx->details      = 'Compound Interest - Month ' . $currentMonth . ' - ' . $invest->plan->name;
+                    $compoundTrx->trx          = $trx;
+                    $compoundTrx->wallet_type  = 'interest_wallet';
+                    $compoundTrx->remark       = 'invest_compound';
+                    $compoundTrx->save();
                 }
 
-                // Handle fractional capital return (for all completed months)
-                // Capital return uses the same wallet as interest (special_wallet if restricted)
-                if ($invest->fractional_capital && (($invest->period - $invest->return_rec_time) <= $invest->period_return_capital)) {
-                    // Calculate total capital to return for all completed months
-                    $totalCapitalReturn = $invest->mon_return_amount * $monthsCompleted;
-                    $newInvestAmount = $invest->amount - $totalCapitalReturn;
-                    $invest->amount  = max(0, $newInvestAmount); // Ensure it doesn't go below 0
+                // Handle fractional capital return
+                // Capital return starts after (period - period_return_capital) months
+                // period_return_capital = number of months for capital return
+                $capitalStartDay = ($invest->period - $invest->period_return_capital) * 21;
 
-                    if ($useSpecialWallet) {
-                        $user->special_wallet += $totalCapitalReturn;
-                        $capitalPostBalance = $user->special_wallet;
-                    } else {
-                        $user->interest_wallet += $totalCapitalReturn;
-                        $capitalPostBalance = $user->interest_wallet;
+                if ($invest->fractional_capital && $invest->period_return_capital > 0 && $invest->return_rec_time > $capitalStartDay) {
+                    // Daily capital return = initial_amount / (period_return_capital * 21 days)
+                    $totalCapitalDays = $invest->period_return_capital * 21;
+                    $dailyCapitalReturn = $invest->initial_amount / $totalCapitalDays;
+
+                    // Don't return more than remaining amount
+                    $dailyCapitalReturn = min($dailyCapitalReturn, $invest->amount);
+
+                    if ($dailyCapitalReturn > 0) {
+                        $invest->amount = max(0, $invest->amount - $dailyCapitalReturn);
+
+                        if ($useSpecialWallet) {
+                            $user->special_wallet += $dailyCapitalReturn;
+                            $capitalPostBalance = $user->special_wallet;
+                        } else {
+                            $user->interest_wallet += $dailyCapitalReturn;
+                            $capitalPostBalance = $user->interest_wallet;
+                        }
+                        $user->save();
+
+                        $fracCapitalTrx               = new Transaction();
+                        $fracCapitalTrx->user_id      = $user->id;
+                        $fracCapitalTrx->invest_id    = $invest->id;
+                        $fracCapitalTrx->amount       = $dailyCapitalReturn;
+                        $fracCapitalTrx->post_balance = $capitalPostBalance;
+                        $fracCapitalTrx->charge       = 0;
+                        $fracCapitalTrx->trx_type     = '+';
+                        $fracCapitalTrx->details      = __('Fractional Capital') . ' - M' . $currentMonth . ' D' . $dayInMonth . ' - ' . $invest->plan->name;
+                        $fracCapitalTrx->trx          = $trx;
+                        $fracCapitalTrx->wallet_type  = $walletType;
+                        $fracCapitalTrx->remark       = 'return_fractional_capital';
+                        $fracCapitalTrx->save();
                     }
-                    $user->save();
-
-                    $monthsCapitalText = $monthsCompleted > 1 ? " ({$monthsCompleted} months)" : "";
-                    $transaction               = new Transaction();
-                    $transaction->user_id      = $user->id;
-                    $transaction->invest_id    = $invest->id;
-                    $transaction->amount       = $totalCapitalReturn;
-                    $transaction->post_balance = $capitalPostBalance;
-                    $transaction->charge       = 0;
-                    $transaction->trx_type     = '+';
-                    $transaction->details      = __('tagretufraccapital') . $monthsCapitalText . ' - ' . $invest->plan->name;
-                    $transaction->trx          = $trx;
-                    $transaction->wallet_type  = $walletType;
-                    $transaction->remark       = 'return_fractional_capital';
-                    $transaction->save();
                 }
 
                 $invest->save();
 
                 notify($user, 'INTEREST', [
                     'trx'          => $invest->trx,
-                    'amount'       => showAmount($totalInterestPayment, currencyFormat: false),
+                    'amount'       => showAmount($dailyInterest, currencyFormat: false),
                     'plan_name'    => @$invest->plan->name,
-                    'post_balance' => showAmount($useSpecialWallet ? $user->special_wallet : $user->interest_wallet, currencyFormat: false),
+                    'post_balance' => showAmount($postBalance, currencyFormat: false),
                 ]);
             }
         } catch (\Throwable $th) {
@@ -401,32 +420,49 @@ class CronController extends Controller
     }
 
     /**
-     * Calculate interest based on distribution configuration
+     * Calculate DAILY interest payment
+     * The system pays daily (21 business days = 1 month)
+     * mon_interest_rate is already interest_rate/21
      *
      * @param Invest $invest
      * @return float
      */
-    protected function calculateInterest($invest)
+    protected function calculateDailyInterest($invest)
     {
         $plan = $invest->plan;
 
         // Check if plan has interest distribution configured
-        if (!$plan->interest_distribution || !isset($plan->interest_distribution['enabled']) || !$plan->interest_distribution['enabled']) {
-            // Use traditional calculation
-            return $invest->amount * ($invest->mon_interest_rate / 100);
+        if ($plan->interest_distribution && isset($plan->interest_distribution['enabled']) && $plan->interest_distribution['enabled']) {
+            return $this->calculateDailyInterestWithDistribution($invest);
         }
 
-        // Get distribution configuration
+        // Standard calculation: daily interest = amount * (mon_interest_rate / 100)
+        // mon_interest_rate = interest_rate / 21, so this gives us the daily rate
+        return $invest->amount * ($invest->mon_interest_rate / 100);
+    }
+
+    /**
+     * Calculate daily interest when plan has interest distribution segments
+     *
+     * @param Invest $invest
+     * @return float
+     */
+    protected function calculateDailyInterestWithDistribution($invest)
+    {
+        $plan = $invest->plan;
         $distribution = $plan->interest_distribution;
         $segments = $distribution['segments'] ?? [];
 
         if (empty($segments)) {
-            // Fallback to traditional calculation if no segments
+            // Fallback to standard calculation
             return $invest->amount * ($invest->mon_interest_rate / 100);
         }
 
-        // Determine current month (1-based index)
-        $currentMonth = $invest->return_rec_time + 1;
+        // Current day (0-based for calculation, return_rec_time is the day we're about to pay)
+        $currentDay = $invest->return_rec_time;
+
+        // Determine which month we're in (0-based)
+        $currentMonth = floor($currentDay / 21) + 1;
 
         // Find which segment the current month belongs to
         $currentSegment = $this->getCurrentSegment($currentMonth, $segments);
@@ -436,19 +472,34 @@ class CronController extends Controller
             return $invest->amount * ($invest->mon_interest_rate / 100);
         }
 
-        // Calculate monthly interest rate for current segment
+        // Calculate daily interest rate for current segment
+        // Segment percentage is for all months in segment, so:
+        // Daily rate = (segment_percentage / segment_months) / 21
         $segmentMonthlyRate = $currentSegment['percentage'] / $currentSegment['months'];
+        $segmentDailyRate = $segmentMonthlyRate / 21;
 
         // Apply interest based on type (percentage or fixed)
         if ($plan->interest_type == 1) {
             // Percentage-based interest
-            $monthlyInterest = $invest->amount * ($segmentMonthlyRate / 100);
+            $dailyInterest = $invest->amount * ($segmentDailyRate / 100);
         } else {
-            // Fixed interest
-            $monthlyInterest = $segmentMonthlyRate;
+            // Fixed interest (divide by 21 to get daily amount)
+            $dailyInterest = $segmentDailyRate / 21;
         }
 
-        return $monthlyInterest;
+        return $dailyInterest;
+    }
+
+    /**
+     * Calculate MONTHLY interest (kept for backward compatibility)
+     *
+     * @param Invest $invest
+     * @return float
+     */
+    protected function calculateInterest($invest)
+    {
+        // Monthly interest = daily interest * 21
+        return $this->calculateDailyInterest($invest) * 21;
     }
 
     /**

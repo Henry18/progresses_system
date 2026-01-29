@@ -34,21 +34,10 @@
             </div>
             @endif
 
-            {{-- Plan Image and Title --}}
+            {{-- Plan Title --}}
             <div class="col-lg-12">
-                <div class="plan-details-header">
-                    <div class="plan-details-image">
-                        @if($plan->image)
-                            <img src="{{ getImage(getFilePath('planImage') . '/' . $plan->image, getFileSize('planImage')) }}"
-                                 alt="{{ __($plan->name) }}" class="w-100">
-                        @else
-                            <img src="{{ getImage(getFilePath('planImage') . '/default.png', getFileSize('planImage')) }}"
-                                 alt="{{ __($plan->name) }}" class="w-100">
-                        @endif
-                    </div>
-                    <div class="plan-details-title-overlay">
-                        <h2 class="plan-details-title">{{ __($plan->name) }}</h2>
-                    </div>
+                <div class="plan-details-header-simple">
+                    <h2 class="plan-details-title-simple">{{ __($plan->name) }}</h2>
                 </div>
             </div>
 
@@ -74,7 +63,7 @@
                                 <i class="las la-chart-line"></i> @lang('Investment Plan')
                             </button>
                         </li>
-                        <li class="nav-item" role="presentation">
+                        <li class="nav-item" role="presentation" hidden>
                             <button class="nav-link" id="comments-tab" data-bs-toggle="tab"
                                     data-bs-target="#comments" type="button" role="tab">
                                 <i class="las la-comments"></i> @lang('Comments')
@@ -139,6 +128,21 @@
                                         @endif
                                     </div>
 
+                                    {{-- Fractional Capital Return Checkbox --}}
+                                    @if($plan->capital_back == 1 && $plan->capital_months_return > 0)
+                                    <div class="mb-4">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="calcFractionalCapital" style="width: 50px; height: 25px;">
+                                            <label class="form-check-label ms-2 fw-bold" for="calcFractionalCapital">
+                                                <i class="las la-calculator text--base"></i> @lang('Calculate with Fractional Capital Return')
+                                            </label>
+                                        </div>
+                                        <small class="text--info mt-1 d-block">
+                                            <i class="las la-info-circle"></i> @lang('When enabled, interest will be calculated based on the remaining capital after each monthly return, resulting in lower total interest.')
+                                        </small>
+                                    </div>
+                                    @endif
+
                                     {{-- Summary Cards --}}
                                     <div class="row gy-3 mb-4">
                                         <div class="col-md-4">
@@ -194,10 +198,10 @@
                                             <tfoot class="table-dark fw-bold">
                                                 <tr>
                                                     <td>@lang('TOTAL')</td>
-                                                    <td class="text-end" id="calcFooterInterest">{{ showAmount(0) }}</td>
-                                                    <td class="text-end" id="calcFooterCapital">{{ showAmount(0) }}</td>
-                                                    <td class="text-end" id="calcFooterTotal">{{ showAmount(0) }}</td>
-                                                    <td class="text-end" id="calcFooterBalance">{{ showAmount(0) }}</td>
+                                                    <td class="text-end" id="calcFooterInterest" data-label="@lang('Total Interest')">{{ showAmount(0) }}</td>
+                                                    <td class="text-end" id="calcFooterCapital" data-label="@lang('Total Capital')">{{ showAmount(0) }}</td>
+                                                    <td class="text-end" id="calcFooterTotal" data-label="@lang('Total Received')">{{ showAmount(0) }}</td>
+                                                    <td class="text-end" id="calcFooterBalance" data-label="@lang('Final Balance')">{{ showAmount(0) }}</td>
                                                 </tr>
                                             </tfoot>
                                         </table>
@@ -280,7 +284,7 @@
                                             <div class="plan-detail-item">
                                                 <span class="plan-detail-label">@lang('Total Return'):</span>
                                                 <span class="plan-detail-value">
-                                                    {{ $plan->interest * $plan->repeat_time }}{{ $plan->interest_type == 1 ? '%' : ' ' . __(gs('cur_text')) }}
+                                                    {{ $plan->interest }}{{ $plan->interest_type == 1 ? '%' : ' ' . __(gs('cur_text')) }}
                                                     @if ($plan->capital_back == 1)
                                                         + <span class="badge badge--success">@lang('Capital')</span>
                                                     @endif
@@ -539,6 +543,9 @@
     </div>
 </section>
 
+{{-- Include Global Investment Calculator --}}
+@include($activeTemplate . 'partials.investment_calculator')
+
 {{-- Include Investment Modal --}}
 @include($activeTemplate . 'partials.invest_modal', ['plans' => [$plan], 'gatewayCurrency' => $gatewayCurrency])
 
@@ -553,7 +560,7 @@
         fixedAmount: {{ $plan->fixed_amount }},
         minimum: {{ $plan->minimum }},
         maximum: {{ $plan->maximum }},
-        interestType: {{ $plan->interest_type }}, // 1 = percentage, 2 = fixed
+        interestType: {{ $plan->interest_type }}, // 1 = percentage, 0 = fixed
         interest: {{ $plan->interest }},
         lifetime: {{ $plan->lifetime }},
         repeatTime: {{ $plan->repeat_time ?? 12 }}, // Default to 12 months if not set
@@ -584,12 +591,18 @@
             calculateReturns();
         });
 
+        // Fractional capital checkbox handler
+        $('#calcFractionalCapital').on('change', function() {
+            calculateReturns();
+        });
+
         // Initial calculation
         calculateReturns();
     });
 
     function calculateReturns() {
         const investmentAmount = parseFloat($('#calcInvestmentAmount').val()) || 0;
+        const fractionalCapital = $('#calcFractionalCapital').is(':checked');
 
         if (investmentAmount <= 0) {
             resetCalculator();
@@ -610,117 +623,151 @@
             }
         }
 
-        // Calculate based on plan type
-        if (planData.hasInterestDistribution && planData.interestDistribution) {
-            calculateWithInterestDistribution(investmentAmount);
+        // Use global InvestmentCalculator
+        if (typeof InvestmentCalculator !== 'undefined') {
+            const result = InvestmentCalculator.calculate({
+                investmentAmount: investmentAmount,
+                interestType: planData.interestType,
+                interest: planData.interest,
+                repeatTime: planData.repeatTime,
+                lifetime: planData.lifetime,
+                capitalBack: planData.capitalBack,
+                capitalMonthsReturn: planData.capitalMonthsReturn,
+                fractionalCapital: fractionalCapital,
+                compoundInterest: planData.compoundInterest,
+                interestDistribution: planData.interestDistribution
+            });
+
+            updateCalculatorUI(result, fractionalCapital);
         } else {
-            calculateStandardPlan(investmentAmount);
+            // Fallback to previous calculation method
+            if (planData.hasInterestDistribution && planData.interestDistribution) {
+                calculateWithInterestDistributionFallback(investmentAmount, fractionalCapital);
+            } else {
+                calculateStandardPlanFallback(investmentAmount, fractionalCapital);
+            }
         }
     }
 
-    function calculateStandardPlan(investmentAmount) {
+    // Fallback calculation for standard plan (without global calculator)
+    function calculateStandardPlanFallback(investmentAmount, fractionalCapital) {
         const monthlyBreakdown = [];
         let totalInterest = 0;
         let totalCapitalReturn = 0;
-        let cumulativeBalance = 0; // Solo acumula los retornos (intereses)
-        let remainingCapital = investmentAmount; // Capital que queda en la plataforma
+        let cumulativeBalance = 0;
+        let remainingCapital = investmentAmount;
 
-        const totalMonths = planData.lifetime === 1 ? 12 : planData.repeatTime; // If lifetime, show 12 months as example
+        const totalMonths = planData.lifetime === 1 ? 12 : planData.repeatTime;
 
-        // Calcular el interés mensual (dividir el porcentaje total entre los meses)
-        let baseMonthlyInterestRate;
+        let baseMonthlyInterestRate = 0;
         if (planData.interestType === 1) {
-            // Percentage-based: dividir el porcentaje total entre los meses
             baseMonthlyInterestRate = planData.interest / totalMonths;
         }
 
+        let capitalPerMonth = 0;
+        if (planData.capitalBack === 1 && planData.capitalMonthsReturn > 0) {
+            const remainingMonths = totalMonths - planData.capitalMonthsReturn + 1;
+            capitalPerMonth = investmentAmount / remainingMonths;
+        }
+
         for (let month = 1; month <= totalMonths; month++) {
-            // Calculate interest for this month PRIMERO con el capital actual
             let monthlyInterest = 0;
             if (planData.interestType === 1) {
-                // Percentage-based interest sobre el capital que queda en la plataforma
-                monthlyInterest = remainingCapital * (baseMonthlyInterestRate / 100);
+                if (fractionalCapital && planData.capitalBack === 1 && planData.capitalMonthsReturn > 0) {
+                    monthlyInterest = remainingCapital * (baseMonthlyInterestRate / 100);
+                } else {
+                    monthlyInterest = investmentAmount * (baseMonthlyInterestRate / 100);
+                }
             } else {
-                // Fixed interest (dividir entre los meses)
                 monthlyInterest = planData.interest / totalMonths;
             }
 
-            // Calculate capital return for this month DESPUÉS de calcular el interés
             let monthlyCapitalReturn = 0;
             if (planData.capitalBack === 1 && planData.capitalMonthsReturn > 0 && month >= planData.capitalMonthsReturn) {
-                // Capital fraccionado: se devuelve desde el mes especificado
-                const remainingMonths = totalMonths - planData.capitalMonthsReturn + 1;
-                monthlyCapitalReturn = investmentAmount / remainingMonths;
+                monthlyCapitalReturn = capitalPerMonth;
                 totalCapitalReturn += monthlyCapitalReturn;
-
-                // Reducir el capital restante DESPUÉS de calcular el interés (para el próximo mes)
                 remainingCapital -= monthlyCapitalReturn;
+                if (remainingCapital < 0) remainingCapital = 0;
             }
 
             totalInterest += monthlyInterest;
             const monthlyTotal = monthlyInterest + monthlyCapitalReturn;
-            cumulativeBalance += monthlyInterest; // Solo acumula los intereses
+            cumulativeBalance += monthlyInterest;
 
             monthlyBreakdown.push({
                 month: month,
                 interest: monthlyInterest,
                 capitalReturn: monthlyCapitalReturn,
                 total: monthlyTotal,
-                balance: cumulativeBalance
+                balance: cumulativeBalance,
+                remainingCapital: remainingCapital
             });
         }
 
-        // Si hay capital back pero NO es fraccionado (capital_months_return = 0),
-        // agregar una fila final con el retorno total del capital
-        if (planData.capitalBack !== 1 && planData.capitalMonthsReturn === 0) {
+        if (planData.capitalBack === 1 && planData.capitalMonthsReturn === 0) {
             monthlyBreakdown.push({
                 month: 'Final',
                 interest: 0,
                 capitalReturn: investmentAmount,
                 total: investmentAmount,
                 balance: cumulativeBalance + investmentAmount,
+                remainingCapital: 0,
                 isFinalCapitalReturn: true
             });
             totalCapitalReturn = investmentAmount;
         }
 
-        // Update UI
-        updateCalculatorUI(investmentAmount, totalInterest, totalCapitalReturn, monthlyBreakdown);
+        const result = {
+            totalInterest,
+            totalCapitalReturn,
+            totalReturn: totalInterest + totalCapitalReturn,
+            roi: (totalInterest / investmentAmount) * 100,
+            monthlyBreakdown,
+            investmentAmount
+        };
+
+        updateCalculatorUI(result, fractionalCapital);
     }
 
-    function calculateWithInterestDistribution(investmentAmount) {
+    // Fallback calculation for interest distribution
+    function calculateWithInterestDistributionFallback(investmentAmount, fractionalCapital) {
         const monthlyBreakdown = [];
         let totalInterest = 0;
         let totalCapitalReturn = 0;
-        let cumulativeBalance = 0; // Solo acumula los retornos (intereses)
-        let remainingCapital = investmentAmount; // Capital que queda en la plataforma
+        let cumulativeBalance = 0;
+        let remainingCapital = investmentAmount;
         let currentMonth = 1;
 
-        // Process each segment
+        let capitalPerMonth = 0;
+        if (planData.capitalBack === 1 && planData.capitalMonthsReturn > 0) {
+            const remainingMonths = planData.repeatTime - planData.capitalMonthsReturn + 1;
+            capitalPerMonth = investmentAmount / remainingMonths;
+        }
+
         planData.interestDistribution.forEach(segment => {
             const segmentMonths = segment.months;
             const segmentPercentage = segment.percentage;
             const monthlyRate = segmentPercentage / segmentMonths;
 
             for (let i = 0; i < segmentMonths; i++) {
-                // Calculate interest for this month PRIMERO con el capital actual
-                const monthlyInterest = investmentAmount * (monthlyRate / 100);
+                let monthlyInterest = 0;
+                if (fractionalCapital && planData.capitalBack === 1 && planData.capitalMonthsReturn > 0) {
+                    monthlyInterest = remainingCapital * (monthlyRate / 100);
+                } else {
+                    monthlyInterest = investmentAmount * (monthlyRate / 100);
+                }
 
-                // Calculate capital return for this month DESPUÉS de calcular el interés
                 let monthlyCapitalReturn = 0;
                 if (planData.capitalBack === 1 && planData.capitalMonthsReturn > 0 && currentMonth >= planData.capitalMonthsReturn) {
-                    // Capital fraccionado: se devuelve desde el mes especificado
-                    const remainingMonths = planData.repeatTime - planData.capitalMonthsReturn + 1;
-                    monthlyCapitalReturn = investmentAmount / remainingMonths;
+                    monthlyCapitalReturn = capitalPerMonth;
                     totalCapitalReturn += monthlyCapitalReturn;
-
-                    // Reducir el capital restante DESPUÉS de calcular el interés (para el próximo mes)
                     remainingCapital -= monthlyCapitalReturn;
+                    if (remainingCapital < 0) remainingCapital = 0;
                 }
 
                 totalInterest += monthlyInterest;
                 const monthlyTotal = monthlyInterest + monthlyCapitalReturn;
-                cumulativeBalance += monthlyInterest; // Solo acumula los intereses
+                cumulativeBalance += monthlyInterest;
 
                 monthlyBreakdown.push({
                     month: currentMonth,
@@ -728,6 +775,7 @@
                     capitalReturn: monthlyCapitalReturn,
                     total: monthlyTotal,
                     balance: cumulativeBalance,
+                    remainingCapital: remainingCapital,
                     segment: segment.description
                 });
 
@@ -735,58 +783,72 @@
             }
         });
 
-        // NO agregar fila final de capital para planes con interest distribution
-        // El capital se maneja igual que en planes estándar (fraccionado o al final según config)
+        if (planData.capitalBack === 1 && planData.capitalMonthsReturn === 0) {
             monthlyBreakdown.push({
                 month: 'Final',
                 interest: 0,
                 capitalReturn: investmentAmount,
                 total: investmentAmount,
                 balance: cumulativeBalance + investmentAmount,
+                remainingCapital: 0,
                 isFinalCapitalReturn: true
             });
             totalCapitalReturn = investmentAmount;
-        // Update UI
-        updateCalculatorUI(investmentAmount, totalInterest, totalCapitalReturn, monthlyBreakdown);
+        }
+
+        const result = {
+            totalInterest,
+            totalCapitalReturn,
+            totalReturn: totalInterest + totalCapitalReturn,
+            roi: (totalInterest / investmentAmount) * 100,
+            monthlyBreakdown,
+            investmentAmount
+        };
+
+        updateCalculatorUI(result, fractionalCapital);
     }
 
-    function updateCalculatorUI(investmentAmount, totalInterest, totalCapitalReturn, monthlyBreakdown) {
+    function updateCalculatorUI(result, fractionalCapital) {
+        const { totalInterest, totalCapitalReturn, totalReturn, roi, monthlyBreakdown, investmentAmount } = result;
+
         // Update summary cards
         $('#calcTotalInterest').text(formatAmount(totalInterest));
-        const totalReturn = totalInterest + totalCapitalReturn;
         $('#calcTotalReturn').text(formatAmount(totalReturn));
-
-        // Calculate ROI
-        const roi = (totalInterest / investmentAmount) * 100;
         $('#calcROI').text(roi.toFixed(2) + '%');
 
         // Update breakdown table
         let tableHTML = '';
         monthlyBreakdown.forEach(row => {
-            // Estilo especial para la fila de retorno final de capital
             const rowClass = row.isFinalCapitalReturn ? 'fw-bold' : '';
             const monthLabel = row.isFinalCapitalReturn ? '@lang("Capital Return")' : row.month;
 
             tableHTML += `
                 <tr class="${rowClass}">
-                    <td>
+                    <td data-label="@lang('Month')">
                         ${monthLabel}
                         ${row.segment ? `<br><small class="">${row.segment}</small>` : ''}
                     </td>
-                    <td class="text-end">${formatAmount(row.interest)}</td>
-                    <td class="text-end">${formatAmount(row.capitalReturn)}</td>
-                    <td class="text-end fw-bold">${formatAmount(row.total)}</td>
-                    <td class="text-end text-success">${formatAmount(row.balance)}</td>
+                    <td class="text-end" data-label="@lang('Interest')">${formatAmount(row.interest)}</td>
+                    <td class="text-end" data-label="@lang('Capital Return')">${formatAmount(row.capitalReturn)}</td>
+                    <td class="text-end fw-bold" data-label="@lang('Total Received')">${formatAmount(row.total)}</td>
+                    <td class="text-end text-success" data-label="@lang('Balance')">${formatAmount(row.balance)}</td>
                 </tr>
             `;
         });
         $('#calcBreakdownBody').html(tableHTML);
 
-        // Update footer - Balance es solo los intereses acumulados
+        // Update footer
         $('#calcFooterInterest').text(formatAmount(totalInterest));
         $('#calcFooterCapital').text(formatAmount(totalCapitalReturn));
         $('#calcFooterTotal').text(formatAmount(totalReturn));
-        $('#calcFooterBalance').text(formatAmount(totalInterest + totalCapitalReturn)); // Solo los intereses acumulados
+        $('#calcFooterBalance').text(formatAmount(totalReturn));
+
+        // Show indicator if fractional calculation is active
+        if (fractionalCapital) {
+            $('#calcTotalInterest').closest('.calc-summary-card').find('small').html('@lang("Total Interest") <span class=\"badge bg-info ms-1\">@lang("Fractional")</span>');
+        } else {
+            $('#calcTotalInterest').closest('.calc-summary-card').find('small').html('@lang("Total Interest")');
+        }
     }
 
     function resetCalculator() {
@@ -801,7 +863,6 @@
     }
 
     function formatAmount(amount) {
-        // Format number with 2 decimals and add currency symbol
         return currencySymbol + ' ' + parseFloat(amount).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
     }
 </script>
@@ -883,34 +944,19 @@
         background: hsl(var(--base));
     }
 
-    .plan-details-header {
-        position: relative;
+    .plan-details-header-simple {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 10px;
-        overflow: hidden;
+        padding: 25px 30px;
         margin-bottom: 30px;
     }
 
-    .plan-details-image img {
-        width: 100%;
-        height: 400px;
-        object-fit: cover;
-    }
-
-    .plan-details-title-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
-        padding: 30px;
-    }
-
-    .plan-details-title {
+    .plan-details-title-simple {
         color: white;
-        font-size: 2.5rem;
+        font-size: 2rem;
         font-weight: 700;
         margin: 0;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
 
     .custom-tabs .nav-tabs {
@@ -974,12 +1020,12 @@
     }
 
     @media (max-width: 768px) {
-        .plan-details-title {
-            font-size: 1.8rem;
+        .plan-details-header-simple {
+            padding: 20px;
         }
 
-        .plan-details-image img {
-            height: 250px;
+        .plan-details-title-simple {
+            font-size: 1.5rem;
         }
 
         .custom-tabs .nav-link {
@@ -989,6 +1035,148 @@
 
         .custom-tabs .nav-link i {
             display: none;
+        }
+
+        /* Responsive Calculator Table */
+        .calc-summary-card {
+            padding: 15px;
+            gap: 10px;
+        }
+
+        .calc-summary-icon {
+            font-size: 28px;
+        }
+
+        .calc-summary-content h4 {
+            font-size: 1.1rem;
+        }
+
+        #calcBreakdownTable {
+            font-size: 12px;
+        }
+
+        #calcBreakdownTable thead th {
+            font-size: 10px;
+            padding: 8px 4px;
+            white-space: nowrap;
+        }
+
+        #calcBreakdownTable tbody td,
+        #calcBreakdownTable tfoot td {
+            padding: 8px 4px;
+        }
+
+        /* Stack cards on mobile */
+        .calc-summary-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 8px;
+        }
+    }
+
+    /* Extra small devices - Transform table to card layout */
+    @media (max-width: 576px) {
+        /* Remove table-responsive scroll on mobile */
+        .table-responsive {
+            overflow-x: visible;
+        }
+
+        #calcBreakdownTable {
+            display: block;
+            border: none;
+        }
+
+        #calcBreakdownTable thead {
+            display: none !important;
+            visibility: hidden;
+            height: 0;
+            position: absolute;
+        }
+
+        #calcBreakdownTable tbody {
+            display: block;
+        }
+
+        #calcBreakdownTable tbody tr {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            padding: 12px;
+        }
+
+        #calcBreakdownTable tbody tr:hover {
+            background: rgba(102, 126, 234, 0.15);
+        }
+
+        #calcBreakdownTable tbody td {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 !important;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: right;
+        }
+
+        #calcBreakdownTable tbody td:last-child {
+            border-bottom: none;
+        }
+
+        #calcBreakdownTable tbody td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: left;
+            flex-shrink: 0;
+            margin-right: 10px;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        /* Footer table - Totals card */
+        #calcBreakdownTable tfoot {
+            display: block !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        #calcBreakdownTable tfoot tr {
+            display: block !important;
+        }
+
+        #calcBreakdownTable tfoot td {
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 !important;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            background: transparent !important;
+        }
+
+        #calcBreakdownTable tfoot td:first-child {
+            display: none !important;
+        }
+
+        #calcBreakdownTable tfoot td:last-child {
+            border-bottom: none;
+        }
+
+        #calcBreakdownTable tfoot td::before {
+            content: attr(data-label);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-right: 10px;
+        }
+
+        #calcBreakdownTable tfoot td .text-end {
+            text-align: right;
         }
     }
 </style>
