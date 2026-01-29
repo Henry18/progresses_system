@@ -56,7 +56,8 @@ class InvestController extends Controller
                 return back()->withNotify($notify);
             }
 
-            $data = PaymentController::insertDeposit($gate, $request->amount, $plan, $request->hold_capital ? Status::YES : Status::NO, $request->compound_interest);
+            $fractionalCapital = $request->fractional_capital_return ? Status::YES : Status::NO;
+            $data = PaymentController::insertDeposit($gate, $request->amount, $plan, $fractionalCapital, $request->compound_interest);
             session()->put('Track', $data->trx);
             return to_route('user.deposit.confirm');
         }
@@ -67,7 +68,8 @@ class InvestController extends Controller
         }
 
         $hyip = new HyipLab($user, $plan);
-        $hyip->invest($request->amount, $wallet, $request->compound_interest, $request->hold_capital ? Status::YES : Status::NO);
+        $fractionalCapital = $request->fractional_capital_return ? Status::YES : Status::NO;
+        $hyip->invest($request->amount, $wallet, $request->compound_interest, $fractionalCapital);
 
         $notify[] = ['success', 'Invested to plan successfully'];
         return back()->withNotify($notify);

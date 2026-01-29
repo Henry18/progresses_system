@@ -1,3 +1,6 @@
+{{-- Include global investment calculator --}}
+@include($activeTemplate . 'partials.investment_calculator')
+
 @once
     <div class="modal custom--modal fade" id="investModal">
         <div class="modal-dialog modal-lg modal-content-bg">
@@ -84,6 +87,29 @@
                                         </div>
                                     </div>
                                 @endif
+
+                                {{-- Fractional Capital Return Checkbox --}}
+                                <div class="col-12 fractionalCapitalContainer" style="display: none;">
+                                    <div class="form-group">
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input" id="fractionalCapitalReturn" name="fractional_capital_return" value="1">
+                                            <label class="form-check-label" for="fractionalCapitalReturn">
+                                                <i class="las la-calculator text--base"></i> @lang('Calculate with Fractional Capital Return')
+                                            </label>
+                                        </div>
+                                        <small class="fst-italic text--info d-block mt-1"><i class="las la-info-circle"></i> @lang('Interest will be calculated based on remaining capital after each monthly capital return.')</small>
+                                    </div>
+                                </div>
+
+                                {{-- Calculated Return Preview --}}
+                                <div class="col-12 calculatedReturnPreview" style="display: none;">
+                                    <div class="alert alert--primary py-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span><i class="las la-chart-line"></i> @lang('Estimated Total Profit'):</span>
+                                            <strong class="estimatedProfit">{{ gs('cur_text') }} 0.00</strong>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 @if (auth()->check())
                                     <div class="col-12">
@@ -215,6 +241,17 @@
                         $('.compoundInterest').hide();
                         $('.investTime').addClass('col-md-12');
                     }
+
+                    // Show fractional capital checkbox only if plan has capital back with months
+                    if (plan.capital_back == '1' && plan.capital_months_return > 0) {
+                        $('.fractionalCapitalContainer').show();
+                        $('.calculatedReturnPreview').show();
+                        $('#fractionalCapitalReturn').prop('checked', false);
+                    } else {
+                        $('.fractionalCapitalContainer').hide();
+                        $('.calculatedReturnPreview').hide();
+                    }
+
                     calculateInterest();
                 });
 
@@ -266,7 +303,12 @@
 
                 $('[name=compound_interest]').on('input', function() {
                     calculateInterest();
-                })
+                });
+
+                // Fractional capital checkbox handler
+                $('#fractionalCapitalReturn').on('change', function() {
+                    calculateInterest();
+                });
 
 
                 function calculateInterest() {
@@ -274,35 +316,69 @@
                     let interestType = plan.interest_type; //1: percent, 0: fixed
                     let repeatTime = plan.repeat_time;
                     let capitalBack = plan.capital_back;
+                    let capitalMonthsReturn = plan.capital_months_return || 0;
                     let investAmount = $('[name=amount]').val() * 1;
                     let compoundInterest = $('[name=compound_interest]').val() ?? 0;
-                    let calculatedInterest = 0;
-                    let baseInterest = 0;
-
-                    console.log(investAmount);
+                    let fractionalCapital = $('#fractionalCapitalReturn').is(':checked');
 
                     if (repeatTime == 0 || investAmount == 0) {
                         $('.calculatedInterest').hide();
+                        $('.calculatedReturnPreview').hide();
                         return false;
                     } else {
                         $('.calculatedInterest').show();
-                    }
-
-                    let totalInterest = interest * repeatTime;
-
-                    if (interestType == '1') {
-                        if (compoundInterest > 0) {
-                            let remainingRepeatTime = repeatTime - compoundInterest;
-                            let interestRatio = 1 + interest / 100;
-                            let compoundCapital = investAmount * Math.pow(interestRatio, compoundInterest);
-                            totalInterest = (compoundCapital * interest / 100) * remainingRepeatTime;
-                        } else {
-                            totalInterest = interest * investAmount / 100 * repeatTime;
+                        if (capitalBack == '1' && capitalMonthsReturn > 0) {
+                            $('.calculatedReturnPreview').show();
                         }
                     }
 
-                    totalInterest = capitalBack ? totalInterest : totalInterest - investAmount;
-                    $('.calculatedInterest').text(`@lang('Total Profit') ` + symbol + totalInterest.toFixed(2));
+                    // Use global calculator if available
+                    if (typeof InvestmentCalculator !== 'undefined') {
+                        let interestDistribution = null;
+                        if (plan.interest_distribution && plan.interest_distribution.enabled && plan.interest_distribution.segments) {
+                            interestDistribution = plan.interest_distribution.segments;
+                        }
+
+                        const result = InvestmentCalculator.calculate({
+                            investmentAmount: investAmount,
+                            interestType: parseInt(interestType),
+                            interest: interest,
+                            repeatTime: repeatTime,
+                            lifetime: plan.lifetime || 0,
+                            capitalBack: parseInt(capitalBack) || 0,
+                            capitalMonthsReturn: capitalMonthsReturn,
+                            fractionalCapital: fractionalCapital,
+                            compoundInterest: parseInt(compoundInterest) || 0,
+                            interestDistribution: interestDistribution
+                        });
+
+                        const totalProfit = result.totalInterest;
+                        $('.calculatedInterest').text(`@lang('Total Profit') ` + symbol + totalProfit.toFixed(2));
+                        $('.estimatedProfit').text(symbol + ' ' + totalProfit.toFixed(2));
+
+                        // Show different text based on fractional option
+                        if (fractionalCapital) {
+                            $('.calculatedInterest').html(`@lang('Total Profit') <span class="badge badge--info ms-1">@lang('Fractional')</span> ` + symbol + totalProfit.toFixed(2));
+                        }
+                    } else {
+                        // Fallback to original calculation
+                        let totalInterest = interest * repeatTime;
+
+                        if (interestType == '1') {
+                            if (compoundInterest > 0) {
+                                let remainingRepeatTime = repeatTime - compoundInterest;
+                                let interestRatio = 1 + interest / 100;
+                                let compoundCapital = investAmount * Math.pow(interestRatio, compoundInterest);
+                                totalInterest = (compoundCapital * interest / 100) * remainingRepeatTime;
+                            } else {
+                                totalInterest = (1 + interest / 100) * investAmount;
+                            }
+                        }
+
+                        totalInterest = capitalBack ? totalInterest : totalInterest - investAmount;
+                        $('.calculatedInterest').text(`@lang('Total Profit') ` + symbol + totalInterest.toFixed(2));
+                        $('.estimatedProfit').text(symbol + ' ' + totalInterest.toFixed(2));
+                    }
                 }
 
                 @if (!gs('schedule_invest'))
@@ -335,6 +411,7 @@
                 $('#investModal').on('show.bs.modal', function() {
                     $('#termsAccepted').prop('checked', false);
                     $('#projectTermsAccepted').prop('checked', false);
+                    $('#fractionalCapitalReturn').prop('checked', false);
                     $('#investSubmitBtn').prop('disabled', true);
                 });
 
