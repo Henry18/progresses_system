@@ -476,7 +476,7 @@ class CronController extends Controller
         // Segment percentage is for all months in segment, so:
         // Daily rate = (segment_percentage / segment_months) / 21
         $segmentMonthlyRate = $currentSegment['percentage'] / $currentSegment['months'];
-        $segmentDailyRate = $segmentMonthlyRate / 21;
+        $segmentDailyRate = ($segmentMonthlyRate / 100) / 21;
 
         $dailyInterest = ($invest->amount * $segmentDailyRate);
 
