@@ -45,7 +45,7 @@
                             <strong>{{ __($invest->plan->name) }}</strong> <br> {{ showAmount($invest->amount) }}
                         </td>
                         <td>
-                            {{ showAmount($invest->amount*($invest->mon_interest_rate/100)) }} @lang('every') @lang('Day')
+                            {{ showAmount(($invest->amount*($invest->mon_interest_rate/100)) / 21) }} @lang('every') @lang('Day')
                             <br>
                             @lang('during')
                             @if ($invest->period == '-1')
@@ -65,7 +65,7 @@
                             @if ($invest->compound_times)
                                 {{ $invest->return_rec_time }} @lang('times') | {{ showAmount($invest->paid) }}
                             @else
-                                {{ ($invest->return_rec_time * 21) + (21 - $invest->rec_total_days) }}x{{ showAmount($invest->amount*($invest->mon_interest_rate/100)) }} = {{ showAmount($invest->paid) }}
+                                {{ ($invest->return_rec_time * 21) + (21 - $invest->rec_total_days) }}x{{ showAmount(($invest->amount*($invest->mon_interest_rate/100)) / 21) }} = {{ showAmount($invest->paid) }}
                             @endif
                         </td>
 
