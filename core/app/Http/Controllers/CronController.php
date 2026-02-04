@@ -438,7 +438,7 @@ class CronController extends Controller
 
         // Standard calculation: daily interest = amount * (mon_interest_rate / 100)
         // mon_interest_rate = interest_rate / 21, so this gives us the daily rate
-        return $invest->amount * ($invest->mon_interest_rate / 100);
+        return ($invest->amount * ($invest->mon_interest_rate / 100) / 21);
     }
 
     /**
@@ -455,7 +455,7 @@ class CronController extends Controller
 
         if (empty($segments)) {
             // Fallback to standard calculation
-            return $invest->amount * ($invest->mon_interest_rate / 100);
+            return ($invest->amount * ($invest->mon_interest_rate / 100) / 21);
         }
 
         // Current day (0-based for calculation, return_rec_time is the day we're about to pay)
@@ -469,7 +469,7 @@ class CronController extends Controller
 
         if (!$currentSegment) {
             // Fallback if segment not found
-            return $invest->amount * ($invest->mon_interest_rate / 100);
+            return ($invest->amount * ($invest->mon_interest_rate / 100) / 21);
         }
 
         // Calculate daily interest rate for current segment
@@ -481,7 +481,7 @@ class CronController extends Controller
         // Apply interest based on type (percentage or fixed)
         if ($plan->interest_type == 1) {
             // Percentage-based interest
-            $dailyInterest = $invest->amount * ($segmentDailyRate / 100);
+            $dailyInterest = ($invest->amount * ($segmentDailyRate / 100) / 21);
         } else {
             // Fixed interest (divide by 21 to get daily amount)
             $dailyInterest = $segmentDailyRate / 21;
