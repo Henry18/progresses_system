@@ -16,7 +16,7 @@
                             <h5 class="alert-heading mb-2">
                                 <i class="las la-info-circle"></i> @lang('This plan is part of:') <strong>{{ __($plan->project->name) }}</strong>
                             </h5>
-                            <p class="mb-2">{{ __(strLimit($plan->project->description, 150)) }}</p>
+                            <p class="mb-2">{!! __(strLimit($plan->project->description, 150)) !!}</p>
                             <div class="d-flex gap-3 flex-wrap">
                                 <a href="{{ route('user.projects.show', $plan->project->id) }}" class="btn btn--sm btn--base">
                                     <i class="las la-eye"></i> @lang('View Project Details')

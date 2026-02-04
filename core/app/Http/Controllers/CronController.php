@@ -478,14 +478,7 @@ class CronController extends Controller
         $segmentMonthlyRate = $currentSegment['percentage'] / $currentSegment['months'];
         $segmentDailyRate = $segmentMonthlyRate / 21;
 
-        // Apply interest based on type (percentage or fixed)
-        if ($plan->interest_type == 1) {
-            // Percentage-based interest
-            $dailyInterest = ($invest->amount * ($segmentDailyRate / 100) / 21);
-        } else {
-            // Fixed interest (divide by 21 to get daily amount)
-            $dailyInterest = $segmentDailyRate / 21;
-        }
+        $dailyInterest = ($invest->amount * $segmentDailyRate);
 
         return $dailyInterest;
     }

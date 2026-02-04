@@ -11,7 +11,7 @@
                     </div>
                     <div class="col-md-9">
                         <h3 class="mb-3">{{ __($project->name) }}</h3>
-                        <p class="text-muted">{{ __($project->description) }}</p>
+                        <p class="text-muted">{!! __($project->description) !!}</p>
 
                         <div class="row mt-3">
                             <div class="col-md-3">
