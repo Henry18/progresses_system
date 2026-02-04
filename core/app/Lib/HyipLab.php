@@ -94,7 +94,7 @@ class HyipLab
         $next = self::nextWorkingDay($plan->days_to_init * 24);
         $shouldPay = -1;
         if ($period > 0) {
-            $shouldPay = $interestAmount * $period;
+            $shouldPay = $interestAmount + $amount;
         }
 
         $invest                     = new Invest();
