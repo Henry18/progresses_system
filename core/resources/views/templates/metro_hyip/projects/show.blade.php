@@ -68,7 +68,9 @@
                             <h4 class="mb-0">@lang('Project Description')</h4>
                         </div>
                         <div class="card-body">
-                            <p class="text-justify">{{ __($project->description) }}</p>
+                            <div class="project-description">
+                                @php echo $project->description @endphp
+                            </div>
                         </div>
                     </div>
 

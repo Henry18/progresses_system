@@ -125,7 +125,7 @@
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ __($project->name) }}</h5>
-                        <p class="card-text text-muted">{{ __(strLimit($project->description, 120)) }}</p>
+                        <p class="card-text text-muted">{!! strLimit($project->description, 120) !!}</p>
 
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">

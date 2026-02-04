@@ -39,9 +39,6 @@
                                             @if (auth()->user()->deposit_wallet > 0)
                                                 <option value="deposit_wallet">@lang('Deposit Wallet - ' . showAmount(auth()->user()->deposit_wallet))</option>
                                             @endif
-                                            @if (auth()->user()->interest_wallet > 0)
-                                                <option value="interest_wallet">@lang('Interest Wallet -' . showAmount(auth()->user()->interest_wallet))</option>
-                                            @endif
                                             @foreach ($gatewayCurrency as $data)
                                                 <option value="{{ $data->id }}" @selected(old('wallet_type') == $data->method_code) data-gateway="{{ $data }}">{{ $data->name }}</option>
                                             @endforeach
@@ -195,7 +192,7 @@
                     $('#projectTermsAccepted').prop('required', true);
 
                     if (plan.project && plan.project.pdf) {
-                        var pdfUrl = '{{ asset('') }}' + 'assets/projects/' + plan.project.pdf;
+                        var pdfUrl = '{{ asset('') }}' + 'assets/projects/files/' + plan.project.pdf;
                         $('#projectPdfLink').attr('href', pdfUrl);
                     } else {
                         $('#projectPdfLink').hide();

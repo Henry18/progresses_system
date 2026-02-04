@@ -34,7 +34,7 @@
                         </div>
                         <div class="plan-card__body">
                             <h3 class="plan-card__name">{{ __($project->name) }}</h3>
-                            <p class="plan-card__desc">{{ __(strLimit($project->description, 120)) }}</p>
+                            <p class="plan-card__desc">{!! strLimit($project->description, 120) !!}</p>
 
                             <div class="plan-card__range mb-3">
                                 <div class="d-flex justify-content-between align-items-center">

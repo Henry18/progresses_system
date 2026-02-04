@@ -18,7 +18,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label>@lang('Description')</label>
-                                    <textarea class="form-control" name="description" rows="6" required>{{ old('description') }}</textarea>
+                                    <textarea class="form-control nicEdit"  name="description" rows="6" required>{{ old('description') }}</textarea>
                                     <small class="text-muted">@lang('Describe the investment project, its goals, and expected returns.')</small>
                                 </div>
                             </div>
