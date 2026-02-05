@@ -73,12 +73,9 @@ class Email extends NotifyProcess implements Notifiable {
     }
 
     protected function sendPhpMail() {
-        if (!function_exists('mail')) {
-            throw new \Exception('PHP mail() function is not available. Please configure SMTP in admin panel.');
-        }
         $sentFromName  = $this->getEmailFrom()['name'];
         $sentFromEmail = $this->getEmailFrom()['email'];
-        $boundary = md5(time());
+        $boundary = \md5(\time());
         $headers       = "From: $sentFromName <$sentFromEmail> \r\n";
         $headers .= "Reply-To: $sentFromName <$sentFromEmail> \r\n";
         $headers .= "MIME-Version: 1.0\r\n";
@@ -89,7 +86,10 @@ class Email extends NotifyProcess implements Notifiable {
         $message .= "--$boundary\r\n";
         $message .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
         $message .= $this->finalMessage;
-        \mail($this->email, $this->subject, $message, $headers);
+        $result = \mail($this->email, $this->subject, $message, $headers);
+        if (!$result) {
+            throw new \Exception('PHP mail() failed to send email to: ' . $this->email);
+        }
     }
 
     protected function sendSmtpMail() {
