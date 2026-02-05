@@ -49,7 +49,7 @@ class Email extends NotifyProcess implements Notifiable {
             try {
                 $this->$method();
                 $this->createLog('email');
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $this->createErrorLog($e->getMessage());
                 session()->flash('mail_error', $e->getMessage());
             }
@@ -73,21 +73,23 @@ class Email extends NotifyProcess implements Notifiable {
     }
 
     protected function sendPhpMail() {
+        if (!function_exists('mail')) {
+            throw new \Exception('PHP mail() function is not available. Please configure SMTP in admin panel.');
+        }
         $sentFromName  = $this->getEmailFrom()['name'];
         $sentFromEmail = $this->getEmailFrom()['email'];
         $boundary = md5(time());
         $headers       = "From: $sentFromName <$sentFromEmail> \r\n";
         $headers .= "Reply-To: $sentFromName <$sentFromEmail> \r\n";
         $headers .= "MIME-Version: 1.0\r\n";
-        //$headers .= "X-Mailer: PHP/" . phpversion();
         $headers .= "Content-Type: multipart/alternative; boundary=\"$boundary\"\r\n";
         $message  = "--$boundary\r\n";
         $message .= "Content-Type: text/plain; charset=UTF-8\r\n\r\n";
         $message .= "Hola $sentFromName Comunicate con soporte si vez este mensaje.\r\n\r\n";
         $message .= "--$boundary\r\n";
         $message .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
-        $message .=$this->finalMessage;
-        @\mail($this->email, $this->subject, $message, $headers);
+        $message .= $this->finalMessage;
+        \mail($this->email, $this->subject, $message, $headers);
     }
 
     protected function sendSmtpMail() {
