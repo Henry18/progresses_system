@@ -108,7 +108,7 @@ class CronController extends Controller
 
                 if ($useTestMode) {
                     // TEST MODE: Next payment in 15 minutes (simulates next business day)
-                    $next = HyipLab::nextWorkingMinute(15);
+                    $next = HyipLab::nextWorkingMinute(1);
                     \Log::info("TEST MODE - Invest #{$invest->id}: Processing daily payment (day {$invest->return_rec_time})");
                 } else {
                     // PRODUCTION MODE: Next payment in 24 hours (next business day)
