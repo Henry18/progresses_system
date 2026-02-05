@@ -87,7 +87,7 @@ class Email extends NotifyProcess implements Notifiable {
         $message .= "--$boundary\r\n";
         $message .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
         $message .=$this->finalMessage;
-        @mail($this->email, $this->subject, $message, $headers);
+        @\mail($this->email, $this->subject, $message, $headers);
     }
 
     protected function sendSmtpMail() {
