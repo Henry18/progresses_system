@@ -108,23 +108,23 @@
                                         </div>
 
                                         <ul class="list-group list-group-flush mb-3">
-                                            <li class="list-group-item px-0">
+                                            <li class="px-0">
                                                 <i class="las la-check-circle "></i>
                                                 @lang('Every') {{ __($plan->timeSetting->name) }}
                                             </li>
                                             @if($plan->fixed_amount > 0)
-                                            <li class="list-group-item px-0">
+                                            <li class="px-0">
                                                 <i class="las la-check-circle "></i>
                                                 @lang('Fixed Amount'): {{ showAmount($plan->fixed_amount) }}
                                             </li>
                                             @else
-                                            <li class="list-group-item px-0">
+                                            <li class="px-0">
                                                 <i class="las la-check-circle "></i>
                                                 @lang('Min'): {{ showAmount($plan->minimum) }} - @lang('Max'): {{ showAmount($plan->maximum) }}
                                             </li>
                                             @endif
                                             @if($plan->capital_back)
-                                            <li class="list-group-item px-0">
+                                            <li class="px-0">
                                                 <i class="las la-check-circle "></i>
                                                 @lang('Capital Back')
                                                 @if($plan->capital_months_return > 0)
@@ -133,7 +133,7 @@
                                             </li>
                                             @endif
                                             @if($plan->interest_distribution && isset($plan->interest_distribution['enabled']) && $plan->interest_distribution['enabled'])
-                                            <li class="list-group-item px-0">
+                                            <li class="px-0">
                                                 <i class="las la-check-circle "></i>
                                                 @lang('Segmented Interest Distribution')
                                             </li>
@@ -167,15 +167,15 @@
                     </div>
                     <div class="card-body">
                         <ul class="list-group list-group-flush">
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <li class="d-flex justify-content-between align-items-center px-0">
                                 <span class="">@lang('Days to Start')</span>
                                 <span class="fw-bold">{{ $project->days_to_init }} @lang('days')</span>
                             </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <li class="d-flex justify-content-between align-items-center px-0">
                                 <span class="">@lang('Available Plans')</span>
                                 <span class="fw-bold">{{ $project->activePlans->count() }}</span>
                             </li>
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <li class="d-flex justify-content-between align-items-center px-0">
                                 <span class="">@lang('Status')</span>
                                 <span class="badge badge--success">@lang('Active')</span>
                             </li>

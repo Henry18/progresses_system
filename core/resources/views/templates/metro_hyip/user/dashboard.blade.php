@@ -1,681 +1,342 @@
-@extends($activeTemplate . 'layouts.master') @section('content') @php $kyc = getContent('kyc.content', true); @endphp
-<section class="mt-3 mb-60">
-  <div class="notice"></div>
-  @if ($user->profile_complete==0)
-  <div class="alert border border--danger" role="alert">
-    <div class="alert__icon d-flex align-items-center text--danger"><i class="fas fa-bell"></i></div>
-    <p class="alert__message">
-      <span class="fw-bold">@lang('Debes Terminar de completar tu perfil')</span><br>
-      <small>@lang('puedes completar tu perfil') <a href="user-data" class="text--base-two">aqui</a></small>
-    </p>
-  </div>
-  @endif
-  @if ($user->kv == Status::KYC_UNVERIFIED && $user->kyc_rejection_reason)
-  <div class="alert border border--danger" role="alert">
-    <div class="alert__icon d-flex align-items-center text--danger"><i class="fas fa-times-circle"></i>
-    </div>
-    <p class="alert__message">
-      <span class="fw-bold">@lang('KYC Documents Rejected')</span><br>
-      <small>
-        {{ __(@$kyc->data_values->reject) }}
-        <a href="javascript::void(0)" class="text--base-two" data-bs-toggle="modal"
-          data-bs-target="#kycRejectionReason">@lang('Click here')</a> @lang('to show the reason').
+@extends($activeTemplate . 'layouts.master')
+@section('content')
+@php $kyc = getContent('kyc.content', true); @endphp
 
-        <a href="{{ route('user.kyc.form') }}" class="text--base-two">@lang('Click Here')</a> @lang('to Re-submit
-        Documents').
-        <a href="{{ route('user.kyc.data') }}" class="text--base-two">@lang('See KYC Data')</a>
-      </small>
-    </p>
-  </div>
-  @elseif($user->kv == Status::KYC_UNVERIFIED)
-  <div class="alert border border--info" role="alert">
-    <div class="alert__icon d-flex align-items-center text--info"><i class="fas fa-exclamation-circle"></i>
-    </div>
-    <p class="alert__message">
-      <span class="fw-bold">@lang('KYC Verification Required')</span><br>
-      <small>{{ __(@$kyc->data_values->required) }} <a href="{{ route('user.kyc.form') }}"
-          class="text--base-two">@lang('Click Here to Submit Documents')</a>
-      </small>
-    </p>
-  </div>
-  @elseif($user->kv == Status::KYC_PENDING)
-  <div class="alert border border--warning" role="alert">
-    <div class="alert__icon d-flex align-items-center text--warning"><i class="las la-hourglass-half"></i>
-    </div>
-    <p class="alert__message">
-      <span class="fw-bold">@lang('KYC Verification Pending')</span><br>
-      <small>{{ __(@$kyc->data_values->pending) }} <a href="{{ route('user.kyc.data') }}"
-          class="text--base-two">@lang('See KYC Data')</a>
-      </small>
-    </p>
-  </div>
-  @endif
+<div class="prgr-dashboard">
 
-  <div class="row justify-content-center mb-3">
-    <div class="col-md-12">
+    {{-- Page header --}}
+    <div class="prgr-page-header">
+        <div class="prgr-page-header__left">
+            <h1 class="prgr-page-header__title">@lang('Panel de Control')</h1>
+            <p class="prgr-page-header__subtitle">
+                @lang('Bienvenido de nuevo'),
+                <a href="{{ route('user.profile.setting') }}">{{ auth()->user()->fullname }}</a>.
+                @lang('Aquí tienes el resumen de tus participaciones.')
+            </p>
+        </div>
+        <div class="prgr-page-header__actions">
+            <a href="{{ route('user.invest.log') }}" class="prgr-btn prgr-btn--outline">
+                <i class="las la-download"></i> @lang('Exportar Reporte')
+            </a>
+            <a href="{{ route('plan') }}" class="prgr-btn prgr-btn--primary">
+                <i class="las la-plus"></i> @lang('Nueva Inversión')
+            </a>
+        </div>
+    </div>
 
-      @if ($user->deposit_wallet
-      <=0 && $user->interest_wallet
-        <=0 ) <div class="alert border border--danger" role="alert">
-          <div class="alert__icon d-flex align-items-center text--danger"><i class="fas fa-exclamation-triangle"></i>
-          </div>
-          <p class="alert__message">
-            <span class="fw-bold">@lang('Empty Balance')</span><br>
-            <small>
-              @lang('Your balance is empty. Please make')
-              <a class="text--base-two" href="{{ route('user.deposit.index') }}" class="link-color">@lang('deposit')</a>
-              @lang('for your next investment.')
-            </small>
-          </p>
-    </div>
-    @endif @if ($user->deposits->where('status', 1)->count() == 1 && !$user->invests->count())
-    <div class="alert border border--success" role="alert">
-      <div class="alert__icon d-flex align-items-center text--success"><i class="fas fa-check"></i>
-      </div>
-      <p class="alert__message">
-        <span class="fw-bold">@lang('First Deposit')</span><br>
-        <small>
-          <span class="fw-bold">@lang('Congratulations!')</span> @lang('You\'ve made your first deposit successfully. Go
-          to')
-          <a href="{{ route('plan') }}" class="text--base-two">@lang('investment plan')</a>
-          @lang('page and invest now')
-        </small>
-      </p>
-    </div>
-    @endif @if ($pendingWithdrawals)
-    <div class="alert border border--primary" role="alert">
-      <div class="alert__icon d-flex align-items-center text--primary"><i class="fas fa-spinner"></i>
-      </div>
-      <p class="alert__message">
-        <span class="fw-bold">@lang('Withdrawal Pending')</span><br>
-        <small>
-          @lang('Total') {{ showAmount($pendingWithdrawals) }} @lang('withdrawal request is pending. Please wait for
-          admin approval. The amount will send to the account which you\'ve provided. See') <a class="text--base-two"
-            href="{{ route('user.withdraw.history') }}" class="link-color">@lang('withdrawal history')</a>
-        </small>
-      </p>
-    </div>
-    @endif @if ($pendingDeposits)
-    <div class="alert border border--primary" role="alert">
-      <div class="alert__icon d-flex align-items-center text--primary"><i class="fas fa-spinner"></i>
-      </div>
-      <p class="alert__message">
-        <span class="fw-bold">@lang('Deposit Pending')</span><br>
-        <small>
-          @lang('Total') {{ showAmount($pendingDeposits) }}
-          @lang('deposit request is pending. Please wait for admin approval. See') <a class="text--base-two"
-            href="{{ route('user.deposit.history') }}">@lang('deposit history')</a>
-        </small>
-      </p>
-    </div>
-    @endif @if (!$user->ts)
-    <div class="alert border border--warning" role="alert">
-      <div class="alert__icon d-flex align-items-center text--warning"><i class="fas fa-user-lock"></i>
-      </div>
-      <p class="alert__message">
-        <span class="fw-bold">@lang('2FA Authentication')</span><br>
-        <small>
-          @lang('To keep safe your account, Please enable') <a href="{{ route('user.twofactor') }}"
-            class="text--base-two">@lang('2FA')</a> @lang('security').
-          @lang('It will make secure your account and balance.')
-        </small>
-      </p>
-    </div>
-    @endif @if ($isHoliday)
+    {{-- Alert banners --}}
+    <div class="prgr-alerts">
 
-    <div class="alert border border--info" role="alert">
-      <div class="alert__icon d-flex align-items-center text--info"><i class="fas fa-toggle-off"></i>
-      </div>
-      <p class="alert__message">
-        <span class="fw-bold">@lang('Holiday')</span><br>
-        <small>@lang('Today is holiday on this system. You\'ll not get any interest today from this system. Also you\'re
-          unable to make withdrawal request today.') <br> @lang('The next working day is coming after') <span
-            id="counter" class="fw-bold text--violet fs--15px"></span></small>
-      </p>
+        @if($user->profile_complete == 0)
+        <div class="prgr-alert prgr-alert--warning">
+            <div class="prgr-alert__icon"><i class="las la-user-edit"></i></div>
+            <div class="prgr-alert__body">
+                <strong>@lang('Perfil incompleto')</strong>
+                <span>@lang('Completa tu perfil para acceder a todas las funciones.')</span>
+            </div>
+            <a href="{{ route('user.profile.setting') }}" class="prgr-alert__action">@lang('COMPLETAR')</a>
+        </div>
+        @endif
+
+        @if($user->kv == Status::KYC_UNVERIFIED && $user->kyc_rejection_reason)
+        <div class="prgr-alert prgr-alert--danger">
+            <div class="prgr-alert__icon"><i class="las la-times-circle"></i></div>
+            <div class="prgr-alert__body">
+                <strong>@lang('KYC Rechazado')</strong>
+                <span>{{ __(@$kyc->data_values->reject) }}</span>
+            </div>
+            <a href="{{ route('user.kyc.form') }}" class="prgr-alert__action">@lang('REENVIAR')</a>
+        </div>
+        @elseif($user->kv == Status::KYC_UNVERIFIED)
+        <div class="prgr-alert prgr-alert--info">
+            <div class="prgr-alert__icon"><i class="las la-id-card"></i></div>
+            <div class="prgr-alert__body">
+                <strong>@lang('Verificación KYC requerida')</strong>
+                <span>{{ __(@$kyc->data_values->required) }}</span>
+            </div>
+            <a href="{{ route('user.kyc.form') }}" class="prgr-alert__action">@lang('VERIFICAR')</a>
+        </div>
+        @elseif($user->kv == Status::KYC_PENDING)
+        <div class="prgr-alert prgr-alert--warning">
+            <div class="prgr-alert__icon"><i class="las la-hourglass-half"></i></div>
+            <div class="prgr-alert__body">
+                <strong>@lang('KYC en revisión')</strong>
+                <span>{{ __(@$kyc->data_values->pending) }}</span>
+            </div>
+            <a href="{{ route('user.kyc.data') }}" class="prgr-alert__action">@lang('VER DATOS')</a>
+        </div>
+        @endif
+
+        @if(!$user->ts)
+        <div class="prgr-alert prgr-alert--warning">
+            <div class="prgr-alert__icon"><i class="las la-bell"></i></div>
+            <div class="prgr-alert__body">
+                <strong>@lang('Notificaciones del Navegador')</strong>
+                <span>@lang('Por favor, permite las notificaciones para recibir actualizaciones en tiempo real sobre tus depósitos.')</span>
+            </div>
+            <a href="{{ route('user.twofactor') }}" class="prgr-alert__action">@lang('CONFIGURAR')</a>
+        </div>
+        @endif
+
+        @if($pendingDeposits)
+        <div class="prgr-alert prgr-alert--info">
+            <div class="prgr-alert__icon"><i class="las la-clock"></i></div>
+            <div class="prgr-alert__body">
+                <strong>@lang('Depósito Pendiente')</strong>
+                <span>@lang('Tu solicitud de') {{ showAmount($pendingDeposits) }} @lang('está siendo procesada por el administrador.')</span>
+            </div>
+            <a href="{{ route('user.deposit.history') }}" class="prgr-alert__action">@lang('VER HISTORIAL')</a>
+        </div>
+        @endif
+
+        @if($pendingWithdrawals)
+        <div class="prgr-alert prgr-alert--info">
+            <div class="prgr-alert__icon"><i class="las la-hourglass-half"></i></div>
+            <div class="prgr-alert__body">
+                <strong>@lang('Retiro Pendiente')</strong>
+                <span>@lang('Total') {{ showAmount($pendingWithdrawals) }} @lang('en proceso de aprobación.')</span>
+            </div>
+            <a href="{{ route('user.withdraw.history') }}" class="prgr-alert__action">@lang('VER HISTORIAL')</a>
+        </div>
+        @endif
+
+        @if($isHoliday)
+        <div class="prgr-alert prgr-alert--warning">
+            <div class="prgr-alert__icon"><i class="las la-calendar-times"></i></div>
+            <div class="prgr-alert__body">
+                <strong>@lang('Día Festivo')</strong>
+                <span>@lang('Hoy no se generan intereses. Próximo día hábil en:') <span id="counter" class="fw-bold ms-1"></span></span>
+            </div>
+        </div>
+        @endif
+
+    </div>
+
+    {{-- Stats grid --}}
+    <div class="prgr-stats-grid">
+
+        <div class="prgr-stat-card">
+            <div class="prgr-stat-card__icon prgr-stat-card__icon--blue">
+                <i class="las la-chart-line"></i>
+            </div>
+            <span class="prgr-stat-card__label">@lang('Inversión Activa')</span>
+            <h2 class="prgr-stat-card__amount">{{ showAmount($runningInvests) }}</h2>
+            <span class="prgr-stat-card__trend prgr-stat-card__trend--up">
+                <i class="las la-arrow-up"></i> @lang('vs mes anterior')
+            </span>
+        </div>
+
+        <div class="prgr-stat-card">
+            <div class="prgr-stat-card__icon prgr-stat-card__icon--green">
+                <i class="las la-wallet"></i>
+            </div>
+            <span class="prgr-stat-card__label">@lang('Ganancia Disponible')</span>
+            <h2 class="prgr-stat-card__amount">{{ showAmount(auth()->user()->interest_wallet) }}</h2>
+            <span class="prgr-stat-card__trend prgr-stat-card__trend--up">
+                <i class="las la-arrow-up"></i> @lang('vs mes anterior')
+            </span>
+        </div>
+
+        <div class="prgr-stat-card">
+            <div class="prgr-stat-card__icon prgr-stat-card__icon--purple">
+                <i class="las la-gift"></i>
+            </div>
+            <span class="prgr-stat-card__label">@lang('Bonos Disponibles')</span>
+            <h2 class="prgr-stat-card__amount">{{ showAmount($bonusWalletInvests) }}</h2>
+            <span class="prgr-stat-card__trend prgr-stat-card__trend--neutral">
+                <i class="las la-minus"></i> @lang('vs mes anterior')
+            </span>
+        </div>
+
+        <div class="prgr-stat-card">
+            <div class="prgr-stat-card__icon prgr-stat-card__icon--amber">
+                <i class="las la-history"></i>
+            </div>
+            <span class="prgr-stat-card__label">@lang('Devolución de Capital')</span>
+            <h2 class="prgr-stat-card__amount">{{ showAmount($fractionalCapital) }}</h2>
+            <span class="prgr-stat-card__trend prgr-stat-card__trend--up">
+                <i class="las la-arrow-up"></i> @lang('vs mes anterior')
+            </span>
+        </div>
+
+        <div class="prgr-stat-card">
+            <div class="prgr-stat-card__icon prgr-stat-card__icon--teal">
+                <i class="las la-university"></i>
+            </div>
+            <span class="prgr-stat-card__label">@lang('Retiro Total Ganancias')</span>
+            <h2 class="prgr-stat-card__amount">{{ showAmount($successfulWithdrawals) }}</h2>
+            <span class="prgr-stat-card__trend prgr-stat-card__trend--up">
+                <i class="las la-arrow-up"></i> @lang('vs mes anterior')
+            </span>
+        </div>
+
+        <div class="prgr-stat-card">
+            <div class="prgr-stat-card__icon prgr-stat-card__icon--rose">
+                <i class="las la-star"></i>
+            </div>
+            <span class="prgr-stat-card__label">@lang('Retiro Total Bonos')</span>
+            <h2 class="prgr-stat-card__amount">{{ showAmount($successfulWithdrawalsBonus) }}</h2>
+            <span class="prgr-stat-card__trend prgr-stat-card__trend--neutral">
+                <i class="las la-minus"></i> @lang('vs mes anterior')
+            </span>
+        </div>
+
+    </div>
+
+    {{-- Investment progress & transactions --}}
+    <div class="prgr-two-col">
+
+        <div class="prgr-card">
+            <div class="prgr-card__header">
+                <h5 class="prgr-card__title">@lang('Progreso de Inversión')</h5>
+            </div>
+            <div class="prgr-card__body">
+                @php
+                    $completedPercent = $totalInvest ? ($completedInvests / $totalInvest) * 100 : 0;
+                    $runningPercent   = $totalInvest ? ($runningInvests / $totalInvest) * 100 : 0;
+                @endphp
+                <div class="prgr-progress-item">
+                    <div class="prgr-progress-item__header">
+                        <span>@lang('Inversión Total')</span>
+                        <span>{{ showAmount($totalInvest) }}</span>
+                    </div>
+                    <div class="prgr-progress-bar"><div class="prgr-progress-bar__fill" style="width:100%"></div></div>
+                </div>
+                <div class="prgr-progress-item">
+                    <div class="prgr-progress-item__header">
+                        <span>@lang('Completada')</span>
+                        <span>{{ showAmount($completedPercent, currencyFormat:false) }}% · {{ showAmount($completedInvests) }}</span>
+                    </div>
+                    <div class="prgr-progress-bar"><div class="prgr-progress-bar__fill prgr-progress-bar__fill--green" style="width:{{ $completedPercent }}%"></div></div>
+                </div>
+                <div class="prgr-progress-item">
+                    <div class="prgr-progress-item__header">
+                        <span>@lang('En curso')</span>
+                        <span>{{ showAmount($runningPercent, currencyFormat:false) }}% · {{ showAmount($runningInvests) }}</span>
+                    </div>
+                    <div class="prgr-progress-bar"><div class="prgr-progress-bar__fill prgr-progress-bar__fill--blue" style="width:{{ $runningPercent }}%"></div></div>
+                </div>
+                @php
+                    $investPaidHistory = $user?->invests->where('status', 1);
+                    $shouldPay = 0; $paid = 0;
+                    foreach ($investPaidHistory as $v) { $shouldPay += $v->should_pay; $paid += $v->paid; }
+                    $total2 = $shouldPay + $paid;
+                    $paidPercent = $total2 > 0 ? ($paid / $total2) * 100 : 0;
+                @endphp
+                <div class="prgr-progress-item" style="margin-top:1rem;padding-top:1rem;border-top:1px solid #f1f5f9">
+                    <div class="prgr-progress-item__header">
+                        <span>@lang('Ganancias Pagadas')</span>
+                        <span>{{ showAmount($paidPercent, currencyFormat:false) }}% · {{ showAmount($paid) }}</span>
+                    </div>
+                    <div class="prgr-progress-bar"><div class="prgr-progress-bar__fill prgr-progress-bar__fill--amber" style="width:{{ $paidPercent }}%"></div></div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">@lang('Pendiente') {{ showAmount($shouldPay) }}</small>
+                        <small class="text-muted">@lang('Total') {{ showAmount($total2) }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="prgr-card">
+            <div class="prgr-card__header">
+                <h5 class="prgr-card__title">@lang('Últimas Transacciones')</h5>
+                <a href="{{ route('user.transactions') }}" class="prgr-card__header-link">@lang('Ver todas') <i class="las la-arrow-right"></i></a>
+            </div>
+            <div class="prgr-card__body prgr-card__body--flush">
+                @forelse($transactions as $trx)
+                <div class="prgr-trx-row">
+                    <div class="prgr-trx-row__icon {{ $trx->trx_type == '+' ? 'prgr-trx-row__icon--in' : 'prgr-trx-row__icon--out' }}">
+                        <i class="las {{ $trx->trx_type == '+' ? 'la-arrow-down' : 'la-arrow-up' }}"></i>
+                    </div>
+                    <div class="prgr-trx-row__info">
+                        <span class="prgr-trx-row__detail">{{ Str::limit($trx->details, 35) }}</span>
+                        <span class="prgr-trx-row__date">{{ showDatetime($trx->created_at, 'd/m/Y') }}</span>
+                    </div>
+                    <div class="prgr-trx-row__amount {{ $trx->trx_type == '+' ? 'prgr-trx-row__amount--in' : 'prgr-trx-row__amount--out' }}">
+                        {{ $trx->trx_type }}{{ showAmount($trx->amount) }}
+                    </div>
+                </div>
+                @empty
+                <div class="prgr-empty">
+                    <i class="las la-receipt"></i>
+                    <span>@lang('Sin transacciones recientes')</span>
+                </div>
+                @endforelse
+            </div>
+        </div>
+
+    </div>
+
+    {{-- Featured projects --}}
+    @if(isset($featuredProjects) && $featuredProjects->count() > 0)
+    <div class="prgr-card mt-4">
+        <div class="prgr-card__header">
+            <h5 class="prgr-card__title">@lang('Proyectos Destacados')</h5>
+            <a href="{{ route('projects.index') }}" class="prgr-card__header-link">@lang('Ver todos') <i class="las la-arrow-right"></i></a>
+        </div>
+        <div class="prgr-card__body">
+            <div class="row g-3">
+                @foreach($featuredProjects as $project)
+                <div class="col-lg-4 col-md-6">
+                    <div class="prgr-project-card">
+                        <img src="{{ getImage(getFilePath('projectImage') . '/' . $project->image, getFileSize('projectImage')) }}"
+                             alt="{{ __($project->name) }}" class="prgr-project-card__img">
+                        <div class="prgr-project-card__body">
+                            <h6 class="prgr-project-card__name">{{ __($project->name) }}</h6>
+                            <div class="prgr-project-card__meta">
+                                <span>{{ showAmount($project->minimum_investment) }} – {{ showAmount($project->maximum_investment) }}</span>
+                                <span class="prgr-badge prgr-badge--blue">{{ $project->active_plans_count }} @lang('planes')</span>
+                            </div>
+                            <a href="{{ route('projects.show', $project->id) }}" class="prgr-btn prgr-btn--primary prgr-btn--sm w-100 mt-2">
+                                @lang('Ver Proyecto') <i class="las la-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
     </div>
     @endif
 
-  </div>
-  </div>
-  <div class="row gy-4 justify-content-center">
-    <div class="col-xxl-4 col-xl-4 col-sm-6">
-      <div class="dashboard-card">
-        <div class="dashboard-card__shape"></div>
-        <div class="dashboard-card__header">
-          <span class="dashboard-card__header-icon style-one">
-            <i class="fas fa-funnel-dollar"></i>
-          </span>
-          <div class="dashboard-card__header-content">
-            <h6 class="dashboard-card__header-title"> @lang('Running') </h6>
-            <span class="dashboard-card__header-currency"> {{ showAmount($runningInvests) }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xxl-4 col-xl-4 col-sm-6">
-      <div class="dashboard-card">
-        <div class="dashboard-card__shape"></div>
-        <div class="dashboard-card__header">
-          <span class="dashboard-card__header-icon style-three">
-            <i class="fas fa-funnel-dollar"></i>
-          </span>
-          <div class="dashboard-card__header-content">
-            <h6 class="dashboard-card__header-title"> @lang('Ganancia Disponible') </h6>
-            <span class="dashboard-card__header-currency"> {{ showAmount(auth()->user()->interest_wallet) }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xxl-4 col-xl-4 col-sm-6">
-      <div class="dashboard-card">
-        <div class="dashboard-card__shape"></div>
-        <div class="dashboard-card__header">
-          <span class="dashboard-card__header-icon style-five">
-            <i class="fa-solid fa-sack-dollar"></i>
-          </span>
-          <div class="dashboard-card__header-content">
-            <h6 class="dashboard-card__header-title"> @lang('Bonos Disponibles') </h6>
-            <span class="dashboard-card__header-currency"> {{ showAmount($bonusWalletInvests) }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xxl-4 col-xl-4 col-sm-6">
-      <div class="dashboard-card">
-        <div class="dashboard-card__shape"></div>
-        <div class="dashboard-card__header">
-          <span class="dashboard-card__header-icon style-four">
-            <i class="fas fa-wallet"></i>
-          </span>
-          <div class="dashboard-card__header-content">
-            <h6 class="dashboard-card__header-title"> @lang('Devolucion de capital') </h6>
-            <span class="dashboard-card__header-currency"> {{ showAmount($fractionalCapital) }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xxl-4 col-xl-4 col-sm-6">
-      <div class="dashboard-card">
-        <div class="dashboard-card__shape"></div>
-        <div class="dashboard-card__header">
-          <span class="dashboard-card__header-icon style-two">
-            <i class="fas fa-coins"></i>
-          </span>
-          <div class="dashboard-card__header-content">
-            <h6 class="dashboard-card__header-title"> @lang('Retiro total de ganancias') </h6>
-            <span class="dashboard-card__header-currency"> {{ showAmount($successfulWithdrawals) }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-xxl-4 col-xl-4 col-sm-6">
-      <div class="dashboard-card">
-        <div class="dashboard-card__shape"></div>
-        <div class="dashboard-card__header">
-          <span class="dashboard-card__header-icon">
-            <i class="fas fa-coins"></i>
-          </span>
-          <div class="dashboard-card__header-content">
-            <h6 class="dashboard-card__header-title"> @lang('Retiro total de bonos') </h6>
-            <span class="dashboard-card__header-currency"> {{ showAmount($successfulWithdrawalsBonus) }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!--div class="col-xxl-6 col-xl-6 col-sm-6">
-			<div class="dashboard-card">
-				<div class="dashboard-card__shape"></div>
-				<div class="dashboard-card__header">
-					<span class="dashboard-card__header-icon">
-                            <i class="fas fa-funnel-dollar"></i>
-                        </span>
-					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> @lang('Total Investments') </h6>
-						<span class="dashboard-card__header-currency"> {{ showAmount($invests) }}
-                            </span>
-					</div>
-				</div>
-				<div class="dashboard-card__item">
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Completed') </span>
-						<h4 class="dashboard-card__amount">
-                                {{ showAmount($completedInvests) }} </h4>
-					</div>
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Running') </span>
-						<h4 class="dashboard-card__amount"> {{ showAmount($runningInvests) }}
-                            </h4>
-					</div>
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Interests') </span>
-						<h4 class="dashboard-card__amount"> {{ showAmount($interests) }} </h4>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xxl-6 col-xl-6 col-sm-6">
-			<div class="dashboard-card">
-				<div class="dashboard-card__shape"></div>
-				<div class="dashboard-card__header">
-					<span class="dashboard-card__header-icon style-two">
-                            <i class="fas fa-coins"></i>
-                        </span>
-					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> @lang('Total Withdraw') </h6>
-						<span class="dashboard-card__header-currency"> {{ showAmount($successfulWithdrawals) }}
-                            </span>
-					</div>
-				</div>
-				<div class="dashboard-card__item">
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Submitted') </span>
-						<h4 class="dashboard-card__amount">
-                                {{ showAmount($submittedWithdrawals) }} </h4>
-					</div>
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Pending') </span>
-						<h4 class="dashboard-card__amount">
-                                {{ showAmount($pendingWithdrawals) }} </h4>
-					</div>
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Rejected') </span>
-						<h4 class="dashboard-card__amount">
-                                {{ showAmount($rejectedWithdrawals) }} </h4>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="col-xxl-6 col-xl-6 col-sm-6">
-			<div class="dashboard-card">
-				<div class="dashboard-card__shape"></div>
-				<div class="dashboard-card__header">
-					<span class="dashboard-card__header-icon style-four">
-                            <i class="fas fa-wallet"></i>
-                        </span>
-					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> @lang('Total Deposit') </h6>
-						<span class="dashboard-card__header-currency"> {{ showAmount($successfulDeposits) }}
-                            </span>
-					</div>
-				</div>
-				<div class="dashboard-card__item">
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Submitted') </span>
-						<h4 class="dashboard-card__amount">
-                                {{ showAmount($submittedDeposits) }} </h4>
-					</div>
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Pending') </span>
-						<h4 class="dashboard-card__amount"> {{ showAmount($pendingDeposits) }}
-                            </h4>
-					</div>
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Rejected') </span>
-						<h4 class="dashboard-card__amount">
-                                {{ showAmount($rejectedDeposits) }} </h4>
-					</div>
-				</div>
-			</div>
-		</div>
+</div>
 
-        <div class="col-xxl-6 col-xl-6 col-sm-6">
-			<div class="dashboard-card">
-				<div class="dashboard-card__shape"></div>
-				<div class="dashboard-card__header">
-					<span class="dashboard-card__header-icon  style-five">
-                            <i class="fa-solid fa-sack-dollar"></i>
-                        </span>
-					<div class="dashboard-card__header-content">
-						<h6 class="dashboard-card__header-title"> @lang('Bonus')</h6>
-						<span class="dashboard-card__header-currency"> {{ showAmount($referralEarnings) }}
-                            </span>
-					</div>
-				</div>
-				<div class="dashboard-card__item">
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Referral') </span>
-						<h4 class="dashboard-card__amount">
-                        {{ showAmount($referralEarnings) }}</h4>
-					</div>
-                    <div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Ranking') </span>
-						<h4 class="dashboard-card__amount">
-                        {{ showAmount($referralEarnings) }}</h4>
-					</div>
-					<div class="dashboard-card__content">
-						<span class="dashboard-card__text"> @lang('Sellers') </span>
-						<h4 class="dashboard-card__amount">
-                        {{ showAmount($referralEarnings) }}</h4>
-					</div>
-				</div>
-			</div>
-		</div-->
-
-  </div>
-  <div class="mt-4">
-    <div class="accordion" id="miAcordeon">
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingOne">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-            @lang('My Investment Progress')
-          </button>
-        </h2>
-        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
-          data-bs-parent="#miAcordeon">
-          <div class="accordion-body">
-            <div class="row gy-4 pt-4 justify-content-center">
-              <div class="col-xxl-6 col-xl-6 col-md-6">
-                <div class="dashboard-item">
-                  <h5 class="dashboard-item__title">
-                    @lang('My Investment Progress')
-                  </h5> @php $completedPercent = $totalInvest ? ($completedInvests / $totalInvest) * 100 : 0;
-                  $runningPercent = $totalInvest ? ($runningInvests / $totalInvest) * 100 : 0; @endphp
-                  <div class="progress-wrapper mb-70">
-                    <div class="progress-basic">
-                      <div class="mb-3">
-                        <div class="investment-wrapper">
-                          <div class="d-flex align-items-center">
-                            <span class="investment-wrapper__icon">
-                              <i class="fas fa-funnel-dollar"></i>
-                            </span>
-                            <div class="investment-wrapper__rate">
-                              <h6 class="investment-wrapper__title">
-                                @lang('Total Investment')
-                              </h6>
-                              <span class="investment-wrapper__interest"> 100% @lang('investment is')
-                                {{ showAmount($totalInvest) }} </span>
-                            </div>
-                          </div>
-
-                        </div>
-                        <div class="progress mb-2">
-                          <div class="progress-bar progress-basic-1" data-wow-duration="1s"
-                            style="width: {{ $totalInvest }}%;" data-wow-delay="0.5s" role="progressbar"
-                            aria-valuenow="{{ $totalInvest }}" aria-valuemin="0" aria-valuemax="100">
-                          </div>
-                        </div>
-                      </div>
-                      <div class="mb-3">
-                        <div class="investment-wrapper">
-                          <div class="d-flex align-items-center">
-                            <span class="investment-wrapper__icon style-two">
-                              <i class="fas fa-funnel-dollar"></i>
-                            </span>
-                            <div class="investment-wrapper__rate">
-                              <h6 class="investment-wrapper__title">
-                                @lang('Complete Investment')
-                              </h6>
-                              <span class="investment-wrapper__interest">
-                                {{ showAmount($completedPercent, currencyFormat: false) }}% @lang('of')
-                                {{ showAmount($completedInvests) }}</span>
-                            </div>
-                          </div>
-
-                        </div>
-                        <div class="progress mb-2">
-                          <div class="progress-bar progress-basic-2" data-wow-duration="1s"
-                            style="width: {{ $completedPercent }}%;" data-wow-delay="0.5s" role="progressbar"
-                            aria-valuenow="1" aria-valuemin="0" aria-valuemax="100">
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        <div class="investment-wrapper">
-                          <div class="d-flex align-items-center">
-                            <span class="investment-wrapper__icon style-three">
-                              <i class="fas fa-funnel-dollar"></i>
-                            </span>
-                            <div class="investment-wrapper__rate">
-                              <h6 class="investment-wrapper__title">
-                                @lang('Running Investment')
-                              </h6>
-                              <span class="investment-wrapper__interest">
-                                {{ showAmount($runningPercent, currencyFormat: false) }}%
-                                @lang('of') {{ showAmount($runningInvests) }}
-                              </span>
-                            </div>
-                          </div>
-
-                        </div>
-
-                        <div class="progress mb-2">
-                          <div class="progress-bar progress-basic-3" data-wow-duration="1s"
-                            style="width: {{ $runningPercent }}%;" data-wow-delay="0.5s" role="progressbar"
-                            aria-valuenow="{{ $runningPercent }}" aria-valuemin="0" aria-valuemax="100">
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xxl-6 col-xl-6 col-md-6">
-                <div class="dashboard-item">
-                  <h4 class="dashboard-item__title"> @lang('Profit Paying History')</h4> @php $investPaidHistory =
-                  $user?->invests->where('status', 1); $shouldPay = 0; $paid = 0; foreach ($investPaidHistory as $value)
-                  { $shouldPay += $value->should_pay; $paid += $value->paid; } $total = $shouldPay + $paid; $paidPercent
-                  = $total > 0 ? ($paid / $total) * 100 : 0; @endphp
-                  <div class="dashboard-item__pay">
-                    <span class="dashboard-item__investment-title">@lang('Should Pay')</span>
-                    <h6 class="dashboard-item__pay-number">{{ showAmount($shouldPay) }}</h6>
-                  </div>
-                  <div class="d-flex justify-content-between mb-2">
-                    <span class="price"> @lang('Paid') ({{ showAmount($paidPercent, currencyFormat: false) }}%) /
-                      {{ showAmount($paid) }}</span>
-                    <span class="price"> {{ showAmount($total) }} </span>
-                  </div>
-                  <div class="progress-basic">
-                    <div class="progress mb-3">
-                      <div class="progress-bar progress-basic-1" data-wow-duration="1s"
-                        style="width: {{ $paidPercent }}%" data-wow-delay="0.5s" role="progressbar" aria-valuenow="10"
-                        aria-valuemin="0" aria-valuemax="100">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="dashboard-item__pay">
-                    <span class="dashboard-item__investment-title">@lang('Return fractional capital')</span>
-                    <h6 class="dashboard-item__pay-number">{{ showAmount($fractionalCapital) }}</h6>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="mt-4">
-    <div class="accordion" id="miAcordeon">
-      <div class="accordion-item">
-        <h2 class="accordion-header" id="headingTwo">
-          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-            @lang('Transactions')
-          </button>
-        </h2>
-        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-          data-bs-parent="#miAcordeon">
-          <div class="accordion-body">
-            <div class="pt-4 table-section">
-              <h4>@lang('My Latest Transactions')</h4>
-              <div class="row gy-4">
-                <div class="col-lg-12">
-                  <table class="table style-two table--responsive--lg">
-                    <thead>
-                      <tr>
-                        <th>@lang('Date')</th>
-                        <th>@lang('Transaction ID')</th>
-                        <th>@lang('Amount')</th>
-                        <th>@lang('Wallet')</th>
-                        <th>@lang('Details')</th>
-                        <th>@lang('Post Balance')</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @forelse($transactions as $trx)
-                      <tr>
-                        <td>
-                          {{ showDatetime($trx->created_at, 'd/m/Y') }}
-                        </td>
-                        <td><span class="text-primary">{{ $trx->trx }}</span></td>
-
-                        <td>
-                          @if ($trx->trx_type == '+')
-                          <span class="text--success">+
-                            {{ showAmount($trx->amount) }}</span> @else
-                          <span class="text--danger">-
-                            {{ showAmount($trx->amount) }}</span> @endif
-                        </td>
-                        <td>
-                          @if ($trx->wallet_type == 'deposit_wallet')
-                          <span class="badge badge--info">@lang('Deposit Wallet')</span> @else
-                          <span class="badge badge--warning">@lang('Interest Wallet')</span> @endif
-                        </td>
-                        <td>{{ $trx->details }}</td>
-                        <td><span>{{ showAmount($trx->post_balance) }}</span>
-                        </td>
-                      </tr>
-                      @empty
-                      <tr>
-                        <td colspan="100%" class="text-center">
-                          {{ __('No Transaction Found') }}</td>
-                      </tr>
-                      @endforelse
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-</section>
-
-@if ($user->kv == Status::KYC_UNVERIFIED && $user->kyc_rejection_reason)
+@if($user->kv == Status::KYC_UNVERIFIED && $user->kyc_rejection_reason)
 <div class="modal fade" id="kycRejectionReason">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">@lang('KYC Document Rejection Reason')</h5>
-        <button type="button" class="close" data-bs-dismiss="modal">
-          <i class="las la-times"></i>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>{{ $user->kyc_rejection_reason }}</p>
-      </div>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@lang('KYC Document Rejection Reason')</h5>
+                <button type="button" class="close" data-bs-dismiss="modal"><i class="las la-times"></i></button>
+            </div>
+            <div class="modal-body"><p>{{ $user->kyc_rejection_reason }}</p></div>
+        </div>
     </div>
-  </div>
 </div>
 @endif
 
-{{-- Featured Projects Section --}}
-@if(isset($featuredProjects) && $featuredProjects->count() > 0)
-<div class="row mt-5">
-  <div class="col-12">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4>@lang('Featured Investment Projects')</h4>
-      <a href="{{ route('projects.index') }}" class="btn btn--sm btn--base">
-        @lang('View All Projects') <i class="las la-arrow-right"></i>
-      </a>
-    </div>
-  </div>
+@endsection
 
-  @foreach($featuredProjects as $project)
-  <div class="col-lg-4 col-md-6 mb-3">
-    <div class="card custom--card h-100">
-      <div class="card-header bg--base p-0">
-        <img src="{{ getImage(getFilePath('projectImage') . '/' . $project->image, getFileSize('projectImage')) }}"
-             alt="{{ __($project->name) }}"
-             class="w-100"
-             style="height: 150px; object-fit: cover;">
-        <span class="badge badge--success position-absolute top-0 end-0 m-2">
-          <i class="las la-star"></i> @lang('Featured')
-        </span>
-      </div>
-      <div class="card-body">
-        <h5 class="card-title mb-2">{{ __($project->name) }}</h5>
-        <p class="card-text text-muted small mb-3">{{ __(strLimit($project->description, 80)) }}</p>
-
-        <div class="row g-2 mb-3">
-          <div class="col-6">
-            <div class="bg--section p-2 rounded text-center">
-              <small class="d-block text-muted">@lang('Min')</small>
-              <strong>{{ showAmount($project->minimum_investment) }}</strong>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="bg--section p-2 rounded text-center">
-              <small class="d-block text-muted">@lang('Max')</small>
-              <strong>{{ showAmount($project->maximum_investment) }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <span class="badge badge--primary">
-            {{ $project->active_plans_count }} @lang('Plans')
-          </span>
-          <small class="text-muted">
-            {{ $project->days_to_init }} @lang('days to start')
-          </small>
-        </div>
-
-        <a href="{{ route('projects.show', $project->id) }}" class="btn btn--base w-100 btn--sm">
-          @lang('View Details') <i class="las la-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-  @endforeach
-</div>
-@endif
-
-@endsection @push('script')
+@push('script')
 <script>
 'use strict';
 (function($) {
-  @if($isHoliday)
-
-  function createCountDown(elementId, sec) {
-    var tms = sec;
-    var x = setInterval(function() {
-      var distance = tms * 1000;
-      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-      var days = `<span>${days}d</span>`;
-      var hours = `<span>${hours}h</span>`;
-      var minutes = `<span>${minutes}m</span>`;
-      var seconds = `<span>${seconds}s</span>`;
-      document.getElementById(elementId).innerHTML = days + ' ' + hours + " " + minutes +
-        " " + seconds;
-      if (distance < 0) {
-        clearInterval(x);
-        document.getElementById(elementId).innerHTML = "COMPLETE";
-      }
-      tms--;
-    }, 1000);
-  }
-
-  createCountDown('counter', {
-    {
-      abs(\Carbon\ Carbon::parse($nextWorkingDay) - > diffInSeconds())
+    @if($isHoliday)
+    function createCountDown(elementId, sec) {
+        var tms = sec;
+        var x = setInterval(function() {
+            var d = tms * 1000;
+            document.getElementById(elementId).innerHTML =
+                `<span>${Math.floor(d/(1000*60*60*24))}d</span> ` +
+                `<span>${Math.floor((d%(1000*60*60*24))/(1000*60*60))}h</span> ` +
+                `<span>${Math.floor((d%(1000*60*60))/(1000*60))}m</span> ` +
+                `<span>${Math.floor((d%(1000*60))/1000)}s</span>`;
+            if (d < 0) { clearInterval(x); document.getElementById(elementId).innerHTML = "COMPLETO"; }
+            tms--;
+        }, 1000);
     }
-  });
-  @endif
+    createCountDown('counter', {{ abs(\Carbon\Carbon::parse($nextWorkingDay)->diffInSeconds()) }});
+    @endif
 })(jQuery);
 </script>
 @endpush

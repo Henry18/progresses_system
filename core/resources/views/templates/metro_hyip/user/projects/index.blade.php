@@ -9,18 +9,18 @@
 
         /* Disclaimer Modal Styles */
         .disclaimer-modal .modal-content {
-            background: linear-gradient(135deg, #1a1754 0%, #0d0b2e 100%);
-            border: 1px solid rgba(90, 72, 224, 0.3);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 16px;
         }
 
         .disclaimer-modal .modal-header {
-            border-bottom: 1px solid rgba(90, 72, 224, 0.3);
+            border-bottom: 1px solid #e2e8f0;
             padding: 1.5rem;
         }
 
         .disclaimer-modal .modal-title {
-            color: #ffc107;
+            color: #1e40af;
             font-weight: 600;
         }
 
@@ -29,11 +29,11 @@
         }
 
         .disclaimer-modal .disclaimer-section {
-            background: rgba(90, 72, 224, 0.1);
+            background: rgba(37, 99, 235, 0.06);
             border-radius: 12px;
             padding: 1.25rem;
             margin-bottom: 1rem;
-            border-left: 4px solid #5a48e0;
+            border-left: 4px solid #2563eb;
         }
 
         .disclaimer-modal .disclaimer-section:last-child {
@@ -41,29 +41,25 @@
         }
 
         .disclaimer-modal .disclaimer-section h6 {
-            color: #5a48e0;
+            color: #2563eb;
             font-weight: 600;
             margin-bottom: 0.75rem;
         }
 
         .disclaimer-modal .disclaimer-section p {
-            color: rgba(255, 255, 255, 0.85);
+            color: #475569;
             margin-bottom: 0;
             line-height: 1.6;
         }
 
         .disclaimer-modal .modal-footer {
-            border-top: 1px solid rgba(90, 72, 224, 0.3);
+            border-top: 1px solid #e2e8f0;
             padding: 1rem 1.5rem;
         }
 
         .disclaimer-modal .form-check-label {
-            color: rgba(255, 255, 255, 0.8);
+            color: #64748b;
             cursor: pointer;
-        }
-
-        .disclaimer-modal .btn-close-white {
-            filter: invert(1) grayscale(100%) brightness(200%);
         }
     </style>
 

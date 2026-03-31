@@ -139,8 +139,8 @@
 
         .admin-answer {
             border-radius: 3px;
-            background-color: #0d0b32;
-            border: 1px solid #7d5203
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
         }
     </style>
 @endpush

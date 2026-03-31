@@ -11,7 +11,7 @@
     --heading-five: clamp(1.125rem, .3vw + 1rem, 1.25rem);
     --heading-six: 1rem;
     /* ========================= Color Variables Start =========================== */
-    --white: 0 0% 100%;
+    --white: 0 0% 27%;
     --light-h: 0;
     --light-s: 0%;
     --light-l: 78%;
@@ -23,8 +23,8 @@
     --heading-color: var(--white);
     --body-color: var(--light);
     --border-color: 0 0% 88%;
-    --body-background: 242 63% 12%;
-    --section-bg: 240 55% 17%;
+    --body-background: 214 100% 97%;
+    --section-bg: 0 0% 96%;
     /* ================================ Box Shadow Start =============================== */
     --header-box-shadow: 0px -1px 15px 3px hsl(var(--black) /.3);
     --mobile-box-shadow: 0px -1px 5px 0px hsl(var(--black) /.92);
@@ -758,7 +758,7 @@ p {
     font-family: var(--heading-font);
     font-weight: 700;
     letter-spacing: 2px;
-    color: hsl(var(--heading-color));
+    color: #FFF;
 }
 
 .section-heading__title {
@@ -1602,7 +1602,7 @@ button:focus {
     border: 0;
     background: var(--base-gradient);
     z-index: 1;
-    color: hsl(var(--white));
+    color: #FFF;
 }
 
 .btn--base.outline::after {
@@ -2699,7 +2699,7 @@ input[type=number] {
 }
 
 .custom--tab .nav-item .nav-link {
-    color: hsl(var(--white));
+    color: #FFF;
     padding: 6px 15px !important;
     background-color: hsl(var(--section-bg)/0.9) !important;
     border-radius: 5px;
@@ -2722,7 +2722,7 @@ input[type=number] {
 }
 
 .custom--tab .nav-item .nav-link.active {
-    color: hsl(var(--white));
+    color: #FFF;
     background: var(--base-gradient) !important;
 }
 
@@ -2988,7 +2988,7 @@ input[type=number] {
 
 @media (min-width: 992px) {
     .nav-menu .nav-item:hover .nav-link {
-        color: hsl(var(--white)) !important;
+        color: #FFF !important;
     }
 
     .nav-menu .nav-item:hover .nav-link::before {
@@ -3005,19 +3005,19 @@ input[type=number] {
     .nav-menu .nav-item .nav-link {
         font-weight: 700;
         font-size: 1.125rem;
-        color: hsl(var(--white)) !important;
+        color: #FFF !important;
         padding: 33px 0;
         position: relative;
         cursor: pointer;
     }
 
     .nav-menu .nav-item .nav-link.active {
-        color: hsl(var(--white)) !important;
+        color: #FFF !important;
     }
 
     .nav-menu .nav-item .nav-link.active::before {
         width: 100%;
-        background-color: hsl(var(--base));
+        background-color: #FFF;
     }
 
     .nav-menu .nav-item .nav-link:hover::before {
@@ -3274,7 +3274,7 @@ select option {
 }
 
 .login-registration-list__link {
-    color: hsl(var(--white));
+    color: #FFF;
     font-size: 16px;
     font-weight: 600;
     font-family: var(--heading-font);
@@ -4522,7 +4522,7 @@ select option {
 
 .search-form .btn--base:hover,
 .search-form .btn--base:focus {
-    color: hsl(var(--white));
+    color: #FFF;
     background-color: hsl(var(--base));
 }
 
@@ -5836,7 +5836,7 @@ body{overflow-x: hidden;}
 }
 
 .plan-card-select .select {
-    color: hsl(var(--white));
+    color: #FFF;
     background-color: hsl(var(--white)/0.2) !important;
     font-weight: 400;
     border-radius: 30px;
@@ -6085,7 +6085,7 @@ body{overflow-x: hidden;}
     font-size: 58px;
     font-family: var(--heading-font);
     font-weight: 700;
-    color: hsl(var(--white));
+    color: #FFF;
 }
 
 @media screen and (max-width: 991px) {

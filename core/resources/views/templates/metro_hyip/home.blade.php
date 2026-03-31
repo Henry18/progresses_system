@@ -37,7 +37,7 @@
 </span>
 <span class="banner-section__icon-four animated">
     <i class="las la-star"></i>
-</span> 
+</span>
 <span class="banner-section__icon-five animated">
     <i class="las la-star"></i>
 </span>
@@ -51,7 +51,7 @@
     <div class="row justify-content-center align-items-center">
         <div class="col-xl-5 col-md-7">
             <div class="banner-content">
-                <h2 class="banner-content__title">  {{ __(@$banner->data_values->heading) }}</h2>
+                <h2 class="banner-content__title" style="color: #FFF;">{{ __(@$banner->data_values->heading) }}</h2>
                 <p>{{ __(@$banner->data_values->sub_heading) }}</p>
                 <!--<div class="banner-content__buttons">
                     <a href="{{ @$banner->data_values->button_link }}" class="btn btn--base">
@@ -133,8 +133,8 @@
 </section>
 <!--========================== Banner Section End ==========================-->
 <style>
-    body{ overflow-x:hidden } 
-canvas{ display: block; vertical-align: bottom; } 
+    body{ overflow-x:hidden }
+canvas{ display: block; vertical-align: bottom; }
 #particles-js{ position:absolute; width: 100%; height: 100%; background-repeat: no-repeat; background-size: 20%; background-position: 50% 50%; z-index:9999999999}
 .city-scene {z-index: -10;}
 </style>
