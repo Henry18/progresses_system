@@ -14,9 +14,9 @@
 
     <link rel="stylesheet" href="{{ asset('assets/global/css/line-awesome.min.css') }}" />
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/main.css') }}?v1.0.1">
 
-    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}?v1.0.1">
 
     @stack('style-lib')
 
