@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="col-lg-6">
-                <div class="about-content">
+                <div class="about-content" style="box-shadow: 0px 2px 15px hsl(0deg 0% 0% / 60%);padding: 1rem;overflow: hidden;border-radius: 5%;margin-bottom: 5%;">
                     <div class="section-heading mb-2">
                         <span class="section-heading__subtitle"> {{ __(@$about->data_values->sub_heading) }} </span>
                         <h2 class="section-heading__title"> {{ __(@$about->data_values->heading) }} </h2>

@@ -441,7 +441,7 @@
                                                 <p class="mb-0">
                                                     <strong>@lang('Total Expected Profit'):</strong> {{ showAmount($totalEarnings) }}
                                                     @if($plan->capital_back == 1)
-                                                        + <span class="badge badge--success">@lang('Capital Return')</span>
+                                                        + <span class="badge badge--success">@lang('Capital back')</span>
                                                     @endif
                                                 </p>
                                             </div>
@@ -992,7 +992,6 @@
     .plan-description {
         font-size: 16px;
         line-height: 1.8;
-        color: #f8f9fa;
     }
 
     .plan-detail-item {
