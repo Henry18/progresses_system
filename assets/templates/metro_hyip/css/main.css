@@ -2935,7 +2935,7 @@ input[type=number] {
 }
 
 .header.fixed-header {
-    background-color: hsl(var(--section-bg));
+    background-color: hsl(222 17% 46%);
     position: fixed;
     transition: 0.3s linear;
     border-bottom: 1px solid hsl(var(--white)/.09);
@@ -2970,19 +2970,19 @@ input[type=number] {
 
     .nav-menu .nav-item {
         position: relative;
-        padding: 0 16px;
+        padding: 0 0.25rem;
     }
 }
 
 @media screen and (min-width: 992px) and (max-width: 1599px) {
     .nav-menu .nav-item {
-        padding: 0 10px;
+        padding: 0 0.25rem;
     }
 }
 
 @media screen and (min-width: 992px) and (max-width: 1199px) {
     .nav-menu .nav-item {
-        padding: 0 7px;
+        padding: 0 0.25rem;
     }
 }
 
@@ -5509,10 +5509,11 @@ body{overflow-x: hidden;}
 /* ================================ Testimonails Section Css End ============================= */
 /* ================================= Blog Section Css Start Here ================================= */
 .blog-item {
-    box-shadow: var(--box-shadow);
+    box-shadow: 0px 2px 15px hsl(0deg 0% 0% / 60%);;
     border-radius: 8px;
     overflow: hidden;
     height: 100%;
+    padding: 1rem;
 }
 
 .blog-item:hover .blog-item__thumb img {
@@ -6009,6 +6010,7 @@ body{overflow-x: hidden;}
     height: 100%;
     transition: all ease 0.2s;
     overflow: hidden;
+    box-shadow: 0px 2px 15px hsl(0deg 0% 0% / 60%);
 }
 
 .plan-item:hover {
@@ -6244,7 +6246,7 @@ body{overflow-x: hidden;}
 /*===== program item css===== */
 .program-item {
     padding: 30px;
-    background-color: hsl(var(--section-bg));
+    background-color: hsl(235 6% 67%);
     display: flex;
     flex-wrap: wrap;
     border-radius: 10px;

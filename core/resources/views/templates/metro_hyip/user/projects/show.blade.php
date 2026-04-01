@@ -33,14 +33,14 @@
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
-                                                <small class="d-block ">@lang('Minimum')</small>
+                                                <small class="d-block ">@lang('Minimum Amount')</small>
                                                 <h3 class="mb-0">{{ showAmount($project->minimum_investment) }}</h3>
                                             </div>
                                             <div class="text-center">
                                                 <i class="las la-arrows-alt-h fs-3"></i>
                                             </div>
                                             <div class="text-end">
-                                                <small class="d-block ">@lang('Maximum')</small>
+                                                <small class="d-block ">@lang('Maximum Amount')</small>
                                                 <h3 class="mb-0">{{ showAmount($project->maximum_investment) }}</h3>
                                             </div>
                                         </div>
