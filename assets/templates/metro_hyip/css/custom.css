@@ -1573,24 +1573,118 @@ label.required:after {
 }
 
 /* ============================================================
-   RESPONSIVE — content area padding
+   RESPONSIVE — comprehensive mobile adaptation
    ============================================================ */
-@media (max-width: 768px) {
-  .prgr-content-area {
-    padding: 20px 16px 40px;
-  }
-  .prgr-topnav__inner {
-    padding: 0 16px;
-  }
-  .prgr-page-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .prgr-topnav__user-info {
-    display: none;
-  }
+
+/* ── 992px: tablet landscape / desktop nav switches to hamburger ── */
+@media (max-width: 991px) {
+  /* Topnav */
+  .prgr-topnav__inner { padding: 0 16px; }
+  .prgr-topnav__user-info { display: none; }
+
+  /* Content */
+  .prgr-content-area { padding: 24px 20px 40px; }
+
+  /* Stats: collapse from 6 → 3 */
+  .prgr-stats-grid { grid-template-columns: repeat(3, 1fr); }
+
+  /* Cards inside Bootstrap grid */
+  .prgr-layout .card-body { overflow-x: auto; }
 }
 
-tbody tr td {
-  color: #6c757d !important;
+/* ── 768px: tablet portrait ── */
+@media (max-width: 768px) {
+  /* Content area */
+  .prgr-content-area { padding: 18px 14px 36px; }
+
+  /* Page header */
+  .prgr-page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .prgr-page-header__actions { width: 100%; }
+  .prgr-page-header__actions .btn { width: 100%; justify-content: center; }
+
+  /* Stats */
+  .prgr-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .prgr-stat-card { padding: 14px 12px; }
+
+  /* Two-col dashboard grid */
+  .prgr-two-col { grid-template-columns: 1fr; gap: 16px; }
+
+  /* Projects grid */
+  .prgr-projects-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+  /* Cards — smaller padding */
+  .prgr-card { border-radius: 10px; }
+  .prgr-card__header { padding: 14px 16px; }
+  .prgr-card__body { padding: 14px 16px; }
+
+  /* Bootstrap card body — allow inner table scroll */
+  .prgr-layout .card > .card-body { overflow-x: auto; }
+  .prgr-layout .card-body > table { display: block; width: 100%; overflow-x: auto; }
+
+  /* Deposit / Withdraw layout reorder: methods above, amount below */
+  .prgr-deposit-layout { grid-template-columns: 1fr !important; }
+  .prgr-deposit-methods { order: -1; }
+
+  /* Mobile menu: active link highlight */
+  .prgr-topnav__mobile ul li a.active { background: #eff6ff; color: #2563eb; font-weight: 600; }
+
+  /* Alerts */
+  .prgr-alert { flex-direction: column; gap: 10px; align-items: flex-start; }
+  .prgr-alert__action { align-self: flex-end; }
+
+  /* Section header */
+  .prgr-section-header { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
+
+/* ── table--responsive--lg mobile: fix row bg on light user area ── */
+@media screen and (max-width: 991px) {
+  .prgr-layout .table--responsive--lg tbody tr { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 10px; }
+  .prgr-layout .table--responsive--lg tbody tr:nth-child(odd) { background-color: #f8fafc; }
+  .prgr-layout .table--responsive--lg tbody tr:hover { transform: none; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  .prgr-layout .table--responsive--lg tbody tr td { border-bottom: 1px solid #f1f5f9; color: #374151; font-size: 13px; }
+  .prgr-layout .table--responsive--lg tbody tr td:last-child { border-bottom: none; }
+}
+
+/* ── 576px: large phone ── */
+@media (max-width: 576px) {
+  .prgr-content-area { padding: 14px 12px 32px; }
+
+  /* Stats: keep 2 cols */
+  .prgr-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .prgr-stat-card__label { font-size: 10px; }
+  .prgr-stat-card__value { font-size: 18px; }
+
+  /* Projects: 2 → 1 */
+  .prgr-projects-grid { grid-template-columns: 1fr; }
+
+  /* Topnav brand text truncate */
+  .prgr-topnav__logo-text { max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* Progress item header: let amount wrap if label is long */
+  .prgr-progress-item__header { flex-wrap: wrap; gap: 2px; }
+  .prgr-progress-item__header span:last-child { margin-left: auto; }
+
+  /* Trx row: compact */
+  .prgr-trx-row { gap: 8px; padding: 10px 0; }
+  .prgr-trx-row__amount { font-size: 13px; }
+  .prgr-trx-row__detail { font-size: 12px; }
+  .prgr-trx-row__date { font-size: 11px; }
+
+  /* Cards */
+  .prgr-card__header { padding: 12px 14px; }
+  .prgr-card__body { padding: 12px 14px; }
+
+  /* Wallet option compact */
+  .prgr-wallet-option { padding: 10px 12px; gap: 10px; }
+  .prgr-wallet-option__icon { width: 32px; height: 32px; font-size: 14px; flex-shrink: 0; }
+}
+
+/* ── 480px: small phone ── */
+@media (max-width: 480px) {
+  .prgr-stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .prgr-stat-card { padding: 12px 10px; }
+  .prgr-stat-card__value { font-size: 17px; }
+}
+
+/* ── Table body text ── */
+tbody tr td { color: #6c757d !important; }
