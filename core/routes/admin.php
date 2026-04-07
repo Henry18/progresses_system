@@ -91,6 +91,12 @@ Route::middleware('admin')->group(function () {
         Route::get('edit/{id}', 'edit')->name('edit');
     });
 
+    Route::controller('ProfitDistributionController')->name('distribution.')->prefix('distribution')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{id}', 'show')->name('show');
+        Route::post('plan/{planId}', 'store')->name('store');
+    });
+
     Route::controller('StakingPoolController')->group(function () {
         Route::name('staking.')->prefix('staking')->group(function () {
             Route::get('/', 'staking')->name('index');
